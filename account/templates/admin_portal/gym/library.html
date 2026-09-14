@@ -1,0 +1,109 @@
+{% extends 'admin_portal/_shell.html' %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}کتابخانه تمرین | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block admin_content %}
+<section class="admin-screen">
+    <header class="admin-screen__header">
+        <h1 class="admin-screen__title">{% trans 'کتابخانه تمرین' %}</h1>
+    </header>
+
+    <section class="admin-stat-grid" aria-label="{% trans 'خلاصه کتابخانه' %}">
+        <article>
+            <span>{% trans 'عضلات' %}</span>
+            <strong>{{ muscle_count }}</strong>
+        </article>
+        <article>
+            <span>{% trans 'حرکات تمرینی' %}</span>
+            <strong>{{ exercise_count }}</strong>
+        </article>
+        <article>
+            <span>{% trans 'حرکات اصلاحی' %}</span>
+            <strong>{{ corrective_count }}</strong>
+        </article>
+    </section>
+
+    <section class="admin-menu-list">
+        <a href="{% url 'register:admin_automatic_programming' %}" class="admin-menu-item">
+            <span>{% trans 'Automatic Programming' %}</span>
+            <span aria-hidden="true">‹</span>
+        </a>
+        <a href="{% url 'register:admin_muscle_list' %}" class="admin-menu-item">
+            <span>{% trans 'کتابخانه عضلات' %}</span>
+            <span aria-hidden="true">‹</span>
+        </a>
+        <a href="{% url 'register:admin_exercise_list' %}" class="admin-menu-item">
+            <span>{% trans 'کتابخانه حرکات تمرینی' %}</span>
+            <span aria-hidden="true">‹</span>
+        </a>
+        <a href="{% url 'register:admin_corrective_list' %}" class="admin-menu-item">
+            <span>{% trans 'کتابخانه حرکات اصلاحی' %}</span>
+            <span aria-hidden="true">‹</span>
+        </a>
+    </section>
+
+    <header class="admin-screen__header">
+        <h2 class="admin-screen__title admin-screen__title--sub">{% trans 'انواع و دسته‌بندی‌های حرکات' %}</h2>
+    </header>
+
+    <section class="admin-menu-list">
+        <a href="{% url 'register:admin_lookup_list' 'body-part' %}" class="admin-menu-item">
+            <span>{% trans 'بخش بدن' %}</span>
+            <span aria-hidden="true">‹</span>
+        </a>
+        <a href="{% url 'register:admin_lookup_list' 'movement-type' %}" class="admin-menu-item">
+            <span>{% trans 'نوع حرکت' %}</span>
+            <span aria-hidden="true">‹</span>
+        </a>
+        <a href="{% url 'register:admin_lookup_list' 'joint-type' %}" class="admin-menu-item">
+            <span>{% trans 'نوع مفصل' %}</span>
+            <span aria-hidden="true">‹</span>
+        </a>
+        <a href="{% url 'register:admin_lookup_list' 'power-type' %}" class="admin-menu-item">
+            <span>{% trans 'نوع قدرت' %}</span>
+            <span aria-hidden="true">‹</span>
+        </a>
+        <a href="{% url 'register:admin_lookup_list' 'difficulty-level' %}" class="admin-menu-item">
+            <span>{% trans 'سطح دشواری' %}</span>
+            <span aria-hidden="true">‹</span>
+        </a>
+        <a href="{% url 'register:admin_lookup_list' 'equipment-type' %}" class="admin-menu-item">
+            <span>{% trans 'تجهیزات' %}</span>
+            <span aria-hidden="true">‹</span>
+        </a>
+        <a href="{% url 'register:admin_lookup_list' 'execution-equipment-type' %}" class="admin-menu-item">
+            <span>{% trans 'نوع تجهیزات اجرایی' %}</span>
+            <span aria-hidden="true">‹</span>
+        </a>
+        <a href="{% url 'register:admin_lookup_list' 'secondary-movement-type' %}" class="admin-menu-item">
+            <span>{% trans 'نوع حرکت دوم' %}</span>
+            <span aria-hidden="true">‹</span>
+        </a>
+        <a href="{% url 'register:admin_lookup_list' 'abnormality-type' %}" class="admin-menu-item">
+            <span>{% trans 'ناهنجاری' %}</span>
+            <span aria-hidden="true">‹</span>
+        </a>
+        <a href="{% url 'register:admin_lookup_list' 'pressure-type' %}" class="admin-menu-item">
+            <span>{% trans 'نوع فشار' %}</span>
+            <span aria-hidden="true">‹</span>
+        </a>
+        <a href="{% url 'register:admin_lookup_list' 'sport-type' %}" class="admin-menu-item">
+            <span>{% trans 'نوع ورزش' %}</span>
+            <span aria-hidden="true">‹</span>
+        </a>
+        <a href="{% url 'register:admin_lookup_list' 'set-type' %}" class="admin-menu-item">
+            <span>{% trans 'نوع ست' %}</span>
+            <span aria-hidden="true">‹</span>
+        </a>
+        <a href="{% url 'register:admin_lookup_list' 'repetition-type' %}" class="admin-menu-item">
+            <span>{% trans 'نوع تکرار' %}</span>
+            <span aria-hidden="true">‹</span>
+        </a>
+        <a href="{% url 'register:admin_lookup_list' 'rest-type' %}" class="admin-menu-item">
+            <span>{% trans 'نوع استراحت' %}</span>
+            <span aria-hidden="true">‹</span>
+        </a>
+    </section>
+</section>
+{% endblock %}

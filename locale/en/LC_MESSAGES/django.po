@@ -1,0 +1,2689 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: EgoFit 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-06-23 00:00+0330\n"
+"PO-Revision-Date: 2026-06-23 00:00+0330\n"
+"Last-Translator: EgoFit\n"
+"Language-Team: EgoFit\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "آرشیو دوره‌ها"
+msgstr "Course Archive"
+
+msgid "مسیر یادگیری‌ات را با یک آرشیو تمیز و حرفه‌ای انتخاب کن"
+msgstr "Choose your learning path from a clean, professional archive"
+
+msgid ""
+"دوره‌های رایگان و پولی را با فیلترهای سریع، کارت‌های خوانا و نمایی مدرن‌تر "
+"مرور کن تا انتخاب نهایی سریع‌تر و دقیق‌تر انجام شود."
+msgstr ""
+"Browse free and paid courses with quick filters, readable cards, and a more "
+"modern view for a faster, more accurate choice."
+
+msgid "مشاهده دوره‌ها"
+msgstr "View Courses"
+
+msgid "فیلترها"
+msgstr "Filters"
+
+msgid "نتیجه فعلی"
+msgstr "Current Results"
+
+msgid "رایگان"
+msgstr "Free"
+
+msgid "پولی"
+msgstr "Paid"
+
+msgid "فیلترهای زنده و انتخاب سریع"
+msgstr "Live filters and quick selection"
+
+msgid "کارت‌های خوانا با تمرکز روی تصمیم خرید"
+msgstr "Readable cards focused on the purchase decision"
+
+msgid "چیدمان مناسب موبایل و دسکتاپ"
+msgstr "Layout suited for mobile and desktop"
+
+msgid "نوع دوره"
+msgstr "Course Type"
+
+msgid "تفکیک سریع رایگان و پولی"
+msgstr "Quick split between free and paid"
+
+msgid "شروع سریع بدون پرداخت"
+msgstr "Quick start, no payment"
+
+msgid "فقط پولی"
+msgstr "Paid only"
+
+msgid "مناسب دوره‌های کامل‌تر"
+msgstr "Suited for more complete courses"
+
+msgid "دسته‌بندی دوره"
+msgstr "Course Category"
+
+msgid "مرور بر اساس موضوع"
+msgstr "Browse by topic"
+
+msgid "اعمال فیلتر"
+msgstr "Apply Filter"
+
+msgid "پاک کردن فیلترها"
+msgstr "Clear Filters"
+
+msgid "نتایج دوره‌ها"
+msgstr "Course Results"
+
+msgid ""
+"نمای آرشیو به‌صورت بهینه‌شده برای تصمیم سریع‌تر، مقایسه ساده‌تر و اسکن بصری "
+"بهتر طراحی شده است."
+msgstr ""
+"The archive view is optimized for faster decisions, easier comparison, and "
+"better visual scanning."
+
+msgid "فقط رایگان"
+msgstr "Free only"
+
+msgid "بدون فیلتر"
+msgstr "No filter"
+
+msgid "فیلتر دوره‌ها"
+msgstr "Filter Courses"
+
+msgid "صفحه پیدا نشد"
+msgstr "Page Not Found"
+
+msgid "ایگوفیت"
+msgstr "EgoFit"
+
+msgid "خطای ۴۰۴"
+msgstr "Error 404"
+
+msgid "این صفحه در مسیر فعلی پیدا نشد"
+msgstr "This page could not be found at the current path"
+
+msgid ""
+"ممکن است آدرس اشتباه وارد شده باشد، صفحه جابه‌جا شده باشد یا دسترسی آن دیگر "
+"از این مسیر ممکن نباشد. از مسیرهای اصلی سایت ادامه دهید."
+msgstr ""
+"The address may be incorrect, the page may have moved, or it may no longer "
+"be accessible from this path. Continue from the site's main sections."
+
+msgid "بازگشت به صفحه اصلی"
+msgstr "Back to Home"
+
+msgid "مسیر یادگیری"
+msgstr "Learning Path"
+
+msgid "بلاگ آموزشی"
+msgstr "Educational Blog"
+
+msgid "آموزش حرفه‌ای و ساختارمند"
+msgstr "Professional, structured education"
+
+msgid "مسیر یادگیری حرفه‌ای، سریع و ساختارمند"
+msgstr "A professional, fast, and structured learning path"
+
+msgid ""
+"دوره‌ها، مقالات و مسیرهای آموزشی با تجربه کاربری مدرن و دسترسی سریع‌تر آماده"
+" شده‌اند."
+msgstr ""
+"Courses, articles, and learning paths are ready with a modern user "
+"experience and faster access."
+
+msgid "درخواست مشاوره"
+msgstr "Request Consultation"
+
+msgid "مزیت‌های مسیر آموزشی"
+msgstr "Benefits of the learning path"
+
+msgid "سیستم یادگیری"
+msgstr "Learning System"
+
+msgid "تجربه یکپارچه آموزش"
+msgstr "An integrated learning experience"
+
+msgid "دسترسی سریع به دوره‌ها، مقالات و مسیرهای پیشنهادی با ساختار شفاف‌تر."
+msgstr ""
+"Quick access to courses, articles, and suggested paths with a clearer "
+"structure."
+
+msgid "دوره فعال"
+msgstr "Active Courses"
+
+msgid "دوره تکمیل‌شده"
+msgstr "Completed Courses"
+
+msgid "محتوای آموزشی"
+msgstr "Educational Content"
+
+msgid "دوره‌های منتخب"
+msgstr "Featured Courses"
+
+msgid "آخرین دوره‌های منتشر شده"
+msgstr "Latest Published Courses"
+
+msgid ""
+"منتخب دوره‌ها با ارائه‌ای شفاف‌تر، کارت‌های مدرن‌تر و دسترسی سریع‌تر به "
+"جزئیات."
+msgstr ""
+"Featured courses with clearer presentation, more modern cards, and faster "
+"access to details."
+
+msgid "مشاهده همه دوره‌ها"
+msgstr "View All Courses"
+
+msgid "مسیر مشاوره"
+msgstr "Consultation Path"
+
+msgid "شروع مسیر مشاوره"
+msgstr "Start Consultation Path"
+
+msgid "آخرین نوشته‌های آموزشی"
+msgstr "Latest Educational Posts"
+
+msgid "مطالب آموزشی با چیدمان خواناتر و تجربه مطالعه بهتر."
+msgstr ""
+"Educational content with a more readable layout and a better reading "
+"experience."
+
+msgid "مشاهده مقالات"
+msgstr "View Articles"
+
+msgid "رفتن به محتوای اصلی"
+msgstr "Skip to main content"
+
+msgid "تماس با ما"
+msgstr "Contact Us"
+
+msgid "ارتباط سریع، شفاف و قابل پیگیری"
+msgstr "Fast, transparent, and traceable communication"
+
+msgid ""
+"برای انتخاب مسیر آموزشی، پشتیبانی خرید، همکاری یا مشاوره تخصصی پیام بگذارید."
+" پیام‌ها ساختارمند ثبت می‌شوند تا تیم بتواند دقیق‌تر پاسخ دهد."
+msgstr ""
+"Leave a message to choose a learning path, get purchase support, "
+"collaborate, or request specialized consultation. Messages are recorded in a"
+" structured way so the team can respond more accurately."
+
+msgid "پشتیبانی حرفه‌ای"
+msgstr "Professional Support"
+
+msgid "فرآیند ارتباطی تمیز، سریع و قابل اتکا"
+msgstr "A clean, fast, and reliable communication process"
+
+msgid "پاسخ‌گویی در ساعات کاری"
+msgstr "Responses during working hours"
+
+msgid "ثبت امن درخواست"
+msgstr "Secure request submission"
+
+msgid "مناسب پشتیبانی و مشاوره"
+msgstr "Suited for support and consultation"
+
+msgid "شماره تماس"
+msgstr "Phone Number"
+
+msgid "شماره تماس هنوز ثبت نشده است."
+msgstr "A phone number has not been registered yet."
+
+msgid "ساعات کاری"
+msgstr "Working Hours"
+
+msgid "در حال بروزرسانی"
+msgstr "Updating soon"
+
+msgid "آدرس"
+msgstr "Address"
+
+msgid "آدرس هنوز ثبت نشده است."
+msgstr "An address has not been registered yet."
+
+msgid "شبکه‌های اجتماعی"
+msgstr "Social Media"
+
+msgid "کانال‌های رسمی"
+msgstr "Official Channels"
+
+msgid "تلگرام"
+msgstr "Telegram"
+
+msgid "یوتیوب"
+msgstr "YouTube"
+
+msgid "درخواست"
+msgstr "Request"
+
+msgid "ارسال پیام"
+msgstr "Send Message"
+
+msgid "فیلدها را دقیق پر کنید تا پاسخ‌گویی سریع‌تر انجام شود."
+msgstr "Fill in the fields accurately for a faster response."
+
+msgid "نام و نام خانوادگی"
+msgstr "Full Name"
+
+msgid "ایمیل"
+msgstr "Email"
+
+msgid "متن پیام"
+msgstr "Message Text"
+
+msgid "مقالات آموزشی"
+msgstr "Educational Articles"
+
+msgid "کتابخانه محتوای آموزشی"
+msgstr "Educational Content Library"
+
+msgid ""
+"مطالب آموزشی با ساختاری یکدست، تجربه‌ی مطالعه بهتر و دسترسی سریع‌تر به "
+"موضوعات تخصصی."
+msgstr ""
+"Educational content with a consistent structure, a better reading "
+"experience, and faster access to specialized topics."
+
+msgid "جستجوی مقاله"
+msgstr "Search Articles"
+
+msgid "عنوان مقاله"
+msgstr "Article Title"
+
+msgid "دسته بندی مقالات"
+msgstr "Article Categories"
+
+msgid "هنوز مقاله‌ای برای نمایش ثبت نشده است."
+msgstr "No articles have been published yet."
+
+msgid "فیلتر مقالات"
+msgstr "Filter Articles"
+
+msgid "درباره ما"
+msgstr "About Us"
+
+msgid "داستان شکل‌گیری ایگوفیت"
+msgstr "The story of how EgoFit was founded"
+
+msgid "آموزش ساختارمند و تجربه‌ای حرفه‌ای برای رشد واقعی"
+msgstr "Structured education and a professional experience for real growth"
+
+msgid "فعالیت‌های ما"
+msgstr "Our Activities"
+
+msgid "بخشی از فعالیت‌های تیم"
+msgstr "Some of the team's activities"
+
+msgid ""
+"نمایی شفاف‌تر از کارهایی که برای ساخت یک اکوسیستم آموزشی حرفه‌ای انجام "
+"می‌دهیم."
+msgstr ""
+"A clearer view of what we do to build a professional educational ecosystem."
+
+msgid "فعالیت"
+msgstr "Activity"
+
+msgid "جامعه و مسیر رشد"
+msgstr "Community and Growth Path"
+
+msgid "نگاه ما به جامعه آموزشی"
+msgstr "Our view of the educational community"
+
+msgid "هنوز مقاله‌ای برای نمایش وجود ندارد"
+msgstr "No articles to display yet"
+
+msgid "پس از انتشار مقالات جدید، این بخش به‌روزرسانی می‌شود."
+msgstr "This section will update once new articles are published."
+
+msgid "تکمیل شده"
+msgstr "Completed"
+
+msgid "تکمیل نشده"
+msgstr "Not Completed"
+
+msgid "بخش"
+msgstr "parts"
+
+msgid "مدرس دوره"
+msgstr "Course Instructor"
+
+msgid "تومان"
+msgstr "Toman"
+
+msgid "مشاهده دوره"
+msgstr "View Course"
+
+msgid "هنوز دوره‌ای برای نمایش وجود ندارد"
+msgstr "No courses to display yet"
+
+msgid "به‌زودی مجموعه دوره‌ها در این بخش نمایش داده می‌شود."
+msgstr "The course collection will be displayed in this section soon."
+
+msgid "تغییر زبان"
+msgstr "Change language"
+
+msgid "تغییر زبان به فارسی"
+msgstr "Switch language to Persian"
+
+msgid "تغییر زبان به انگلیسی"
+msgstr "Switch language to English"
+
+msgid "فارسی"
+msgstr "Persian"
+
+msgid "انگلیسی"
+msgstr "English"
+
+msgid "منو سایت"
+msgstr "Site Menu"
+
+msgid "باز کردن منو"
+msgstr "Open menu"
+
+msgid "آکادمی"
+msgstr "Academy"
+
+msgid "لوگوی ایگوفیت"
+msgstr "EgoFit logo"
+
+msgid "دسته بندی آموزش‌ها"
+msgstr "Course Categories"
+
+msgid "دسته بندی بلاگ‌ها"
+msgstr "Blog Categories"
+
+msgid "تغییر حالت تاریک"
+msgstr "Toggle dark mode"
+
+msgid "سبد خرید"
+msgstr "Cart"
+
+msgid "پنل ادمین"
+msgstr "Admin Panel"
+
+msgid "پنل کاربری"
+msgstr "User Panel"
+
+msgid "ثبت نام یا ورود"
+msgstr "Sign Up or Log In"
+
+msgid "ورود به پنل ادمین"
+msgstr "Go to Admin Panel"
+
+msgid "مشاهده پروفایل"
+msgstr "View Profile"
+
+msgid "دوره‌ها"
+msgstr "Courses"
+
+msgid "مالی و پرداخت‌ها"
+msgstr "Finance & Payments"
+
+msgid "دیدگاه‌ها"
+msgstr "Comments"
+
+msgid "اعلان‌ها"
+msgstr "Notifications"
+
+msgid "تغییر رمز عبور"
+msgstr "Change Password"
+
+msgid "خروج از حساب"
+msgstr "Log Out"
+
+msgid "جستجو در دوره‌ها و مقالات"
+msgstr "Search courses and articles"
+
+msgid "جستجو در دوره‌ها و مقالات..."
+msgstr "Search courses and articles..."
+
+msgid "جستجو"
+msgstr "Search"
+
+msgid "پنل کاربر"
+msgstr "User Panel"
+
+msgid "ورود به پنل کاربر"
+msgstr "Go to User Panel"
+
+msgid "مسیر یادگیری حرفه‌ای با تجربه‌ای روان‌تر و مدرن‌تر"
+msgstr "A professional learning path with a smoother, more modern experience"
+
+msgid "بستن منو"
+msgstr "Close menu"
+
+msgid "جستجو در سایت"
+msgstr "Search the site"
+
+msgid "زبان سایت"
+msgstr "Site Language"
+
+msgid "تم تاریک"
+msgstr "Dark Mode"
+
+msgid "روشن"
+msgstr "Light"
+
+msgid "تاریک"
+msgstr "Dark"
+
+msgid "به پنل ادمین دسترسی سریع دارید"
+msgstr "You have quick access to the admin panel"
+
+msgid "به پنل کاربری خود دسترسی سریع دارید"
+msgstr "You have quick access to your user panel"
+
+msgid "پروفایل"
+msgstr "Profile"
+
+msgid "خروج"
+msgstr "Log Out"
+
+msgid "بازگشت به بالای صفحه"
+msgstr "Back to top"
+
+msgid "درباره مجموعه"
+msgstr "About the Organization"
+
+msgid "تجربه‌ای حرفه‌ای برای یادگیری ساختارمند"
+msgstr "A professional experience for structured learning"
+
+msgid "لینک‌های مفید"
+msgstr "Useful Links"
+
+msgid "نماد اعتماد محلی"
+msgstr "Local trust seal"
+
+msgid ""
+"این وب‌سایت دارای نماد اعتماد الکترونیکی بوده و فرآیند خرید و ثبت‌نام با "
+"ساختاری امن و استاندارد ارائه می‌شود."
+msgstr ""
+"This website holds an electronic trust seal, and the purchase and "
+"registration process follows a secure, standard structure."
+
+msgid "کلیه حقوق محفوظ است"
+msgstr "All rights reserved"
+
+msgid "طراحی مجدد رابط کاربری با تمرکز بر وضوح، سرعت و تجربه کاربری بهتر"
+msgstr ""
+"Interface redesigned with a focus on clarity, speed, and a better user "
+"experience"
+
+msgid "این صفحه پیدا نشد"
+msgstr "This page was not found"
+
+msgid ""
+"ممکن است آدرس اشتباه وارد شده باشد، صفحه جابه‌جا شده باشد یا دسترسی آن دیگر "
+"فعال نباشد."
+msgstr ""
+"The address may be incorrect, the page may have moved, or it may no longer "
+"be active."
+
+msgid "درخواست معتبر نیست"
+msgstr "Invalid request"
+
+msgid ""
+"درخواست شما به‌درستی پردازش نشد. لطفاً صفحه را دوباره بارگذاری کنید و مجدداً"
+" تلاش کنید."
+msgstr ""
+"Your request could not be processed correctly. Please reload the page and "
+"try again."
+
+msgid "خطای ۴۰۰"
+msgstr "Error 400"
+
+msgid "دسترسی غیرمجاز"
+msgstr "Unauthorized Access"
+
+msgid ""
+"شما اجازه دسترسی به این بخش را ندارید یا باید دوباره وارد حساب خود شوید."
+msgstr ""
+"You don't have permission to access this section, or you need to log in "
+"again."
+
+msgid "خطای ۴۰۳"
+msgstr "Error 403"
+
+msgid "خطای داخلی سرور"
+msgstr "Internal Server Error"
+
+msgid "در پردازش درخواست مشکلی رخ داد. تیم فنی از این خطا مطلع شده است."
+msgstr ""
+"Something went wrong while processing the request. The technical team has "
+"been notified."
+
+msgid "خطای ۵۰۰"
+msgstr "Error 500"
+
+msgid "متن پاسخ معتبر نیست."
+msgstr "The reply text is invalid."
+
+msgid "شناسه دیدگاه معتبر نیست."
+msgstr "The comment ID is invalid."
+
+msgid "پاسخ شما ثبت شد و بعد از بررسی نمایش داده می‌شود."
+msgstr "Your reply has been submitted and will be shown after review."
+
+msgid "متن دیدگاه معتبر نیست."
+msgstr "The comment text is invalid."
+
+msgid "دیدگاه شما ثبت شد و بعد از بررسی نمایش داده می‌شود."
+msgstr "Your comment has been submitted and will be shown after review."
+
+msgid "پیام شما با موفقیت ارسال شد!"
+msgstr "Your message was sent successfully!"
+
+msgid "خطا در ارسال پیام، لطفا دوباره تلاش کنید."
+msgstr "There was an error sending your message. Please try again."
+
+msgid "نام باید حداقل ۳ کاراکتر باشد."
+msgstr "Name must be at least 3 characters."
+
+msgid "متن پیام باید حداقل ۱۰ کاراکتر باشد."
+msgstr "Message text must be at least 10 characters."
+
+msgid "شماره تماس معتبر نیست."
+msgstr "The phone number is invalid."
+
+msgid "متن دیدگاه باید حداقل ۵ کاراکتر باشد."
+msgstr "Comment text must be at least 5 characters."
+
+msgid "متن پاسخ باید حداقل ۳ کاراکتر باشد."
+msgstr "Reply text must be at least 3 characters."
+
+msgid "دیدگاه والد معتبر نیست."
+msgstr "The parent comment is invalid."
+
+msgid ""
+"نتیجه‌ای برای فیلترهای انتخاب شده پیدا نشد، لطفاً گزینه‌های دیگری امتحان "
+"کنید."
+msgstr "No results found for the selected filters. Please try other options."
+
+msgid ""
+"هیچ مقاله‌ای برای فیلترهای انتخاب شده پیدا نشد، لطفاً گزینه‌های دیگری را "
+"امتحان کنید."
+msgstr "No articles found for the selected filters. Please try other options."
+
+msgid "زمان مطالعه %(reading_time)s دقیقه"
+msgstr "Reading time: %(reading_time)s minutes"
+
+msgid "%(course_count)s دوره برای نمایش آماده است"
+msgstr "%(course_count)s courses ready to display"
+
+msgid "شماره تلفن باید 11 رقم باشد."
+msgstr "Phone number must be 11 digits."
+
+msgid "لطفا کد 5 رقمی وارد کنید."
+msgstr "Please enter the 5-digit code."
+
+msgid "لطفا یک شماره تماس 11 رقمی وارد کنید."
+msgstr "Please enter an 11-digit phone number."
+
+msgid "لطفا نام کاربری خود را وارد کنید."
+msgstr "Please enter your username."
+
+msgid "نام کاربری باید فقط شامل حروف و اعداد باشد."
+msgstr "Username must contain only letters and numbers."
+
+msgid "رمز عبور باید حداقل 8 کاراکتر داشته باشد."
+msgstr "Password must be at least 8 characters."
+
+msgid "رمز عبور باید شامل حرف کوچک، حرف بزرگ و عدد باشد."
+msgstr ""
+"Password must include a lowercase letter, an uppercase letter, and a number."
+
+msgid "شماره تلفن خود را وارد کنید"
+msgstr "Enter your phone number"
+
+msgid "کد را وارد کنید"
+msgstr "Enter the code"
+
+msgid "لطفا کد 5 رقمی وارد کنید"
+msgstr "Please enter the 5-digit code"
+
+msgid "لطفا ایمیل خود را وارد کنید."
+msgstr "Please enter your email."
+
+msgid "این ایمیل قبلا توسط کاربر دیگری ثبت شده است."
+msgstr "This email is already registered by another user."
+
+msgid "لطفا شماره تماس جدید را وارد کنید."
+msgstr "Please enter your new phone number."
+
+msgid "فرمت شماره تماس نامعتبر است."
+msgstr "Invalid phone number format."
+
+msgid "این شماره تماس قبلا ثبت شده است."
+msgstr "This phone number is already registered."
+
+msgid "وزن"
+msgstr "Weight"
+
+msgid "وزن خود را وارد کنید"
+msgstr "Enter your weight"
+
+msgid "قد"
+msgstr "Height"
+
+msgid "قد خود را وارد کنید"
+msgstr "Enter your height"
+
+msgid "تاریخ تولد"
+msgstr "Date of birth"
+
+msgid "لطفا تاریخ را با فرمت 1368/05/23 وارد کنید."
+msgstr "Please enter the date in the format 1368/05/23."
+
+msgid "گروه خونی"
+msgstr "Blood type"
+
+msgid "در صورت وجود درد یا آسیب، توضیح دهید"
+msgstr "Describe any pain or injury, if applicable"
+
+msgid "بیماری زمینه‌ای (اختیاری)"
+msgstr "Underlying medical condition (optional)"
+
+msgid "محدودیت‌های غذایی (اختیاری)"
+msgstr "Dietary restrictions (optional)"
+
+msgid "حداقل یکی از برنامه غذایی یا برنامه تمرینی را انتخاب کنید."
+msgstr "Select at least one of diet plan or workout plan."
+
+msgid "شماره تماس ثبت‌شده در حساب"
+msgstr "The phone number registered on your account"
+
+msgid "لطفا یک شماره تماس ۱۱ رقمی وارد کنید."
+msgstr "Please enter an 11-digit phone number."
+
+msgid "حسابی با این شماره تماس پیدا نشد."
+msgstr "No account was found with this phone number."
+
+msgid "کد تایید"
+msgstr "Verification code"
+
+msgid "کد پنج رقمی"
+msgstr "Five-digit code"
+
+msgid "لطفا کد ۵ رقمی وارد کنید."
+msgstr "Please enter the 5-digit code."
+
+msgid "رمز عبور جدید"
+msgstr "New password"
+
+msgid "رمز عبور باید حداقل ۸ کاراکتر باشد."
+msgstr "Password must be at least 8 characters."
+
+msgid "تکرار رمز عبور جدید"
+msgstr "Repeat new password"
+
+msgid "رمز عبور جدید و تکرار آن یکسان نیستند."
+msgstr "The new password and its confirmation do not match."
+
+msgid "رمز عبور"
+msgstr "Password"
+
+msgid "تایید رمز عبور"
+msgstr "Confirm password"
+
+msgid "شماره تلفن"
+msgstr "Phone Number"
+
+msgid "نام کاربری نمی‌تواند خالی باشد."
+msgstr "Username cannot be empty."
+
+msgid "نام و نام خانوادگی باید فقط شامل حروف، اعداد و فاصله باشد."
+msgstr "Full name must contain only letters, numbers, and spaces."
+
+msgid "این نام و نام خانوادگی قبلا ثبت شده است."
+msgstr "This full name is already registered."
+
+msgid "کلمه عبور فعلی"
+msgstr "Current password"
+
+msgid "لطفا کلمه عبور فعلی خود را وارد کنید"
+msgstr "Please enter your current password"
+
+msgid "کلمه عبور جدید"
+msgstr "New password"
+
+msgid "لطفا کلمه عبور جدید خود را وارد کنید"
+msgstr "Please enter your new password"
+
+msgid "کلمه عبور باید حداقل 8 کاراکتر داشته باشد"
+msgstr "Password must be at least 8 characters"
+
+msgid "کلمه عبور باید حداقل یک حرف کوچک، یک حرف بزرگ و یک عدد داشته باشد"
+msgstr ""
+"Password must include at least one lowercase letter, one uppercase letter, "
+"and one number"
+
+msgid "تکرار کلمه عبور جدید"
+msgstr "Repeat new password"
+
+msgid "لطفا تکرار کلمه عبور جدید خود را وارد کنید"
+msgstr "Please enter your new password again"
+
+msgid "تکرار کلمه عبور باید حداقل 8 کاراکتر داشته باشد"
+msgstr "Password confirmation must be at least 8 characters"
+
+msgid ""
+"تکرار کلمه عبور باید حداقل یک حرف کوچک، یک حرف بزرگ و یک عدد داشته باشد"
+msgstr ""
+"Password confirmation must include at least one lowercase letter, one "
+"uppercase letter, and one number"
+
+msgid "کلمه عبور جدید و تکرار آن یکسان نیستند"
+msgstr "The new password and its confirmation do not match"
+
+msgid "نام کاربری"
+msgstr "Username"
+
+msgid "نام یا شماره همراه کاربر را وارد کنید"
+msgstr "Enter the user's name or mobile number"
+
+msgid "نام"
+msgstr "Name"
+
+msgid "نام نمایشی در تابلوی امتیازات"
+msgstr "Display name on the leaderboard"
+
+msgid "قد به سانتی‌متر"
+msgstr "Height in centimeters"
+
+msgid "وزن به کیلوگرم"
+msgstr "Weight in kilograms"
+
+msgid "تاریخ تولد (فرمت: سال/ماه/روز)"
+msgstr "Date of birth (format: year/month/day)"
+
+msgid "سن"
+msgstr "Age"
+
+msgid "بدون مربی"
+msgstr "No coach"
+
+msgid "مثلاً: برنامه تمرینی هفته ۱"
+msgstr "e.g., Week 1 workout plan"
+
+msgid "نقش ادمین"
+msgstr "Admin role"
+
+msgid "نام را وارد کنید"
+msgstr "Enter the name"
+
+msgid "نام عضله"
+msgstr "Muscle name"
+
+msgid "نام حرکت"
+msgstr "Exercise name"
+
+msgid "بدون عضله فرعی"
+msgstr "No secondary muscle"
+
+msgid "ورود با شماره تماس | ایگوفیت"
+msgstr "Login with phone number | EgoFit"
+
+msgid "ورود سریع"
+msgstr "Quick login"
+
+msgid "ورود به حساب کاربری"
+msgstr "Log in to your account"
+
+msgid "شماره موبایل خود را وارد کنید تا کد تایید برای شما ارسال شود."
+msgstr "Enter your mobile number to receive a verification code."
+
+msgid "شماره موبایل"
+msgstr "Mobile number"
+
+msgid "دریافت کد تایید"
+msgstr "Get verification code"
+
+msgid "مسیرهای جایگزین ورود"
+msgstr "Alternative login options"
+
+msgid "ورود با رمز عبور"
+msgstr "Login with password"
+
+msgid "ثبت‌نام با رمز عبور"
+msgstr "Sign up with password"
+
+msgid "ورود به حساب | ایگوفیت"
+msgstr "Login | EgoFit"
+
+msgid "نام کاربری و رمز عبور خود را وارد کنید."
+msgstr "Enter your username and password."
+
+msgid "ورود"
+msgstr "Login"
+
+msgid "مسیرهای کمکی ورود"
+msgstr "Helpful login links"
+
+msgid "رمز عبور را فراموش کرده‌ام"
+msgstr "I forgot my password"
+
+msgid "ورود با شماره تماس"
+msgstr "Login with phone number"
+
+msgid "ثبت‌نام با رمز عبور | ایگوفیت"
+msgstr "Sign up with password | EgoFit"
+
+msgid "ایجاد حساب"
+msgstr "Create account"
+
+msgid "نام، شماره تماس و رمز عبور را وارد کنید."
+msgstr "Enter your name, phone number, and password."
+
+msgid "مسیرهای کمکی ثبت‌نام"
+msgstr "Helpful sign-up links"
+
+msgid "تایید کد ورود | ایگوفیت"
+msgstr "Verify login code | EgoFit"
+
+msgid "بازگشت به ورود"
+msgstr "Back to login"
+
+msgid "تایید هویت"
+msgstr "Identity verification"
+
+msgid "کد تایید را وارد کنید"
+msgstr "Enter the verification code"
+
+msgid "کد ۵ رقمی به شماره"
+msgstr "A 5-digit code for the number"
+
+msgid "ارسال شد."
+msgstr "was sent."
+
+msgid "ویرایش شماره"
+msgstr "Edit number"
+
+msgid "کد ارسال‌شده به شماره موبایل خود را وارد کنید."
+msgstr "Enter the code sent to your mobile number."
+
+msgid "اعتبار کد:"
+msgstr "Code valid for:"
+
+msgid "ارسال مجدد تا"
+msgstr "Resend in"
+
+msgid "دریافت مجدد کد"
+msgstr "Resend code"
+
+msgid "تایید و ادامه"
+msgstr "Verify and continue"
+
+msgid "بازیابی رمز عبور | ایگوفیت"
+msgstr "Password recovery | EgoFit"
+
+msgid "بازیابی حساب"
+msgstr "Account recovery"
+
+msgid "بازیابی رمز عبور"
+msgstr "Password recovery"
+
+msgid "شماره تماس ثبت‌شده را وارد کنید تا کد تایید ارسال شود."
+msgstr "Enter your registered phone number to receive a verification code."
+
+msgid "ارسال کد بازیابی"
+msgstr "Send recovery code"
+
+msgid "تنظیم رمز عبور جدید | ایگوفیت"
+msgstr "Set new password | EgoFit"
+
+msgid "تنظیم رمز جدید"
+msgstr "Set new password"
+
+msgid "کد تایید و رمز عبور جدید را ثبت کنید."
+msgstr "Enter the verification code and your new password."
+
+msgid "ثبت رمز جدید"
+msgstr "Save new password"
+
+msgid "ویرایش شماره تماس | ایگوفیت"
+msgstr "Edit phone number | EgoFit"
+
+msgid "شماره تماس جدید"
+msgstr "New phone number"
+
+msgid "ارسال کد تایید"
+msgstr "Send verification code"
+
+msgid "تایید شماره جدید | ایگوفیت"
+msgstr "Verify new number | EgoFit"
+
+msgid "تایید و ثبت شماره"
+msgstr "Verify and save number"
+
+msgid "تغییر رمز عبور | ایگوفیت"
+msgstr "Change password | EgoFit"
+
+msgid "رمز عبور فعلی"
+msgstr "Current password"
+
+msgid "به‌روزرسانی رمز عبور"
+msgstr "Update password"
+
+msgid "وزنتون رو به کیلوگرم وارد کنید."
+msgstr "Enter your weight in kilograms."
+
+msgid "قدتون رو به سانتی متر وارد کنید."
+msgstr "Enter your height in centimeters."
+
+msgid "تاریخ تولدتون رو وارد کنید."
+msgstr "Enter your date of birth."
+
+msgid "گروه خونی خود را انتخاب کنید."
+msgstr "Select your blood type."
+
+msgid "کد تایید برای شما ارسال شد."
+msgstr "A verification code has been sent to you."
+
+msgid "با موفقیت وارد شدید."
+msgstr "You have successfully logged in."
+
+msgid "کد وارد شده نادرست یا منقضی شده است."
+msgstr "The code entered is incorrect or has expired."
+
+msgid "درخواست معتبر نیست."
+msgstr "The request is not valid."
+
+msgid "امکان ارسال دوباره کد وجود ندارد. دوباره شماره موبایل را وارد کنید."
+msgstr "The code cannot be resent. Please enter your mobile number again."
+
+msgid "کد تایید دوباره ارسال شد."
+msgstr "The verification code has been resent."
+
+msgid "اطلاعات حساب و وضعیت بدن خود را در یک نگاه مدیریت کنید."
+msgstr "Manage your account information and body status at a glance."
+
+msgid "آنالیز"
+msgstr "Analysis"
+
+msgid "شاخص‌های بدنی و گزارش‌های روزانه را از اینجا بررسی کنید."
+msgstr "Review your body metrics and daily reports here."
+
+msgid "مربی شما"
+msgstr "Your Coach"
+
+msgid ""
+"در این بخش اطلاعات مربی اختصاصی و مسیر پیگیری برنامه نمایش داده می‌شود."
+msgstr ""
+"This section shows your dedicated coach's information and your plan "
+"tracking."
+
+msgid "درخواست شما برای مربی ثبت شد."
+msgstr "Your request for a coach has been submitted."
+
+msgid "اطلاعات پروفایل با موفقیت به‌روزرسانی شد."
+msgstr "Your profile information has been updated successfully."
+
+msgid "دوره‌های من"
+msgstr "My Courses"
+
+msgid "آخرین دوره‌هایی که به آن‌ها دسترسی دارید را ببینید."
+msgstr "View the latest courses you have access to."
+
+msgid "برنامه‌های من"
+msgstr "My Plans"
+
+msgid "فایل‌ها و برنامه‌هایی که مربی برای شما ارسال کرده است."
+msgstr "Files and plans your coach has sent you."
+
+msgid "مالی و سفارش‌ها"
+msgstr "Finance & Orders"
+
+msgid "وضعیت پرداخت‌ها و سفارش‌های ثبت شده را بررسی کنید."
+msgstr "Check the status of your payments and submitted orders."
+
+msgid "دیدگاه‌های من"
+msgstr "My Comments"
+
+msgid "آخرین تعامل‌های شما با دوره‌ها در این بخش نمایش داده می‌شود."
+msgstr "Your latest interactions with courses are shown in this section."
+
+msgid "اعلان‌های سیستم و درخواست‌های جدید را از اینجا دنبال کنید."
+msgstr "Follow system notifications and new requests here."
+
+msgid "درخواست شما ثبت شد."
+msgstr "Your request has been submitted."
+
+msgid "اطلاعات شما با موفقیت بروزرسانی شد."
+msgstr "Your information has been updated successfully."
+
+msgid "ویرایش پروفایل"
+msgstr "Edit Profile"
+
+msgid "اطلاعات اصلی حساب کاربری خود را به‌روزرسانی کنید."
+msgstr "Update your account's main information."
+
+msgid "ویرایش شماره تماس"
+msgstr "Edit Phone Number"
+
+msgid "شماره تماس حساب خود را با دریافت کد تایید به‌روزرسانی کنید."
+msgstr "Update your account's phone number by receiving a verification code."
+
+msgid "تایید شماره تماس"
+msgstr "Verify Phone Number"
+
+msgid "کد ارسال شده به شماره جدید را وارد کنید."
+msgstr "Enter the code sent to the new number."
+
+msgid "شماره تماس با موفقیت تایید و بروزرسانی شد."
+msgstr "The phone number has been verified and updated successfully."
+
+msgid "درخواست تغییر شماره معتبر نیست."
+msgstr "The phone number change request is not valid."
+
+msgid "شماره تماس جدید معتبر نیست."
+msgstr "The new phone number is not valid."
+
+msgid "رمز عبور حساب خود را به شکل امن به‌روز کنید."
+msgstr "Update your account password securely."
+
+msgid "رمز عبور شما با موفقیت تغییر کرد."
+msgstr "Your password has been changed successfully."
+
+msgid "نام کاربری یا کلمه عبور اشتباه است."
+msgstr "Incorrect username or password."
+
+msgid "کد تایید برای شماره شما ارسال شد."
+msgstr "A verification code has been sent to your number."
+
+msgid "درخواست بازیابی رمز عبور معتبر نیست."
+msgstr "The password recovery request is not valid."
+
+msgid "رمز عبور با موفقیت تغییر کرد. اکنون وارد حساب شوید."
+msgstr "Password changed successfully. Please log in now."
+
+msgid "سفارش‌ها"
+msgstr "Orders"
+
+msgid "ثبت نشده"
+msgstr "Not recorded"
+
+msgid "کم‌وزن"
+msgstr "Underweight"
+
+msgid "نرمال"
+msgstr "Normal"
+
+msgid "اضافه‌وزن"
+msgstr "Overweight"
+
+msgid "چاق"
+msgstr "Obese"
+
+msgid "تولد"
+msgstr "Birth"
+
+msgid "شماره همراه"
+msgstr "Mobile Number"
+
+msgid "دور مچ دست"
+msgstr "Wrist circumference"
+
+msgid "دور ساعد"
+msgstr "Forearm circumference"
+
+msgid "دور بازو (استراحت)"
+msgstr "Arm circumference (relaxed)"
+
+msgid "دور بازو (انقباض)"
+msgstr "Arm circumference (flexed)"
+
+msgid "دور سر"
+msgstr "Head circumference"
+
+msgid "دور گردن"
+msgstr "Neck circumference"
+
+msgid "دور قفسه سینه"
+msgstr "Chest circumference"
+
+msgid "دور شانه‌ها"
+msgstr "Shoulder circumference"
+
+msgid "دور کمر"
+msgstr "Waist circumference"
+
+msgid "دور شکم"
+msgstr "Abdomen circumference"
+
+msgid "دور باسن"
+msgstr "Hip circumference"
+
+msgid "دور ران"
+msgstr "Thigh circumference"
+
+msgid "دور ساق پا"
+msgstr "Calf circumference"
+
+msgid "چین پوستی سینه (مرد)"
+msgstr "Chest skinfold (male)"
+
+msgid "زیر بغل"
+msgstr "Axilla skinfold"
+
+msgid "زیر کتف"
+msgstr "Subscapular skinfold"
+
+msgid "کنار ناف"
+msgstr "Abdominal skinfold"
+
+msgid "بالای لگن"
+msgstr "Suprailiac skinfold"
+
+msgid "زیر سینه"
+msgstr "Chest skinfold"
+
+msgid "جلو بازو"
+msgstr "Biceps skinfold"
+
+msgid "پشت بازو"
+msgstr "Triceps skinfold"
+
+msgid "جلوی ران"
+msgstr "Thigh skinfold"
+
+msgid "پشت ساق"
+msgstr "Calf skinfold"
+
+msgid "درصد چربی بدن"
+msgstr "Body Fat Percentage"
+
+msgid "توده عضلانی بدون چربی"
+msgstr "Lean Body Mass"
+
+msgid "سانتی‌متر"
+msgstr "cm"
+
+msgid "میلی‌متر"
+msgstr "mm"
+
+msgid "کیلوگرم"
+msgstr "kg"
+
+msgid "سانتی متر"
+msgstr "cm"
+
+msgid "سال"
+msgstr "years"
+
+msgid "وضعیت WHR"
+msgstr "WHR Status"
+
+msgid "وضعیت WHtR"
+msgstr "WHtR Status"
+
+msgid "اندازه قاب بدن"
+msgstr "Body Frame Size"
+
+msgid "سوماتوتایپ (اندومورف/مزومورف/اکتومورف)"
+msgstr "Somatotype (Endomorph/Mesomorph/Ectomorph)"
+
+msgid "کالری مورد نیاز روزانه"
+msgstr "Daily Calorie Needs"
+
+msgid "پروتئین مورد نیاز روزانه"
+msgstr "Daily Protein Needs"
+
+msgid "%(min)s تا %(max)s گرم"
+msgstr "%(min)s to %(max)s grams"
+
+msgid "برای محاسبه درصد چربی، مربی باید جنسیت را در پروفایل ثبت کند."
+msgstr ""
+"To calculate body fat percentage, the coach must record gender in the "
+"profile."
+
+msgid "برای محاسبه درصد چربی، اندازه‌گیری کالیپر کافی توسط مربی لازم است."
+msgstr ""
+"To calculate body fat percentage, sufficient caliper measurements by the "
+"coach are required."
+
+msgid "برای نمایش گزارش، وزن و قد را ثبت کنید."
+msgstr "To display the report, record your weight and height."
+
+msgid "از تاریخ %(start_date)s تا تاریخ %(end_date)s"
+msgstr "From %(start_date)s to %(end_date)s"
+
+msgid "حساب کاربری یافت نشد."
+msgstr "Account not found."
+
+msgid "دوره مورد نظر یافت نشد."
+msgstr "The requested course was not found."
+
+msgid "مطلوب"
+msgstr "Optimal"
+
+msgid "متوسط"
+msgstr "Moderate"
+
+msgid "پرخطر"
+msgstr "High risk"
+
+msgid "نسبتا نامطلوب"
+msgstr "Somewhat unfavorable"
+
+msgid "بسیار پرخطر"
+msgstr "Very high risk"
+
+msgid "درشت"
+msgstr "Large"
+
+msgid "ریز"
+msgstr "Small"
+
+msgid "مرد"
+msgstr "Male"
+
+msgid "زن"
+msgstr "Female"
+
+msgid "کم‌تحرک (کمتر از ۵۰۰۰ قدم در روز)"
+msgstr "Sedentary (less than 5,000 steps/day)"
+
+msgid "کم‌فعال (۵۰۰۰ تا ۷۵۰۰ قدم در روز)"
+msgstr "Lightly active (5,000-7,500 steps/day)"
+
+msgid "نسبتاً فعال (۷۵۰۰ تا ۱۰۰۰۰ قدم در روز)"
+msgstr "Moderately active (7,500-10,000 steps/day)"
+
+msgid "فعال (۱۰۰۰۰ تا ۱۲۵۰۰ قدم در روز)"
+msgstr "Active (10,000-12,500 steps/day)"
+
+msgid "بسیار فعال (بیش از ۱۲۵۰۰ قدم در روز)"
+msgstr "Very active (more than 12,500 steps/day)"
+
+msgid "آدرس ایمیل"
+msgstr "Email Address"
+
+msgid "نام کامل"
+msgstr "Full Name"
+
+msgid "ادمین"
+msgstr "Admin"
+
+msgid "وزن (کیلوگرم)"
+msgstr "Weight (kg)"
+
+msgid "قد (سانتی‌متر)"
+msgstr "Height (cm)"
+
+msgid "عکس پروفایل"
+msgstr "Profile Picture"
+
+msgid "نام نمایشی"
+msgstr "Display Name"
+
+msgid "جنسیت"
+msgstr "Gender"
+
+msgid "سطح فعالیت"
+msgstr "Activity Level"
+
+msgid "مربی"
+msgstr "Coach"
+
+msgid "دور بازو در حالت استراحت"
+msgstr "Arm circumference (relaxed)"
+
+msgid "دور بازو در حالت انقباض"
+msgstr "Arm circumference (flexed)"
+
+msgid "دور ران پا"
+msgstr "Thigh circumference"
+
+msgid "عرض شانه"
+msgstr "Shoulder width"
+
+msgid "عرض لگن"
+msgstr "Hip width"
+
+msgid "عرض آرنج"
+msgstr "Elbow width"
+
+msgid "عرض زانو"
+msgstr "Knee width"
+
+msgid "طول بازو"
+msgstr "Arm length"
+
+msgid "چین پوستی بین نوک سینه و زیربغل"
+msgstr "Chest-axilla skinfold"
+
+msgid "ناحیه زیر بغل"
+msgstr "Axilla region"
+
+msgid "زیر استخوان کتف"
+msgstr "Subscapular skinfold"
+
+msgid "کنار ناو"
+msgstr "Abdominal skinfold"
+
+msgid "بالای لگن کنار شکم"
+msgstr "Suprailiac (beside abdomen)"
+
+msgid "عضله جلو بازو"
+msgstr "Biceps muscle"
+
+msgid "پشت ساق پا"
+msgstr "Calf (back)"
+
+msgid "تصویر"
+msgstr "Image"
+
+msgid "ویدیو"
+msgstr "Video"
+
+msgid "عنوان"
+msgstr "Title"
+
+msgid "فایل"
+msgstr "File"
+
+msgid "۱ جلسه در هفته"
+msgstr "1 session per week"
+
+msgid "۲ جلسه در هفته"
+msgstr "2 sessions per week"
+
+msgid "۳ جلسه در هفته"
+msgstr "3 sessions per week"
+
+msgid "۴ جلسه در هفته"
+msgstr "4 sessions per week"
+
+msgid "۵ جلسه در هفته"
+msgstr "5 sessions per week"
+
+msgid "۶ جلسه در هفته"
+msgstr "6 sessions per week"
+
+msgid "هر چه مربی صلاح بداند"
+msgstr "Whatever the coach recommends"
+
+msgid "در انتظار بررسی"
+msgstr "Pending review"
+
+msgid "بررسی شده"
+msgstr "Reviewed"
+
+msgid "تعداد جلسات در هفته"
+msgstr "Sessions per week"
+
+msgid "درخواست برنامه غذایی"
+msgstr "Diet plan requested"
+
+msgid "درخواست برنامه تمرینی"
+msgstr "Workout plan requested"
+
+msgid "درد یا آسیب"
+msgstr "Pain or injury"
+
+msgid "بیماری زمینه‌ای"
+msgstr "Underlying condition"
+
+msgid "محدودیت‌های غذایی"
+msgstr "Dietary restrictions"
+
+msgid "وضعیت"
+msgstr "Status"
+
+msgid "مبدا"
+msgstr "Origin"
+
+msgid "انتها"
+msgstr "Insertion"
+
+msgid "عصب"
+msgstr "Nerve"
+
+msgid "عملکرد"
+msgstr "Function"
+
+msgid "عضله اصلی"
+msgstr "Primary Muscle"
+
+msgid "عضله فرعی"
+msgstr "Secondary Muscle"
+
+msgid "بخش بدن"
+msgstr "Body Part"
+
+msgid "نوع حرکت"
+msgstr "Movement Type"
+
+msgid "نوع مفصل"
+msgstr "Joint Type"
+
+msgid "نوع قدرت"
+msgstr "Power Type"
+
+msgid "سطح دشواری"
+msgstr "Difficulty Level"
+
+msgid "تجهیزات"
+msgstr "Equipment"
+
+msgid "تصویر یا ویدیو"
+msgstr "Image or Video"
+
+msgid "بالاتنه"
+msgstr "Upper Body"
+
+msgid "پایین‌تنه"
+msgstr "Lower Body"
+
+msgid "هل دادن"
+msgstr "Push"
+
+msgid "کشیدن"
+msgstr "Pull"
+
+msgid "پا"
+msgstr "Leg"
+
+msgid "مرکزی بدن"
+msgstr "Core"
+
+msgid "تمام بدن"
+msgstr "Full Body"
+
+msgid "تک‌مفصلی"
+msgstr "Single-joint"
+
+msgid "چندمفصلی"
+msgstr "Multi-joint"
+
+msgid "پاورلیفتینگ"
+msgstr "Powerlifting"
+
+msgid "قدرتی"
+msgstr "Strength"
+
+msgid "مبتدی"
+msgstr "Beginner"
+
+msgid "پیشرفته"
+msgstr "Advanced"
+
+msgid "وزن بدن"
+msgstr "Bodyweight"
+
+msgid "وزنه آزاد"
+msgstr "Free Weight"
+
+msgid "دستگاه ثابت"
+msgstr "Fixed Machine"
+
+msgid "کابل"
+msgstr "Cable"
+
+msgid "کش"
+msgstr "Band"
+
+msgid "سایر"
+msgstr "Other"
+
+msgid "منتشر شده"
+msgstr "Published"
+
+msgid "در انتظار تایید"
+msgstr "Pending approval"
+
+msgid "%(time)s پیش"
+msgstr "%(time)s ago"
+
+msgid "هنوز دیدگاهی ثبت نکرده‌اید"
+msgstr "You haven't posted any comments yet"
+
+msgid "وقتی روی دوره‌ها نظر بگذارید، این بخش به‌صورت خودکار تکمیل می‌شود."
+msgstr "When you comment on courses, this section will fill in automatically."
+
+msgid "در حال تکمیل"
+msgstr "In progress"
+
+msgid "%(price)s تومان"
+msgstr "%(price)s Toman"
+
+msgid "برنامه شما هنوز خالی است"
+msgstr "Your plan is still empty"
+
+msgid ""
+"پس از تهیه یا افزودن دوره‌های رایگان، این بخش به صورت خودکار تکمیل می‌شود."
+msgstr ""
+"After purchasing or adding free courses, this section will fill in "
+"automatically."
+
+msgid "ادامه یادگیری"
+msgstr "Continue learning"
+
+msgid "موفق"
+msgstr "Successful"
+
+msgid "در انتظار پرداخت"
+msgstr "Awaiting payment"
+
+msgid "بدون آیتم"
+msgstr "No items"
+
+msgid "تراکنشی ثبت نشده است"
+msgstr "No transactions recorded"
+
+msgid "پس از خرید دوره‌ها، سابقه پرداخت شما در اینجا نمایش داده می‌شود."
+msgstr "After purchasing courses, your payment history will be shown here."
+
+msgid "اعلان جدیدی ندارید"
+msgstr "You have no new notifications"
+
+msgid "هر زمان پیام جدیدی برای حساب شما ثبت شود، اینجا نمایش داده می‌شود."
+msgstr ""
+"Whenever a new message is recorded for your account, it will be shown here."
+
+msgid "ارسال‌شده در %(uploaded_at)s"
+msgstr "Sent on %(uploaded_at)s"
+
+msgid "توسط %(uploader)s"
+msgstr "by %(uploader)s"
+
+msgid "دانلود فایل"
+msgstr "Download File"
+
+msgid "هنوز برنامه‌ای برای شما ارسال نشده است"
+msgstr "No plan has been sent to you yet"
+
+msgid ""
+"وقتی مربی برنامه تمرینی یا غذایی برای شما ارسال کند، اینجا نمایش داده "
+"می‌شود."
+msgstr ""
+"When your coach sends you a workout or diet plan, it will be shown here."
+
+msgid "سربرگ پنل کاربری"
+msgstr "User panel header"
+
+msgid "حساب کاربری"
+msgstr "Account"
+
+msgid "بستن"
+msgstr "Close"
+
+msgid "حساب فعال"
+msgstr "Active Account"
+
+msgid "دسترسی امن"
+msgstr "Secure Access"
+
+msgid "آخرین ورود"
+msgstr "Last Login"
+
+msgid "امروز"
+msgstr "Today"
+
+msgid "آماده"
+msgstr "Ready"
+
+msgid "پیشخوان"
+msgstr "Dashboard"
+
+msgid "برنامه شما"
+msgstr "Your Plan"
+
+msgid "برنامه‌ها"
+msgstr "Plans"
+
+msgid "تنظیمات حساب"
+msgstr "Account Settings"
+
+msgid "🎉 تولدت مبارک، %(display_name)s!"
+msgstr "🎉 Happy birthday, %(display_name)s!"
+
+msgid "تیم ایگوفیت برات یک سال پر از پیشرفت آرزو می‌کند."
+msgstr "The EgoFit team wishes you a year full of progress."
+
+msgid "درباره من"
+msgstr "About Me"
+
+msgid "وب‌سایت"
+msgstr "Website"
+
+msgid "گیت‌هاب"
+msgstr "GitHub"
+
+msgid "لینکدین"
+msgstr "LinkedIn"
+
+msgid "ذخیره تغییرات"
+msgstr "Save Changes"
+
+msgid "تایید"
+msgstr "Confirm"
+
+msgid "مربی اختصاصی شما"
+msgstr "Your Dedicated Coach"
+
+msgid "هنوز مربی اختصاصی ثبت نشده است."
+msgstr "No dedicated coach has been assigned yet."
+
+msgid ""
+"وقتی مربی برای حساب شما تعریف شود، اطلاعات و دسترسی‌های او در این بخش نمایش "
+"داده می‌شود."
+msgstr ""
+"Once a coach is assigned to your account, their information and access will "
+"be shown in this section."
+
+msgid "درخواست برنامه از مربی"
+msgstr "Request a Plan from Your Coach"
+
+msgid "با ثبت این فرم، درخواست شما برای مربی ارسال می‌شود."
+msgstr "Submitting this form will send your request to your coach."
+
+msgid "یک درخواست در انتظار بررسی دارید (ثبت‌شده در %(created_at)s)."
+msgstr "You have a pending request (submitted on %(created_at)s)."
+
+msgid "ارسال درخواست"
+msgstr "Send Request"
+
+msgid "ماه قبل"
+msgstr "Previous month"
+
+msgid "ماه بعد"
+msgstr "Next month"
+
+msgid "فرمول: %(formula)s"
+msgstr "Formula: %(formula)s"
+
+msgid "روند تغییرات"
+msgstr "Trend"
+
+msgid "داده کافی برای نمودار وجود ندارد"
+msgstr "Not enough data for a chart"
+
+msgid ""
+"برای نمایش روند تغییرات، حداقل ۲ اندازه‌گیری مربی در بازه انتخاب‌شده لازم "
+"است."
+msgstr ""
+"At least 2 coach measurements in the selected range are needed to display "
+"the trend."
+
+msgid "اندازه‌گیری‌های ثبت‌شده توسط مربی"
+msgstr "Measurements recorded by your coach"
+
+msgid "آخرین رکورد"
+msgstr "Latest record"
+
+msgid "محیط بدن"
+msgstr "Body Circumference"
+
+msgid "کالیپر"
+msgstr "Caliper"
+
+msgid "نتیجه‌ای یافت نشد."
+msgstr "No result found."
+
+msgid "برای نمایش گزارش، حداقل وزن و قد را در پروفایل ثبت کنید."
+msgstr ""
+"To display the report, record at least your weight and height in your "
+"profile."
+
+msgid "ثبت اطلاعات شخصی"
+msgstr "Record Personal Information"
+
+msgid "ثبت اندازه‌گیری محیط بدن"
+msgstr "Record Body Circumference Measurement"
+
+msgid "ثبت کالیپر (Caliper)"
+msgstr "Record Caliper Measurement"
+
+msgid "برنامه/فایل با موفقیت آپلود شد."
+msgstr "The plan/file was uploaded successfully."
+
+msgid "حداقل یک فایل تصویر یا ویدیو انتخاب کنید."
+msgstr "Select at least one image or video file."
+
+msgid "فایل با موفقیت آپلود شد."
+msgstr "The file was uploaded successfully."
+
+msgid "آپلود فایل"
+msgstr "Upload File"
+
+msgid "نقش کاربر به‌روزرسانی شد."
+msgstr "The user's role has been updated."
+
+msgid "درخواست به‌عنوان بررسی‌شده علامت خورد."
+msgstr "The request has been marked as reviewed."
+
+msgid "ویرایش عضله"
+msgstr "Edit Muscle"
+
+msgid "افزودن عضله"
+msgstr "Add Muscle"
+
+msgid "ویرایش حرکت"
+msgstr "Edit Exercise"
+
+msgid "افزودن حرکت"
+msgstr "Add Exercise"
+
+msgid "نمی‌توانید نقش خودتان را تغییر دهید."
+msgstr "You cannot change your own role."
+
+msgid "حداقل یک ادمین باید در سیستم باقی بماند."
+msgstr "At least one admin must remain in the system."
+
+msgid "ارسال پیامک بیش از حد طول کشید. لطفاً چند لحظه بعد دوباره تلاش کنید."
+msgstr "Sending the SMS took too long. Please try again in a moment."
+
+msgid "ارسال پیامک با خطا مواجه شد. لطفاً دوباره تلاش کنید."
+msgstr "Sending the SMS failed. Please try again."
+
+msgid "پیکربندی سرویس پیامک انجام نشده است."
+msgstr "The SMS service has not been configured."
+
+msgid "پاسخ نامعتبر از سرویس پیامک دریافت شد."
+msgstr "An invalid response was received from the SMS service."
+
+msgid "%(account_title)s | ایگوفیت"
+msgstr "%(account_title)s | EgoFit"
+
+msgid "%(page_title)s | ایگوفیت"
+msgstr "%(page_title)s | EgoFit"
+
+msgid "سربرگ پنل ادمین"
+msgstr "Admin panel header"
+
+msgid "مدیریت کاربران"
+msgstr "User Management"
+
+msgid "جستجو و مدیریت"
+msgstr "Search & Manage"
+
+msgid "کاربر انتخاب‌شده"
+msgstr "Selected User"
+
+msgid "خروج از پنل"
+msgstr "Log out of panel"
+
+msgid "ثبت اطلاعات کاربر | ایگوفیت"
+msgstr "Record User Information | EgoFit"
+
+msgid "ثبت اطلاعات کاربر"
+msgstr "Record User Information"
+
+msgid "بازگشت"
+msgstr "Back"
+
+msgid "اعطای نقش ادمین"
+msgstr "Grant Admin Role"
+
+msgid "ثبت اندازه‌گیری محیط بدن (Circumference)"
+msgstr "Record Body Circumference Measurement (Circumference)"
+
+msgid "آپلود فایل/برنامه برای کاربر"
+msgstr "Upload File/Plan for User"
+
+msgid "آخرین محیط بدن"
+msgstr "Latest Body Circumference"
+
+msgid "ثبت شده"
+msgstr "Recorded"
+
+msgid "آخرین کالیپر"
+msgstr "Latest Caliper"
+
+msgid "فایل‌ها"
+msgstr "Files"
+
+msgid "درخواست‌های این کاربر از مربی"
+msgstr "This User's Coach Requests"
+
+msgid "برنامه غذایی"
+msgstr "Diet Plan"
+
+msgid "برنامه تمرینی"
+msgstr "Workout Plan"
+
+msgid "بررسی شد"
+msgstr "Reviewed"
+
+msgid "جست و جو کاربر | ایگوفیت"
+msgstr "Search User | EgoFit"
+
+msgid "جست و جو کاربر"
+msgstr "Search User"
+
+msgid "جست و جو"
+msgstr "Search"
+
+msgid "خلاصه مدیریت"
+msgstr "Management Summary"
+
+msgid "کاربران"
+msgstr "Users"
+
+msgid "پروفایل کامل"
+msgstr "Complete Profile"
+
+msgid "ادمین‌ها"
+msgstr "Admins"
+
+msgid "درخواست‌های در انتظار"
+msgstr "Pending Requests"
+
+msgid "🎉 تولد امروز"
+msgstr "🎉 Birthday Today"
+
+msgid "درخواست‌های از مربی (%(count)s)"
+msgstr "Coach Requests (%(count)s)"
+
+msgid "مشاهده کاربر"
+msgstr "View User"
+
+msgid "نام یا شماره را دوباره بررسی کنید."
+msgstr "Check the name or number again."
+
+msgid "مشاهده اطلاعات"
+msgstr "View Information"
+
+msgid "کاربران اخیر"
+msgstr "Recent Users"
+
+msgid "هنوز کاربری ثبت نشده است."
+msgstr "No user has been registered yet."
+
+msgid "اندازه‌ها را بر اساس میلی‌متر ثبت کنید."
+msgstr "Record the measurements in millimeters."
+
+msgid "راهنمای اندازه‌گیری"
+msgstr "Measurement Guide"
+
+msgid "بدن انسان"
+msgstr "Human body"
+
+msgid "سر"
+msgstr "Head"
+
+msgid "گردن"
+msgstr "Neck"
+
+msgid "سینه"
+msgstr "Chest"
+
+msgid "کمر"
+msgstr "Waist"
+
+msgid "باسن"
+msgstr "Hips"
+
+msgid "ران / ساق"
+msgstr "Thigh / Calf"
+
+msgid ""
+"اندازه‌های زیر اختیاری‌اند (برای محاسبه سوماتوتایپ و نسبت‌های بدنی) — در "
+"صورت خالی ماندن، مقدار پیش‌فرض استاندارد جای آن‌ها استفاده می‌شود."
+msgstr ""
+"The measurements below are optional (used to calculate somatotype and body "
+"ratios) - if left blank, a standard default value will be used instead."
+
+msgid "ثبت"
+msgstr "Save"
+
+msgid "اندازه‌گیری‌های ثبت‌شده"
+msgstr "Recorded Measurements"
+
+msgid ""
+"برای نمایش روند تغییرات، حداقل ۲ اندازه‌گیری در بازه انتخاب‌شده لازم است."
+msgstr ""
+"At least 2 measurements in the selected range are needed to display the "
+"trend."
+
+msgid "برای نمایش گزارش، اطلاعات پایه کاربر را ثبت کنید."
+msgstr "To display the report, record the user's basic information."
+
+msgid "ثبت اطلاعات پایه"
+msgstr "Record Basic Information"
+
+msgid "کتابخانه تمرین | ایگوفیت"
+msgstr "Exercise Library | EgoFit"
+
+msgid "کتابخانه تمرین"
+msgstr "Exercise Library"
+
+msgid "خلاصه کتابخانه"
+msgstr "Library Summary"
+
+msgid "عضلات"
+msgstr "Muscles"
+
+msgid "حرکات تمرینی"
+msgstr "Exercises"
+
+msgid "کتابخانه عضلات"
+msgstr "Muscle Library"
+
+msgid "کتابخانه حرکات تمرینی"
+msgstr "Exercise Library"
+
+msgid "کتابخانه حرکات تمرینی | ایگوفیت"
+msgstr "Exercise Library | EgoFit"
+
+msgid "ویرایش"
+msgstr "Edit"
+
+msgid "حذف"
+msgstr "Delete"
+
+msgid "حرکتی ثبت نشده است."
+msgstr "No exercise has been recorded."
+
+msgid "کتابخانه عضلات | ایگوفیت"
+msgstr "Muscle Library | EgoFit"
+
+msgid "عضله‌ای ثبت نشده است."
+msgstr "No muscle has been recorded."
+
+msgid "جستجو و داشبورد"
+msgstr "Search & Dashboard"
+
+msgid "لیست کاربران"
+msgstr "Client List"
+
+msgid "ثبت اطلاعات"
+msgstr "Records"
+
+msgid "کتابخانه"
+msgstr "Library"
+
+msgid "لیست کاربران | ایگوفیت"
+msgstr "Client List | EgoFit"
+
+msgid "مرتب‌سازی"
+msgstr "Sort"
+
+msgid "تاریخ ثبت‌نام"
+msgstr "Registration Date"
+
+msgid "صفحه‌بندی"
+msgstr "Pagination"
+
+msgid "قبلی"
+msgstr "Previous"
+
+msgid "بعدی"
+msgstr "Next"
+
+msgid "صفحه %(current)s از %(total)s"
+msgstr "Page %(current)s of %(total)s"
+
+msgid "کاربری یافت نشد."
+msgstr "No user found."
+
+msgid "انواع و دسته‌بندی‌های حرکات"
+msgstr "Exercise Types & Categories"
+
+msgid "افزودن"
+msgstr "Add"
+
+msgid "موردی ثبت نشده است."
+msgstr "No items recorded yet."
+
+msgid "ویرایش %(title)s"
+msgstr "Edit %(title)s"
+
+msgid "افزودن %(title)s"
+msgstr "Add %(title)s"
+
+msgid "این مقدار برای یک یا چند حرکت تمرینی استفاده شده و قابل حذف نیست."
+msgstr "This value is used by one or more exercises and cannot be deleted."
+
+msgid "نام انگلیسی حرکت"
+msgstr "English exercise name"
+
+msgid "افزودن کاربر جدید"
+msgstr "Add New Client"
+
+msgid "رمز عبور (برای ورود به اپ)"
+msgstr "Password (for app login)"
+
+msgid "برای ورود کاربر به اپ استفاده می‌شود"
+msgstr "Used by the client to log into the app"
+
+msgid "شماره تماس معتبر نیست."
+msgstr "The phone number is not valid."
+
+msgid "کاربر جدید با موفقیت اضافه شد."
+msgstr "New client added successfully."
+
+msgid "این کاربر سفارش پرداخت‌شده دارد و قابل حذف نیست."
+msgstr "This client has a paid order and cannot be deleted."
+
+msgid "کاربر با موفقیت حذف شد."
+msgstr "Client deleted successfully."
+
+msgid "آیا از حذف این کاربر اطمینان دارید؟ این عمل غیرقابل بازگشت است."
+msgstr ""
+"Are you sure you want to delete this client? This action cannot be undone."
+
+msgid "حذف کاربر"
+msgstr "Delete Client"
+
+msgid "دور مچ دست (چپ)"
+msgstr "Wrist Circumference (Left)"
+
+msgid "دور ساعد (چپ)"
+msgstr "Forearm Circumference (Left)"
+
+msgid "دور بازو در حالت استراحت (چپ)"
+msgstr "Arm Circumference, Relaxed (Left)"
+
+msgid "دور بازو در حالت انقباض (چپ)"
+msgstr "Arm Circumference, Flexed (Left)"
+
+msgid "دست چپ"
+msgstr "Left Arm"
+
+msgid "تاریخ ثبت اندازه‌گیری (شمسی)"
+msgstr "Measurement Date (Jalali)"
+
+msgid "تاریخ ثبت (فرمت: سال/ماه/روز)"
+msgstr "Entry date (format: year/month/day)"
+
+msgid "تاریخچه و ویرایش اندازه‌گیری‌ها"
+msgstr "Measurement History & Edit"
+
+msgid "تاریخچه اندازه‌گیری‌ها"
+msgstr "Measurement History"
+
+msgid "ویرایش اندازه‌گیری"
+msgstr "Edit Measurement"
+
+msgid "به‌روزرسانی"
+msgstr "Update"
+
+msgid "اندازه‌گیری به‌روزرسانی شد."
+msgstr "Measurement updated."
+
+msgid "اندازه‌گیری محیط بدن"
+msgstr "Circumference Measurement"
+
+msgid "اندازه‌گیری کالیپر"
+msgstr "Caliper Measurement"
+
+msgid "سفارش مورد نظر پیدا نشد."
+msgstr "The requested order was not found."
+
+msgid "این سفارش قبلا پرداخت شده است."
+msgstr "This order has already been paid."
+
+msgid "مبلغ سفارش نامعتبر است."
+msgstr "The order amount is invalid."
+
+msgid "سفارش منتظر با این پرداخت پیدا نشد."
+msgstr "No order awaiting this payment was found."
+
+msgid "تراکنش ناموفق بود یا توسط کاربر لغو شد."
+msgstr "The transaction failed or was canceled by the user."
+
+msgid "شناسه پرداخت از درگاه دریافت نشد."
+msgstr "No payment ID was received from the gateway."
+
+msgid "سفارش متناظر با این پرداخت پیدا نشد."
+msgstr "No order corresponding to this payment was found."
+
+msgid "کد تخفیف را وارد کنید."
+msgstr "Enter the discount code."
+
+msgid "برای این سفارش قبلاً کد تخفیف اعمال شده است."
+msgstr "A discount code has already been applied to this order."
+
+msgid "کد تخفیف نامعتبر است."
+msgstr "The discount code is invalid."
+
+msgid "این کد تخفیف قابل استفاده نیست."
+msgstr "This discount code cannot be used."
+
+msgid "شما قبلاً از این کد تخفیف استفاده کرده‌اید."
+msgstr "You have already used this discount code."
+
+msgid "سبد خرید خالی است."
+msgstr "Your cart is empty."
+
+msgid "تمام دوره‌های این سفارش قبلاً خریداری شده‌اند."
+msgstr "All courses in this order have already been purchased."
+
+msgid "پاسخ نامعتبر از درگاه پرداخت دریافت شد."
+msgstr "An invalid response was received from the payment gateway."
+
+msgid "شناسه درگاه پرداخت (Merchant ID) تنظیم نشده است."
+msgstr "The payment gateway ID (Merchant ID) has not been configured."
+
+msgid "اتصال به درگاه پرداخت برقرار نشد."
+msgstr "Could not connect to the payment gateway."
+
+msgid "درخواست پرداخت توسط درگاه رد شد."
+msgstr "The payment request was rejected by the gateway."
+
+msgid "شناسه پرداخت نامعتبر است."
+msgstr "The payment ID is invalid."
+
+msgid "سبد خرید خالی | ایگوفیت"
+msgstr "Empty Cart | EgoFit"
+
+msgid "سبد خرید | ایگوفیت"
+msgstr "Shopping Cart | EgoFit"
+
+msgid "آماده نهایی‌سازی مسیر آموزشی شما"
+msgstr "Ready to finalize your learning path"
+
+msgid ""
+"%(counter)s دوره در سبد خرید قرار دارد. قبل از پرداخت، جزئیات دوره‌ها و مبلغ"
+" نهایی را بررسی کنید."
+msgstr ""
+"%(counter)s courses are in your cart. Before paying, review the course "
+"details and final amount."
+
+msgid "پرداخت امن"
+msgstr "Secure Payment"
+
+msgid "مبلغ قابل پرداخت"
+msgstr "Amount Payable"
+
+msgid "مدرس: %(author)s"
+msgstr "Instructor: %(author)s"
+
+msgid "قیمت دوره"
+msgstr "Course Price"
+
+msgid "حذف از سبد"
+msgstr "Remove from Cart"
+
+msgid "خلاصه سفارش"
+msgstr "Order Summary"
+
+msgid "پرداخت نهایی"
+msgstr "Final Payment"
+
+msgid "سفارش بعد از تایید شما ساخته می‌شود و سپس وارد مرحله پرداخت خواهید شد."
+msgstr ""
+"The order will be created after your confirmation, and you'll then proceed "
+"to payment."
+
+msgid "تعداد دوره"
+msgstr "Number of Courses"
+
+msgid "مبلغ کل"
+msgstr "Total Amount"
+
+msgid "پرداخت از مسیر امن و قابل پیگیری انجام می‌شود."
+msgstr "Payment is processed through a secure, traceable channel."
+
+msgid "ادامه فرایند خرید"
+msgstr "Continue Checkout"
+
+msgid "افزودن دوره‌های بیشتر"
+msgstr "Add More Courses"
+
+msgid "هنوز دوره‌ای انتخاب نکرده‌اید"
+msgstr "You haven't selected a course yet"
+
+msgid ""
+"برای شروع، دوره مناسب خود را انتخاب کنید و بعد از بررسی جزئیات، فرایند خرید "
+"را ادامه دهید."
+msgstr ""
+"To get started, choose the right course for you, and continue checkout after"
+" reviewing the details."
+
+msgid "پرداخت موفق | ایگوفیت"
+msgstr "Payment Successful | EgoFit"
+
+msgid "پرداخت موفق"
+msgstr "Payment Successful"
+
+msgid "پرداخت شما با موفقیت انجام شد"
+msgstr "Your payment was completed successfully"
+
+msgid ""
+"دوره‌های خریداری‌شده اکنون در پروفایل شما در دسترس هستند و می‌توانید "
+"بلافاصله یادگیری را شروع کنید."
+msgstr ""
+"Your purchased courses are now available in your profile, and you can start "
+"learning right away."
+
+msgid "مشاهده دوره‌های من"
+msgstr "View My Courses"
+
+msgid "ادامه مرور دوره‌ها"
+msgstr "Continue Browsing Courses"
+
+msgid "پرداخت ناموفق | ایگوفیت"
+msgstr "Payment Failed | EgoFit"
+
+msgid "پرداخت ناموفق"
+msgstr "Payment Failed"
+
+msgid "پرداخت کامل نشد"
+msgstr "Payment Not Completed"
+
+msgid ""
+"فرایند پرداخت با خطا متوقف شد یا توسط شما لغو گردید. می‌توانید دوباره تلاش "
+"کنید یا به سبد خرید بازگردید."
+msgstr ""
+"The payment process stopped due to an error or was canceled by you. You can "
+"try again or return to your cart."
+
+msgid "بازگشت به سبد خرید"
+msgstr "Back to Cart"
+
+msgid "صفحه اصلی"
+msgstr "Home"
+
+msgid "جزئیات سفارش | ایگوفیت"
+msgstr "Order Details | EgoFit"
+
+msgid "جزئیات سفارش"
+msgstr "Order Details"
+
+msgid "بررسی نهایی سفارش شماره %(order_number)s"
+msgstr "Final review of order number %(order_number)s"
+
+msgid ""
+"قبل از اتصال به درگاه، دوره‌ها، مبلغ پرداختی و کد تخفیف را بررسی کنید. بعد "
+"از پرداخت موفق، دوره‌ها در حساب شما فعال می‌شوند."
+msgstr ""
+"Before connecting to the gateway, review the courses, payment amount, and "
+"discount code. After successful payment, the courses will be activated on "
+"your account."
+
+msgid "پرداخت شده"
+msgstr "Paid"
+
+msgid "در حال پرداخت"
+msgstr "Payment in Progress"
+
+msgid "آماده پرداخت"
+msgstr "Ready for Payment"
+
+msgid "مبلغ نهایی سفارش"
+msgstr "Final Order Amount"
+
+msgid "قیمت ثبت‌شده در سفارش"
+msgstr "Price Recorded on Order"
+
+msgid "پرداخت"
+msgstr "Payment"
+
+msgid "خلاصه پرداخت"
+msgstr "Payment Summary"
+
+msgid "در صورت داشتن کد تخفیف، قبل از اتصال به درگاه آن را اعمال کنید."
+msgstr ""
+"If you have a discount code, apply it before connecting to the gateway."
+
+msgid "مبلغ اولیه"
+msgstr "Initial Amount"
+
+msgid "تخفیف"
+msgstr "Discount"
+
+msgid "تخفیف اعمال‌شده"
+msgstr "Discount Applied"
+
+msgid "مبلغ نهایی"
+msgstr "Final Amount"
+
+msgid ""
+"بعد از پرداخت موفق، دسترسی دوره‌ها به صورت خودکار برای حساب شما فعال می‌شود."
+msgstr ""
+"After successful payment, course access will be automatically activated for "
+"your account."
+
+msgid "کد تخفیف"
+msgstr "Discount Code"
+
+msgid "کد تخفیف را وارد کنید"
+msgstr "Enter the discount code"
+
+msgid "اعمال کد تخفیف"
+msgstr "Apply Discount Code"
+
+msgid "اتصال به درگاه پرداخت"
+msgstr "Connect to Payment Gateway"
+
+msgid "نام خانوادگی"
+msgstr "Last Name"
+
+msgid "این نام و نام خانوادگی قبلاً ثبت شده است."
+msgstr "This first and last name is already registered."
+
+msgid "قد نشسته"
+msgstr "Sitting Height"
+
+msgid "طول پا"
+msgstr "Leg Length"
+
+msgid "شکم"
+msgstr "Abdomen"
+
+msgid "سه‌تیغ خاصره"
+msgstr "Suprailiac"
+
+msgid "جلوبازو"
+msgstr "Biceps"
+
+msgid "حرکات اصلاحی"
+msgstr "Corrective Exercises"
+
+msgid "کتابخانه حرکات اصلاحی"
+msgstr "Corrective Exercises Library"
+
+msgid "به‌زودی"
+msgstr "Coming Soon"
+
+msgid "نام انگلیسی"
+msgstr "English Name"
+
+msgid "تجهیزات اجرا"
+msgstr "Equipment Used"
+
+msgid "تجهیزات اجرا (انگلیسی)"
+msgstr "Equipment Used (English)"
+
+msgid "تعداد ست"
+msgstr "Set Count"
+
+msgid "هدف ست"
+msgstr "Set Goal"
+
+msgid "تعداد تکرار"
+msgstr "Rep Count"
+
+msgid "هدف تکرار"
+msgstr "Rep Goal"
+
+msgid "زمان استراحت (دقیقه)"
+msgstr "Rest Time (Minutes)"
+
+msgid "هدف استراحت"
+msgstr "Rest Goal"
+
+msgid "نوع فشار"
+msgstr "Pressure Type"
+
+msgid "زمان‌محور"
+msgstr "Time-Based"
+
+msgid "وزنه‌محور"
+msgstr "Weight-Based"
+
+msgid "زمان و وزنه"
+msgstr "Time and Weight"
+
+msgid "تکرارمحور (بدون وزنه/زمان)"
+msgstr "Reps-Based (No Weight/Time)"
+
+msgid "نوع حرکت دوم"
+msgstr "Secondary Movement Type"
+
+msgid "نوع حرکت دوم (انگلیسی)"
+msgstr "Secondary Movement Type (English)"
+
+msgid "اعلانات"
+msgstr "Notifications"
+
+msgid "درخواستی در انتظار بررسی نیست."
+msgstr "There are no requests pending review."
+
+msgid "امروز تولدی ثبت نشده است."
+msgstr "No birthdays today."
+
+msgid "پیامک ارسال شد ✓"
+msgstr "SMS Sent ✓"
+
+msgid "تاریخ ارسال (شمسی)"
+msgstr "Sent Date (Jalali)"
+
+msgid "نوع تجهیزات اجرایی"
+msgstr "Execution Equipment Type"
+
+msgid "ناهنجاری"
+msgstr "Postural Disorder"
+
+msgid "نوع ناهنجاری"
+msgstr "Disorder Type"
+
+msgid "تجهیزات مورد نیاز"
+msgstr "Required Equipment"
+
+msgid "افزودن حرکت اصلاحی"
+msgstr "Add Corrective Exercise"
+
+msgid "ویرایش حرکت اصلاحی"
+msgstr "Edit Corrective Exercise"
+
+msgid "حرکت اصلاحی‌ای ثبت نشده است."
+msgstr "No corrective exercise has been registered."
+
+msgid "نام انگلیسی عضله"
+msgstr "Muscle English Name"
+
+msgid "توضیحات حرکت"
+msgstr "Exercise Description"
+
+msgid "توضیحات"
+msgstr "Description"
+
+msgid "زیربغل"
+msgstr "Axilla"
+
+msgid "تحت کتفی"
+msgstr "Subscapular"
+
+msgid "نامشخص"
+msgstr "Unspecified"
+
+msgid "نوع ورزش"
+msgstr "Sport Type"
+
+msgid "نوع ست"
+msgstr "Set Type"
+
+msgid "نوع تکرار"
+msgstr "Repetition Type"
+
+msgid "نوع استراحت"
+msgstr "Rest Type"
+
+msgid "هدف"
+msgstr "Goal"
+
+msgid "زمان استراحت"
+msgstr "Rest Time"
+
+msgid "دور ران پا (چپ)"
+msgstr "Thigh Circumference (Left)"
+
+msgid "دور ساق پا (چپ)"
+msgstr "Calf Circumference (Left)"
+
+msgid "مشاهده همه"
+msgstr "View all"
+
+msgid "هنوز در دوره‌ای ثبت‌نام نکرده‌اید."
+msgstr "You haven't enrolled in any course yet."
+
+msgid "این نام به‌صورت یکتا برای شناسایی حساب شما استفاده می‌شود."
+msgstr "This name uniquely identifies your account."
+
+msgid "لطفا نام کاربری را وارد کنید."
+msgstr "Please enter a username."
+
+msgid "این نام کاربری قبلا توسط کاربر دیگری انتخاب شده است."
+msgstr "This username is already taken by another user."
+
+msgid "نوع برنامه"
+msgstr "Program type"
+
+msgid "قد و وزن"
+msgstr "Height & weight"
+
+msgid "دورسنجی (سانتی‌متر)"
+msgstr "Circumference (cm)"
+
+msgid "فیلدهای ستاره‌دار اجباری هستند."
+msgstr "Fields marked with an asterisk are required."
+
+msgid "سلامتی و محدودیت‌ها"
+msgstr "Health & restrictions"
+
+msgid "فایل‌های پیوست"
+msgstr "Attachments"
+
+msgid "افزودن عکس، ویدیو، صدا یا PDF"
+msgstr "Add a photo, video, audio or PDF"
+
+msgid ""
+"می‌توانید چند فایل را هم‌زمان انتخاب کنید — حداکثر ۱۵ مگابایت برای هر فایل."
+msgstr "You can select multiple files at once — up to 15 MB each."
+
+msgid "فایل‌های ثبت‌شده"
+msgstr "Saved files"
+
+msgid "به‌روزرسانی درخواست"
+msgstr "Update request"
+
+msgid "درخواست شما به‌روزرسانی شد."
+msgstr "Your request has been updated."
+
+msgid "حجم هر فایل باید حداکثر ۱۵ مگابایت باشد."
+msgstr "Each file must be at most 15 MB."
+
+msgid "فقط فایل‌های تصویر، ویدیو، صدا یا PDF مجاز هستند."
+msgstr "Only image, video, audio or PDF files are allowed."
+
+msgid ""
+"یک درخواست در انتظار بررسی دارید (ثبت‌شده در %(created_at)s). تا پیش از "
+"بررسی مربی می‌توانید آن را ویرایش کنید."
+msgstr ""
+"You have a request awaiting review (submitted on %(created_at)s). You can "
+"edit it until the coach reviews it."
+
+msgid "آنالیز بدنی"
+msgstr "Body analysis"
+
+msgid "اندازه‌گیری‌های بدنی"
+msgstr "Body measurements"
+
+msgid "شاخص توده بدنی (BMI)"
+msgstr "Body Mass Index (BMI)"
+
+msgid "کمبود وزن"
+msgstr "Underweight"
+
+msgid "اضافه وزن"
+msgstr "Overweight"
+
+msgid "نسبت کمر به باسن (WHR)"
+msgstr "Waist-to-hip ratio (WHR)"
+
+msgid "بررسی شاخص دلخواه"
+msgstr "Explore a metric"
+
+msgid "نتایج محاسبات"
+msgstr "Calculation results"
+
+msgid "وزن (kg)"
+msgstr "Weight (kg)"
+
+msgid "درصد چربی (%)"
+msgstr "Body fat (%)"
+
+msgid "کالری روزانه (kcal)"
+msgstr "Daily calories (kcal)"
+
+msgid "روند اندازه‌گیری‌های بدنی"
+msgstr "Body measurement trends"
+
+msgid "سینه و سرشانه"
+msgstr "Chest & shoulders"
+
+msgid "شکم، کمر و باسن"
+msgstr "Abdomen, waist & hips"
+
+msgid "بازو"
+msgstr "Arm"
+
+msgid "مچ و ساعد"
+msgstr "Wrist & forearm"
+
+msgid "ران"
+msgstr "Thigh"
+
+msgid "ساق"
+msgstr "Calf"
+
+msgid "جدول اندازه‌گیری‌های مربی"
+msgstr "Coach measurement tables"
+
+msgid "شاخص"
+msgstr "Metric"
+
+msgid "مقدار"
+msgstr "Value"
+
+msgid "تاریخچه"
+msgstr "History"
+
+msgid "تاریخ"
+msgstr "Date"
+
+msgid "درصد چربی"
+msgstr "Body fat"
+
+msgid "توده بدون چربی"
+msgstr "Lean mass"
+
+msgid "افزودن اندازه‌ها به اندازه‌گیری‌ها"
+msgstr "Add measurements to records"
+
+msgid "به اندازه‌گیری‌ها افزوده شد"
+msgstr "Added to measurements"
+
+msgid "پیوست‌ها"
+msgstr "Attachments"
+
+msgid "اندازه‌های درخواست به اندازه‌گیری‌های کاربر افزوده شد."
+msgstr "The request's measurements were added to the user's records."
+
+msgid "اندازه‌ای برای افزودن وجود ندارد یا قبلاً افزوده شده است."
+msgstr "There are no measurements to add, or they were already added."
+
+msgid "بازو آزاد"
+msgstr "Relaxed arm"
+
+msgid "بازو منقبض"
+msgstr "Flexed arm"
+
+msgid "سرشانه"
+msgstr "Shoulders"
+
+msgid "🎉 تولدت مبارک، %(name)s!"
+msgstr "🎉 Happy birthday, %(name)s!"
+
+msgid "تاریخ آنالیز"
+msgstr "Analysis date"
+
+msgid "نمایش"
+msgstr "Show"
+
+msgid "برای این شاخص داده کافی ثبت نشده است."
+msgstr "Not enough data recorded for this metric."
+
+msgid "کالری روزانه"
+msgstr "Daily calories"
+
+msgid "پروتئین روزانه"
+msgstr "Daily protein"

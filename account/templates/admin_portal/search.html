@@ -1,0 +1,158 @@
+{% extends 'admin_portal/_shell.html' %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}جست و جو کاربر | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block admin_content %}
+<section class="admin-screen admin-search-screen">
+    <header class="admin-screen__header">
+        <h1 class="admin-screen__title">{% trans 'جست و جو کاربر' %}</h1>
+    </header>
+
+    <p class="admin-screen__lead">{% trans 'نام یا شماره همراه کاربر را وارد کنید' %}</p>
+
+    <form method="get" class="admin-search-form">
+        {{ form.query }}
+        <button type="submit" class="admin-primary-btn">{% trans 'جست و جو' %}</button>
+    </form>
+    <a href="{% url 'register:admin_user_list' %}" class="admin-primary-btn admin-mobile-client-button">{% trans 'مشاهده لیست کاربران' %}</a>
+
+    <section class="admin-stat-grid" aria-label="{% trans 'خلاصه مدیریت' %}">
+        <article>
+            <span>{% trans 'کاربران' %}</span>
+            <strong>{{ total_users }}</strong>
+        </article>
+        <article>
+            <span>{% trans 'پروفایل کامل' %}</span>
+            <strong>{{ completed_profiles_count }}</strong>
+        </article>
+        <article>
+            <span>{% trans 'ادمین‌ها' %}</span>
+            <strong>{{ admin_users_count }}</strong>
+        </article>
+        <article>
+            <span>{% trans 'درخواست‌های در انتظار' %}</span>
+            <strong>{{ pending_coach_requests_count }}</strong>
+        </article>
+    </section>
+
+    {% if admin_users %}
+        <section class="admin-recent-panel">
+            <h2>{% blocktrans with count=admin_users_count %}ادمین‌ها و مربیان ({{ count }}){% endblocktrans %}</h2>
+            <div class="admin-recent-list">
+                {% for user in admin_users %}
+                    <a href="{% url 'register:admin_user_hub' user.id %}" class="admin-mini-user">
+                        <span>{{ user.fullname }}{% if user.is_admin %} · {% trans 'ادمین' %}{% endif %}</span>
+                        <small>{{ user.phone }}</small>
+                    </a>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+
+    {% if birthday_users %}
+        <section class="admin-recent-panel">
+            <h2>{% trans '🎉 تولد امروز' %}</h2>
+            <div class="admin-recent-list">
+                {% for user in birthday_users %}
+                    <a href="{% url 'register:admin_user_hub' user.id %}" class="admin-mini-user">
+                        <span>{{ user.display_name|default:user.fullname }}</span>
+                        <small>{{ user.phone }}</small>
+                    </a>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+
+    {% if pending_coach_requests %}
+        <section class="admin-recent-panel">
+            <h2>{% blocktrans with count=pending_coach_requests_count %}درخواست‌های از مربی ({{ count }}){% endblocktrans %}</h2>
+            <div class="admin-result-list">
+                {% for coach_request in pending_coach_requests %}
+                    <article class="admin-result-card">
+                        <div class="admin-result-card__meta">
+                            <div>
+                                <strong>{{ coach_request.user.fullname }}</strong>
+                                <span>{{ coach_request.get_sessions_per_week_display }} —
+                                    {% if coach_request.wants_diet %}{% trans 'برنامه غذایی' %}{% endif %}
+                                    {% if coach_request.wants_workout %}{% trans 'برنامه تمرینی' %}{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        {% include 'admin_portal/_coach_request_detail.html' with coach_request=coach_request %}
+                        <div class="admin-result-card__actions">
+                            <a href="{% url 'register:admin_user_hub' coach_request.user.id %}" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'مشاهده کاربر' %}</a>
+                            {% if coach_request.has_body_data and not coach_request.pushed_to_measurements %}
+                                <form method="post" action="{% url 'register:admin_coach_request_push' coach_request.pk %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                    <button type="submit" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'افزودن اندازه‌ها به اندازه‌گیری‌ها' %}</button>
+                                </form>
+                            {% elif coach_request.pushed_to_measurements %}
+                                <span class="coach-req-pushed">{% trans 'به اندازه‌گیری‌ها افزوده شد' %}</span>
+                            {% endif %}
+                            <form method="post" action="{% url 'register:admin_coach_request_handled' coach_request.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="admin-primary-btn admin-primary-btn--small">{% trans 'بررسی شد' %}</button>
+                            </form>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+
+    {% if has_searched and not search_results %}
+        <article class="admin-empty admin-empty--center">
+            <strong>{% trans 'نتیجه‌ای یافت نشد.' %}</strong>
+            <p>{% trans 'نام یا شماره را دوباره بررسی کنید.' %}</p>
+        </article>
+    {% endif %}
+
+    <section class="admin-result-list">
+        {% for user in search_results %}
+            <article class="admin-result-card">
+                <div class="admin-result-card__meta">
+                    <span class="admin-result-card__avatar" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="8.5" r="3.5" stroke="currentColor" stroke-width="1.8"/>
+                            <path d="M6 19V17.5C6 15.6 7.6 14 9.5 14H14.5C16.4 14 18 15.6 18 17.5V19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                    <div>
+                        <strong>{{ user.fullname }}{% if user.is_admin %} · {% trans 'ادمین' %}{% endif %}</strong>
+                        <span>{{ user.phone }}</span>
+                    </div>
+                </div>
+                <div class="admin-result-card__actions">
+                    <a href="{% url 'register:admin_upload' user.id %}" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'آپلود فایل' %}</a>
+                    {% if not user.is_admin %}
+                    <form method="post" action="{% url 'register:admin_role_toggle' user.id %}" class="admin-role-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="is_admin" value="on">
+                        <button type="submit" class="admin-secondary-btn admin-secondary-btn--small" title="{% trans 'اعطای نقش ادمین' %}">+ {% trans 'ادمین' %}</button>
+                    </form>
+                    {% endif %}
+                    <a href="{% url 'register:admin_user_hub' user.id %}" class="admin-primary-btn admin-primary-btn--small">{% trans 'مشاهده اطلاعات' %}</a>
+                </div>
+            </article>
+        {% empty %}
+            {% if not has_searched %}
+                <section class="admin-recent-panel">
+                    <h2>{% trans 'کاربران اخیر' %}</h2>
+                    <div class="admin-recent-list">
+                        {% for user in recent_users %}
+                            <a href="{% url 'register:admin_user_hub' user.id %}" class="admin-mini-user">
+                                <span>{{ user.fullname }}</span>
+                                <small>{{ user.phone }}</small>
+                            </a>
+                        {% empty %}
+                            <p>{% trans 'هنوز کاربری ثبت نشده است.' %}</p>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endif %}
+        {% endfor %}
+    </section>
+</section>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'admin_portal/_shell.html' %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}تاریخچه اندازه‌گیری‌ها | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block admin_content %}
+<section class="admin-screen admin-search-screen">
+    <header class="admin-screen__header">
+        <a href="{% url 'register:admin_user_hub' target_user.id %}" class="admin-back-link" aria-label="{% trans 'بازگشت' %}">→</a>
+        <h1 class="admin-screen__title">{% trans 'تاریخچه اندازه‌گیری‌ها' %}</h1>
+    </header>
+
+    <p class="admin-screen__lead">{{ target_user.fullname }}</p>
+
+    <section class="admin-result-list admin-result-list--grid">
+        {% for entry in measurement_entries %}
+            <article class="admin-result-card">
+                <div class="admin-result-card__meta">
+                    <div>
+                        <strong>{{ entry.label }}</strong>
+                        <span dir="ltr">{{ entry.date }}</span>
+                    </div>
+                </div>
+                <div class="admin-result-card__actions">
+                    <a href="{{ entry.edit_url }}" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'ویرایش' %}</a>
+                </div>
+            </article>
+        {% empty %}
+            <article class="admin-empty admin-empty--center">
+                <strong>{% trans 'موردی ثبت نشده است.' %}</strong>
+            </article>
+        {% endfor %}
+    </section>
+</section>
+{% endblock %}

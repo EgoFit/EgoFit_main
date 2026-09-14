@@ -1,0 +1,100 @@
+{% load static %}
+{% load my_tags %}
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}" dir="{% if LANGUAGE_CODE == 'en' %}ltr{% else %}rtl{% endif %}" x-bind:class="darkMode ? 'dark' : ''" x-data="themeController">
+<head>
+    <script>
+        (function () {
+            var stored = localStorage.getItem('darkMode');
+            var isDark = stored === 'true';
+            document.documentElement.classList.toggle('dark', isDark);
+        })();
+    </script>
+    <script>
+        document.addEventListener('alpine:init', function () {
+            Alpine.data('themeController', function () {
+                return {
+                    darkMode: localStorage.getItem('darkMode') === 'true',
+                    init() {
+                        const applyTheme = (value) => {
+                            localStorage.setItem('darkMode', value ? 'true' : 'false');
+                            document.documentElement.classList.toggle('dark', value);
+                        };
+
+                        applyTheme(this.darkMode);
+                        this.$watch('darkMode', applyTheme);
+                    },
+                };
+            });
+
+            Alpine.data('mobileMenu', function () {
+                return {
+                    offcanvasOpen: false,
+                    init() {
+                        const syncBodyScroll = (value) => {
+                            document.body.classList.toggle('overflow-hidden', value);
+                        };
+
+                        syncBodyScroll(this.offcanvasOpen);
+                        this.$watch('offcanvasOpen', syncBodyScroll);
+                        window.addEventListener('resize', () => {
+                            if (window.innerWidth >= 992) {
+                                this.offcanvasOpen = false;
+                            }
+                        });
+                    },
+                };
+            });
+        });
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="v6H0hnvakLzKOhJkiGbzBU-nR-5J7n0HA2672yzoa2A" />
+    {% if site_settings.logo %}
+        <link rel="icon" href="{{ site_settings.logo.url }}" />
+    {% else %}
+        <link rel="icon" type="image/webp" href="{% static 'images/logoimageego.webp' %}" />
+    {% endif %}
+    {% block public_media_css %}
+        <link rel="stylesheet" href="{% static 'css/dependencies/swiper-bundle.min.css' %}" />
+        <link rel="stylesheet" href="{% static 'css/dependencies/plyr.min.css' %}" />
+    {% endblock %}
+    <link rel="stylesheet" href="{% static 'css/fonts.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/tokens.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/app.css' %}" />
+    {% block public_ui_css %}
+        <link rel="stylesheet" href="{% static 'css/home-refactor.css' %}" />
+    {% endblock %}
+    {% block extra_css %}{% endblock %}
+    {% trans 'ایگوفیت' as default_meta_title %}
+    <title>{% block title %}{{ site_settings.default_meta_title|default_cms:default_meta_title }}{% endblock %}</title>
+</head>
+<body class="{% block body_class %}public-site{% endblock %}">
+{% block skip_link %}<a href="#main-content" class="skip-link">{% trans 'رفتن به محتوای اصلی' %}</a>{% endblock %}
+<div class="site-shell flex flex-col min-h-screen {% block page_wrapper_class %}bg-background{% endblock %}">
+    {% block header %}
+        {% include 'includes/header.html' %}
+    {% endblock %}
+
+    <div class="site-content flex flex-col flex-1" id="main-content" tabindex="-1">
+        {% block content %}{% endblock %}
+
+        {% block footer %}
+            {% include 'includes/footer.html' %}
+        {% endblock %}
+    </div>
+</div>
+
+<script src="{% static 'js/dependencies/alpinejs.min.js' %}"></script>
+{% block public_media_js %}
+    <script src="{% static 'js/dependencies/swiper-bundle.min.js' %}"></script>
+    <script src="{% static 'js/dependencies/plyr.min.js' %}"></script>
+{% endblock %}
+<script src="{% static 'js/app.js' %}"></script>
+{% block public_ui_js %}
+    <script src="{% static 'js/home-refactor.js' %}"></script>
+{% endblock %}
+{% block extra_js %}{% endblock %}
+</body>
+</html>

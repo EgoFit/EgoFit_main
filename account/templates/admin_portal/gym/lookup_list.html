@@ -1,0 +1,40 @@
+{% extends 'admin_portal/_shell.html' %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}{{ page_title }} | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block admin_content %}
+<section class="admin-screen admin-search-screen">
+    <header class="admin-screen__header admin-screen__header--split">
+        <a href="{% url 'register:admin_gym_library' %}" class="admin-back-link" aria-label="{% trans 'بازگشت' %}">→</a>
+        <h1 class="admin-screen__title">{{ lookup_title }}</h1>
+    </header>
+
+    <a href="{% url 'register:admin_lookup_add' lookup_key %}" class="admin-primary-btn">+ {% trans 'افزودن' %}</a>
+
+    <section class="admin-result-list admin-result-list--grid">
+        {% for item in items %}
+            <article class="admin-result-card">
+                <div class="admin-result-card__meta">
+                    <div>
+                        <strong>{{ item.primary }}</strong>{% if item.secondary %} <span dir="ltr">{{ item.secondary }}</span>{% endif %}
+                    </div>
+                </div>
+                <div class="admin-result-card__actions">
+                    <a href="{% url 'register:admin_lookup_edit' lookup_key item.pk %}" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'ویرایش' %}</a>
+                    <form method="post" action="{% url 'register:admin_lookup_delete' lookup_key item.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'حذف' %}</button>
+                    </form>
+                </div>
+            </article>
+        {% empty %}
+            <article class="admin-empty admin-empty--center">
+                <strong>{% trans 'موردی ثبت نشده است.' %}</strong>
+            </article>
+        {% endfor %}
+    </section>
+
+    {% include 'admin_portal/gym/_pagination.html' %}
+</section>
+{% endblock %}

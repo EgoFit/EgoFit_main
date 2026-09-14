@@ -1,0 +1,381 @@
+{% extends 'account/_shell.html' %}
+{% load my_tags %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}برنامه بدنسازی | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block account_content %}
+<section class="profile-screen profile-screen--wide workout-program-screen">
+    <header class="profile-screen__header">
+        <h2 class="profile-screen__title">{% trans 'برنامه بدنسازی' %}</h2>
+    </header>
+
+    <div class="workout-program-list" data-workout-program-list>
+        {% if programs %}
+            <div class="workout-program-list__header">
+                <div class="workout-program-list__heading">
+                    <span class="workout-program-list__icon" aria-hidden="true">✦</span>
+                    <div>
+                        <span class="account-eyebrow">{% trans 'برنامه‌های تمرینی شما' %}</span>
+                        <h2>{% trans 'یک برنامه را برای شروع انتخاب کنید' %}</h2>
+                        <p>{% trans 'جزئیات تمرین، رکوردها و بازخورد هر برنامه در صفحه اختصاصی آن در دسترس است.' %}</p>
+                    </div>
+                </div>
+                <span class="workout-program-list__count">{{ programs|length }} {% trans 'برنامه' %}</span>
+            </div>
+        {% endif %}
+
+        {% for program in programs %}
+            <a href="#workout-program-{{ program.pk }}" class="workout-program-list-item secondary-action" data-workout-program-open="{{ program.pk }}">
+                <span class="workout-program-list-item__index" aria-hidden="true">{{ forloop.counter|stringformat:"02d" }}</span>
+                <span class="workout-program-list-item__body">
+                    <span class="workout-program-list-item__title">{{ program.title }}</span>
+                    <span class="workout-program-list-item__meta">
+                        <span><strong>{% trans 'شروع' %}</strong>{{ program.start_date|date:"Y/m/d" }}</span>
+                        {% if program.end_date %}<span><strong>{% trans 'پایان' %}</strong>{{ program.end_date|date:"Y/m/d" }}</span>{% endif %}
+                        <span><strong>{% trans 'مربی' %}</strong>{% if program.prescribed_by %}{{ program.prescribed_by.display_name|default:program.prescribed_by.fullname }}{% else %}{% trans 'نامشخص' %}{% endif %}</span>
+                    </span>
+                    <span class="workout-program-list-item__status"><span aria-hidden="true"></span>{% if program.can_access %}{% trans 'آماده ثبت رکورد' %}{% else %}{% trans 'نیازمند پرداخت' %}{% endif %}</span>
+                </span>
+                <span class="workout-program-list-item__arrow" aria-hidden="true">←</span>
+            </a>
+        {% empty %}
+            <section class="account-card">
+                <div class="empty-state">
+                    <h3>{% trans 'هنوز برنامه بدنسازی برای شما ثبت نشده است' %}</h3>
+                    <p>{% trans 'پس از تجویز و انتشار برنامه توسط مربی، برنامه شما در این بخش نمایش داده می‌شود.' %}</p>
+                </div>
+            </section>
+        {% endfor %}
+    </div>
+
+    {% for program in programs %}
+        <article class="workout-program-card" id="workout-program-{{ program.pk }}" data-workout-program-detail hidden>
+            <div class="workout-program-card__back">
+                <button type="button" class="secondary-action" data-workout-program-back>{% trans 'بازگشت به لیست برنامه‌ها' %}</button>
+            </div>
+            {% if not program.can_access %}
+                <section class="account-card">
+                    <span class="account-eyebrow">{% trans 'برنامه پولی' %}</span>
+                    <h2>{{ program.title }}</h2>
+                    <p>{% trans 'برای مشاهده جزئیات، ثبت رکورد و دریافت PDF، ابتدا هزینه برنامه را پرداخت کنید.' %}</p>
+                    <form method="post" action="{% url 'register:profile_workout_program_pay' program.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="cta-primary">{% blocktrans with price=program.price %}پرداخت {{ price }} تومان و فعال‌سازی برنامه{% endblocktrans %}</button>
+                    </form>
+                </section>
+            {% else %}
+            <header class="workout-program-card__header">
+                <div>
+                    <span class="account-eyebrow">{% trans 'برنامه تجویز‌شده' %}</span>
+                    <h2>{{ program.title }}</h2>
+                    <p>
+                        {% trans 'شروع' %}: {{ program.start_date|date:"Y/m/d" }}
+                        {% if program.end_date %} — {% trans 'پایان' %}: {{ program.end_date|date:"Y/m/d" }}{% endif %}
+                    </p>
+                </div>
+                <a
+                    href="{% url 'register:profile_workout_program_pdf' program.pk %}"
+                    class="secondary-action workout-program-pdf-download"
+                    download
+                    aria-label="{% trans 'دریافت PDF برنامه' %}"
+                >
+                    <span class="workout-program-pdf-download__icon" aria-hidden="true">⇩</span>
+                    <span>{% trans 'دریافت PDF' %}</span>
+                </a>
+            </header>
+
+            {% if program.notes %}
+                <div class="workout-program-card__notes">{{ program.notes|linebreaksbr }}</div>
+            {% endif %}
+
+            {% for day in program.days.all %}
+                <form method="post" action="{% url 'register:profile_workout_program_performance' program.pk %}" class="workout-performance-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="day_id" value="{{ day.pk }}">
+                    <section class="workout-day">
+                        <div class="workout-day__heading">
+                            <div class="workout-day__title">
+                                <span class="account-eyebrow workout-day__eyebrow">{% trans 'جلسه تمرین' %} {{ forloop.counter }}</span>
+                                <h3>{{ day.name }}</h3>
+                            </div>
+                            {% if day.notes %}<p>{{ day.notes }}</p>{% endif %}
+                        </div>
+                        <div class="workout-table-wrap">
+                            <table class="workout-table">
+                                <thead>
+                                    <tr>
+                                        <th>{% trans 'حرکت' %}</th>
+                                        <th>{% trans 'ست' %}</th>
+                                        <th>{% trans 'تکرار' %}</th>
+                                        <th>{% trans 'استراحت (دقیقه)' %}</th>
+                                        <th>{% trans 'نکته' %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in day.items.all %}
+                                        <tr>
+                                            <td>
+                                                <a href="{% url 'register:profile_workout_movement' 'exercise' item.exercise.pk %}?program={{ program.pk }}" class="workout-movement-link">{{ item.exercise.name }}</a>
+                                            </td>
+                                            <td>{{ item.sets }}</td>
+                                            <td>{{ item.reps }}</td>
+                                            <td>{{ item.rest|default:"—" }}</td>
+                                            <td>{{ item.note|default:"—" }}</td>
+                                        </tr>
+                                        {% if item.superset_exercise %}
+                                            <tr>
+                                                <td>
+                                                    <span class="workout-superset-label">{% trans 'سوپرست با حرکت بالا' %}</span>
+                                                    <a href="{% url 'register:profile_workout_movement' 'exercise' item.superset_exercise.pk %}?program={{ program.pk }}" class="workout-movement-link">{{ item.superset_exercise.name }}</a>
+                                                </td>
+                                                <td>{{ item.superset_sets|default:item.sets }}</td>
+                                                <td>{{ item.superset_reps|default:item.reps }}</td>
+                                                <td>{{ item.superset_rest|default:item.rest|default:"—" }}</td>
+                                                <td>{{ item.note|default:"—" }}</td>
+                                            </tr>
+                                        {% endif %}
+                                        {% if item.third_exercise %}
+                                            <tr>
+                                                <td>
+                                                    <span class="workout-superset-label">{% trans ' حرکت سوم برای دو حرکت بالا' %}</span>
+                                                    <a href="{% url 'register:profile_workout_movement' 'exercise' item.third_exercise.pk %}?program={{ program.pk }}" class="workout-movement-link">{{ item.third_exercise.name }}</a>
+                                                </td>
+                                                <td>{{ item.third_sets|default:item.sets }}</td>
+                                                <td>{{ item.third_reps|default:item.reps }}</td>
+                                                <td>{{ item.third_rest|default:item.rest|default:"—" }}</td>
+                                                <td>{{ item.note|default:"—" }}</td>
+                                            </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="workout-performance-grid">
+                            {% for movement in day.performance_movements %}
+                                <article class="workout-performance-card" data-performance-card data-performance-key="{{ movement.input_prefix }}">
+                                    <div class="workout-performance-card__header">
+                                        <div>
+                                            <a href="{% url 'register:profile_workout_movement' 'exercise' movement.exercise.pk %}?program={{ program.pk }}" class="workout-movement-link">{{ movement.exercise.name }}</a>
+                                            <p>{% trans 'ثبت عملکرد برای' %} {{ movement.repetitions }} {% trans 'تکرار' %}</p>
+                                        </div>
+                                        <label class="workout-performance-card__select">
+                                            <span>{% trans 'نحوه اجرا' %}</span>
+                                            <select name="{{ movement.input_prefix }}_mode" data-performance-mode-select>
+                                                {% for mode in movement.modes %}
+                                                    <option value="{{ mode.value }}" {% if mode.value == movement.selected_mode %}selected{% endif %}>{{ mode.label }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </label>
+                                    </div>
+
+                                    {% for mode in movement.modes %}
+                                        <div
+                                            class="workout-performance-mode"
+                                            data-performance-mode-panel="{{ mode.value }}"
+                                            {% if mode.value != movement.selected_mode %}hidden{% endif %}
+                                        >
+                                            <div class="workout-performance-mode__summary">
+                                                {% if mode.best %}
+                                                    <span>{% trans 'رکورد قبلی برای این تعداد تکرار' %}: <strong>{{ mode.best }} {{ mode.unit }}</strong></span>
+                                                {% else %}
+                                                    <span>{% trans 'برای این تعداد تکرار هنوز رکوردی ثبت نشده است.' %}</span>
+                                                {% endif %}
+                                                <small>{% trans 'برای این حرکت فقط یک ردیف و به تعداد ست برنامه ثبت می‌شود.' %}</small>
+                                            </div>
+                                            <div class="workout-set-inputs">
+                                                {% for set in mode.sets %}
+                                                    <label>
+                                                        <span>{% trans 'ست' %} {{ set.number }} <small>({{ mode.unit }})</small></span>
+                                                        <input
+                                                            type="number"
+                                                            name="{{ movement.input_prefix }}_{{ mode.value }}_set_{{ set.number }}"
+                                                            value="{{ set.value|default_if_none:'' }}"
+                                                            min="0"
+                                                            step="{{ mode.step }}"
+                                                            inputmode="decimal"
+                                                            placeholder="{% trans 'مقدار' %}"
+                                                            {% if mode.value == movement.selected_mode %}{% else %}disabled{% endif %}
+                                                        >
+                                                    </label>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </article>
+                            {% endfor %}
+                        </div>
+
+                        <section class="workout-program-feedback">
+                            <div class="workout-program-feedback__heading">
+                                <div>
+                                    <span class="account-eyebrow">{% trans 'بازخورد روز' %}</span>
+                                    <h3>{% trans 'سطح دشواری این روز چقدر بود؟' %}</h3>
+                                    <p>{% trans 'پس از پایان این روز، یک امتیاز از صفر تا ۱۰ به سختی تمرین بدهید.' %}</p>
+                                </div>
+                                <output data-difficulty-output>
+                                    {% if day.user_feedback %}{{ day.user_feedback.difficulty }}{% else %}5{% endif %}/10
+                                </output>
+                            </div>
+                            <input
+                                type="range"
+                                name="difficulty"
+                                min="0"
+                                max="10"
+                                step="1"
+                                value="{% if day.user_feedback %}{{ day.user_feedback.difficulty }}{% else %}5{% endif %}"
+                                data-difficulty-slider
+                                aria-label="{% trans 'سطح دشواری این روز از صفر تا ده' %}"
+                            >
+                            <div class="workout-program-feedback__scale" aria-hidden="true">
+                                <span>0</span><span>5</span><span>10</span>
+                            </div>
+                        </section>
+
+                        <button type="submit" class="cta-primary workout-performance-submit" aria-label="{% trans 'ذخیره رکوردها و بازخورد این روز' %}">
+                            <span aria-hidden="true">✓</span>
+                            {% trans 'ذخیره رکوردها و بازخورد' %}
+                        </button>
+                    </section>
+                </form>
+                {% endfor %}
+
+                {% if program.warmup_correctives %}
+                    <section class="workout-corrective">
+                        <h3>{% trans 'حرکات اصلاحی حین گرم کردن' %}</h3>
+                        {% for corrective in program.warmup_correctives %}
+                            <div class="workout-corrective__item">
+                                <a href="{% url 'register:profile_workout_movement' 'corrective' corrective.corrective_exercise.pk %}?program={{ program.pk }}" class="workout-movement-link">{{ corrective.corrective_exercise.name }}</a>
+                                <span>{% if corrective.sets %}{{ corrective.sets }} {% trans 'ست' %}{% endif %}{% if corrective.reps %} — {{ corrective.reps }}{% endif %}</span>
+                                {% if corrective.note %}<small>{{ corrective.note }}</small>{% endif %}
+                            </div>
+                        {% endfor %}
+                    </section>
+                {% endif %}
+                {% if program.cooldown_correctives %}
+                    <section class="workout-corrective">
+                        <h3>{% trans 'حرکات اصلاحی حین سرد کردن' %}</h3>
+                        {% for corrective in program.cooldown_correctives %}
+                            <div class="workout-corrective__item">
+                                <a href="{% url 'register:profile_workout_movement' 'corrective' corrective.corrective_exercise.pk %}?program={{ program.pk }}" class="workout-movement-link">{{ corrective.corrective_exercise.name }}</a>
+                                <span>{% if corrective.sets %}{{ corrective.sets }} {% trans 'ست' %}{% endif %}{% if corrective.reps %} — {{ corrective.reps }}{% endif %}</span>
+                                {% if corrective.note %}<small>{{ corrective.note }}</small>{% endif %}
+                            </div>
+                        {% endfor %}
+                    </section>
+                {% endif %}
+
+                {% if program.supplements_note or program.warmup_notes or program.cooldown_notes %}
+                    <section class="workout-program-card__extra">
+                        {% if program.supplements_note %}<div><strong>{% trans 'مکمل و نکات تغذیه‌ای' %}</strong><p>{{ program.supplements_note|linebreaksbr }}</p></div>{% endif %}
+                        {% if program.warmup_notes %}<div><strong>{% trans 'توضیحات گرم کردن' %}</strong><p>{{ program.warmup_notes|linebreaksbr }}</p></div>{% endif %}
+                        {% if program.cooldown_notes %}<div><strong>{% trans 'توضیحات سرد کردن' %}</strong><p>{{ program.cooldown_notes|linebreaksbr }}</p></div>{% endif %}
+                    </section>
+                {% endif %}
+            {% endif %}
+
+        </article>
+    {% endfor %}
+</section>
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            (function () {
+                var list = document.querySelector("[data-workout-program-list]");
+                var details = Array.prototype.slice.call(document.querySelectorAll("[data-workout-program-detail]"));
+                if (!list || !details.length) {
+                    return;
+                }
+
+                function showList() {
+                    details.forEach(function (detail) {
+                        detail.hidden = true;
+                    });
+                    list.hidden = false;
+                }
+
+                function showDetail(pk) {
+                    var target = document.getElementById("workout-program-" + pk);
+                    if (!target) {
+                        return false;
+                    }
+                    details.forEach(function (detail) {
+                        detail.hidden = detail !== target;
+                    });
+                    list.hidden = true;
+                    target.scrollIntoView({ behavior: "smooth", block: "start" });
+                    return true;
+                }
+
+                function pkFromHash() {
+                    var match = /^#workout-program-(\d+)/.exec(window.location.hash);
+                    return match ? match[1] : null;
+                }
+
+                document.querySelectorAll("[data-workout-program-open]").forEach(function (trigger) {
+                    trigger.addEventListener("click", function (event) {
+                        event.preventDefault();
+                        var pk = trigger.getAttribute("data-workout-program-open");
+                        if (showDetail(pk)) {
+                            history.pushState(null, "", "#workout-program-" + pk);
+                        }
+                    });
+                });
+
+                document.querySelectorAll("[data-workout-program-back]").forEach(function (backButton) {
+                    backButton.addEventListener("click", function (event) {
+                        event.preventDefault();
+                        showList();
+                        history.pushState(null, "", window.location.pathname + window.location.search);
+                    });
+                });
+
+                window.addEventListener("popstate", function () {
+                    var pk = pkFromHash();
+                    if (!pk || !showDetail(pk)) {
+                        showList();
+                    }
+                });
+
+                var initialPk = pkFromHash();
+                if (!initialPk || !showDetail(initialPk)) {
+                    showList();
+                }
+            })();
+
+            document.querySelectorAll("[data-performance-card]").forEach(function (card) {
+                var select = card.querySelector("[data-performance-mode-select]");
+                var panels = card.querySelectorAll("[data-performance-mode-panel]");
+                if (!select) {
+                    return;
+                }
+                function syncMode() {
+                    panels.forEach(function (panel) {
+                        var active = panel.dataset.performanceModePanel === select.value;
+                        panel.hidden = !active;
+                        panel.querySelectorAll("input").forEach(function (input) {
+                            input.disabled = !active;
+                        });
+                    });
+                }
+                select.addEventListener("change", syncMode);
+                syncMode();
+            });
+
+            document.querySelectorAll("[data-difficulty-slider]").forEach(function (slider) {
+                var output = slider.closest(".workout-program-feedback").querySelector("[data-difficulty-output]");
+                function syncDifficulty() {
+                    if (output) {
+                        output.textContent = slider.value + "/10";
+                    }
+                }
+                slider.addEventListener("input", syncDifficulty);
+                syncDifficulty();
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends 'account/_shell.html' %}
+{% load my_tags %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}پروفایل | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block account_content %}
+<section class="profile-screen">
+    <header class="profile-screen__header">
+        <h2 class="profile-screen__title">{% trans 'پروفایل' %}</h2>
+    </header>
+
+    {% if dashboard_feed %}
+        <article class="dashboard-feed-banner dashboard-feed-banner--{{ dashboard_feed.kind }}">
+            <span class="dashboard-feed-banner__icon" aria-hidden="true">{% if dashboard_feed.kind == 'birthday' %}🎉{% else %}📣{% endif %}</span>
+            <div class="dashboard-feed-banner__body">
+                <strong>{{ dashboard_feed.title }}</strong>
+                {% if dashboard_feed.body %}<p>{{ dashboard_feed.body }}</p>{% endif %}
+            </div>
+        </article>
+    {% endif %}
+
+    <article class="profile-identity-card">
+        <div class="profile-identity-card__meta">
+            <span class="profile-identity-card__label">{% trans 'نام و نام خانوادگی' %}</span>
+            <strong>{{ request.user.fullname }}</strong>
+            <span class="profile-identity-card__phone">{{ request.user.phone }}</span>
+        </div>
+        <div class="profile-identity-card__avatar" aria-hidden="true">
+            {% if request.user.profile_picture %}
+                <img src="{{ request.user.profile_picture|public_media_url }}" alt="{{ request.user.fullname }}" loading="lazy">
+            {% else %}
+                <img src="{% static 'images/avatars/download.png' %}" alt="{{ request.user.fullname }}" loading="lazy">
+            {% endif %}
+        </div>
+    </article>
+
+    <section class="profile-metric-grid">
+        {% for card in profile_overview_cards %}
+            <a href="{% url card.edit_url %}" class="profile-metric-card {% if card.full_width %}profile-metric-card--wide{% endif %} {% if card.icon == 'blood_group' %}profile-metric-card--blood{% endif %}">
+                <div class="profile-metric-card__icon" aria-hidden="true">
+                    {% include 'includes/profile_metric_icon.html' with icon=card.icon %}
+                </div>
+                <div class="profile-metric-card__content">
+                    <span class="profile-metric-card__label">{{ card.label }}</span>
+                    <strong class="profile-metric-card__value">{{ card.value }}</strong>
+                </div>
+            </a>
+        {% endfor %}
+    </section>
+
+    <section class="dashboard-courses" aria-label="{% trans 'دوره‌های من' %}">
+        <div class="dashboard-courses__head">
+            <h2 class="dashboard-courses__title">{% trans 'دوره‌های من' %}</h2>
+            <a href="{% url 'register:profile_course' %}" class="dashboard-courses__link">{% trans 'مشاهده همه' %}</a>
+        </div>
+        {% if recent_courses %}
+            <div class="dashboard-courses__list">
+                {% for item in recent_courses %}
+                    <a href="{% url 'home:series_episod' item.id %}" class="dashboard-course-card">
+                        <span class="dashboard-course-card__thumb">
+                            {% if item.image %}<img src="{{ item.image|public_media_url }}" alt="" loading="lazy">{% endif %}
+                        </span>
+                        <span class="dashboard-course-card__body">
+                            <strong class="dashboard-course-card__title">{{ item.title }}</strong>
+                            <span class="dashboard-course-card__meta">{{ item.author }}</span>
+                        </span>
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="dashboard-courses__empty">
+                <p>{% trans 'هنوز در دوره‌ای ثبت‌نام نکرده‌اید.' %}</p>
+                <a href="{% url 'home:series' %}" class="cta-primary">{% trans 'مشاهده دوره‌ها' %}</a>
+            </div>
+        {% endif %}
+    </section>
+
+    <section class="profile-settings-hub" aria-label="{% trans 'تنظیمات حساب' %}">
+        <h2 class="profile-settings-hub__title">{% trans 'تنظیمات حساب' %}</h2>
+        <nav class="profile-settings-hub__list">
+            <a href="{% url 'register:profile_financial' %}" class="profile-settings-hub__item">{% trans 'مالی و سفارش‌ها' %}</a>
+            <a href="{% url 'register:profile_comments' %}" class="profile-settings-hub__item">{% trans 'دیدگاه‌های من' %}</a>
+            <a href="{% url 'register:profile_notifications' %}" class="profile-settings-hub__item">{% trans 'اعلان‌ها' %}</a>
+            <a href="{% url 'register:profile_useredit' %}" class="profile-settings-hub__item">{% trans 'ویرایش پروفایل' %}</a>
+            <a href="{% url 'register:profile_number_edit' %}" class="profile-settings-hub__item">{% trans 'ویرایش شماره تماس' %}</a>
+            <a href="{% url 'register:change_password' %}" class="profile-settings-hub__item">{% trans 'تغییر رمز عبور' %}</a>
+            <a href="{% url 'register:logout' %}" class="profile-settings-hub__item profile-settings-hub__item--danger">{% trans 'خروج از حساب' %}</a>
+        </nav>
+    </section>
+</section>
+{% endblock %}

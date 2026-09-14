@@ -1,0 +1,25 @@
+{% extends 'admin_portal/_shell.html' %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}{{ page_title }} | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block admin_content %}
+<section class="admin-screen">
+    <header class="admin-screen__header">
+        <a href="{% url 'register:admin_muscle_list' %}" class="admin-back-link" aria-label="{% trans 'بازگشت' %}">→</a>
+        <h1 class="admin-screen__title">{{ page_title }}</h1>
+    </header>
+
+    <form method="post" enctype="multipart/form-data" class="admin-form-grid admin-form-grid--stacked">
+        {% csrf_token %}
+        <div class="field-group"><label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>{{ form.name }}{{ form.name.errors }}</div>
+        <div class="field-group"><label for="{{ form.name_en.id_for_label }}">{{ form.name_en.label }}</label>{{ form.name_en }}{{ form.name_en.errors }}</div>
+        <div class="field-group"><label for="{{ form.origin.id_for_label }}">{{ form.origin.label }}</label>{{ form.origin }}{{ form.origin.errors }}</div>
+        <div class="field-group"><label for="{{ form.insertion.id_for_label }}">{{ form.insertion.label }}</label>{{ form.insertion }}{{ form.insertion.errors }}</div>
+        <div class="field-group"><label for="{{ form.nerve.id_for_label }}">{{ form.nerve.label }}</label>{{ form.nerve }}{{ form.nerve.errors }}</div>
+        <div class="field-group"><label for="{{ form.function_note.id_for_label }}">{{ form.function_note.label }}</label>{{ form.function_note }}{{ form.function_note.errors }}</div>
+        <div class="field-group"><label for="{{ form.image.id_for_label }}">{{ form.image.label }}</label>{{ form.image }}{{ form.image.errors }}</div>
+        <button type="submit" class="admin-primary-btn">{% trans 'ثبت' %}</button>
+    </form>
+</section>
+{% endblock %}

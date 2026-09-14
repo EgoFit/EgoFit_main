@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}پرداخت ناموفق | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block content %}
+<main class="page-section">
+    <div class="shell-container">
+        <section class="section-card result-card is-danger modern-surface" data-reveal>
+            <span class="result-card__icon" aria-hidden="true">!</span>
+            <span class="eyebrow">{% trans 'پرداخت ناموفق' %}</span>
+            <h1>{% trans 'پرداخت کامل نشد' %}</h1>
+            <p>{% trans 'فرایند پرداخت با خطا متوقف شد یا توسط شما لغو گردید. می‌توانید دوباره تلاش کنید یا به سبد خرید بازگردید.' %}</p>
+            <div class="result-card__actions">
+                <a href="{% url 'cart:cart_detail' %}" class="cta-primary cta-primary--strong">{% trans 'بازگشت به سبد خرید' %}</a>
+                <a href="{% url 'home:home' %}" class="cta-secondary cta-secondary--soft">{% trans 'صفحه اصلی' %}</a>
+            </div>
+        </section>
+    </div>
+</main>
+{% endblock %}

@@ -1,0 +1,176 @@
+{% extends 'admin_portal/_shell.html' %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}اعلانات | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block admin_content %}
+<section class="admin-screen admin-notifications-screen">
+    <header class="admin-screen__header">
+        <h1 class="admin-screen__title">{% trans 'اعلانات' %}</h1>
+    </header>
+
+    <section class="admin-recent-panel">
+        <h2>{% blocktrans with count=pending_coach_requests|length %}درخواست‌های از مربی ({{ count }}){% endblocktrans %}</h2>
+        <div class="admin-result-list">
+            {% for coach_request in pending_coach_requests %}
+                <article class="admin-result-card admin-notification-card">
+                    <header class="admin-notification-card__header">
+                        <div class="admin-notification-user">
+                            <span class="admin-notification-user__avatar" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <circle cx="12" cy="8.5" r="3.5" stroke="currentColor" stroke-width="1.8"/>
+                                    <path d="M6 19V17.5C6 15.6 7.6 14 9.5 14H14.5C16.4 14 18 15.6 18 17.5V19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                                </svg>
+                            </span>
+                            <div class="admin-notification-user__identity">
+                                <span class="account-eyebrow">{% trans 'درخواست جدید برنامه' %}</span>
+                                <strong>{{ coach_request.user.display_name|default:coach_request.user.fullname }}</strong>
+                                <a href="tel:{{ coach_request.user.phone }}" dir="ltr">{{ coach_request.user.phone }}</a>
+                            </div>
+                        </div>
+                        <time datetime="{{ coach_request.created_at|date:'c' }}">{{ coach_request.created_at|date:"Y/m/d" }}</time>
+                    </header>
+
+                    <div class="admin-notification-request-meta">
+                        <span>{{ coach_request.get_sessions_per_week_display }}</span>
+                        {% if coach_request.wants_diet %}<span>{% trans 'برنامه غذایی' %}</span>{% endif %}
+                        {% if coach_request.wants_workout %}<span>{% trans 'برنامه تمرینی' %}</span>{% endif %}
+                    </div>
+
+                    <div class="admin-notification-card__summary">
+                        <span>{% trans 'اطلاعات ارسالی ورزشکار' %}</span>
+                        <strong>{% trans 'برای بررسی و تنظیم برنامه' %}</strong>
+                    </div>
+
+                    <div class="admin-notification-card__details">
+                        {% include 'admin_portal/_coach_request_detail.html' with coach_request=coach_request %}
+                    </div>
+                    <div class="admin-result-card__actions">
+                        <a href="{% url 'register:admin_user_hub' coach_request.user.id %}" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'مشاهده کاربر' %}</a>
+                        {% if coach_request.has_body_data and not coach_request.pushed_to_measurements %}
+                            <form method="post" action="{% url 'register:admin_coach_request_push' coach_request.pk %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="next" value="{% url 'register:admin_notifications' %}">
+                                <button type="submit" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'افزودن اندازه‌ها به اندازه‌گیری‌ها' %}</button>
+                            </form>
+                        {% elif coach_request.pushed_to_measurements %}
+                            <span class="coach-req-pushed">{% trans 'به اندازه‌گیری‌ها افزوده شد' %}</span>
+                        {% endif %}
+                        <form method="post" action="{% url 'register:admin_coach_request_handled' coach_request.pk %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{% url 'register:admin_notifications' %}">
+                            <button type="submit" class="admin-primary-btn admin-primary-btn--small">{% trans 'بررسی شد' %}</button>
+                        </form>
+                    </div>
+                </article>
+            {% empty %}
+                <article class="admin-empty admin-empty--center">
+                    <strong>{% trans 'درخواستی در انتظار بررسی نیست.' %}</strong>
+                </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="admin-recent-panel">
+        <h2>{% blocktrans with count=pending_opinions|length %}نظرات تماس با ما ({{ count }}){% endblocktrans %}</h2>
+        <div class="admin-result-list">
+            {% for opinion in pending_opinions %}
+                <article class="admin-result-card admin-notification-card admin-moderation-card">
+                    <header class="admin-notification-card__header">
+                        <div class="admin-notification-user">
+                            <span class="admin-notification-user__avatar" aria-hidden="true">✉</span>
+                            <div class="admin-notification-user__identity">
+                                <span class="account-eyebrow">{% trans 'نظر جدید' %}</span>
+                                <strong>{{ opinion.name }}</strong>
+                                <a href="mailto:{{ opinion.email }}" dir="ltr">{{ opinion.email }}</a>
+                            </div>
+                        </div>
+                        {% if opinion.phone %}<a class="admin-notification-card__phone" href="tel:{{ opinion.phone }}" dir="ltr">{{ opinion.phone }}</a>{% endif %}
+                    </header>
+                    <div class="admin-notification-card__summary">
+                        <span>{% trans 'متن نظر' %}</span>
+                        <p>{{ opinion.comment }}</p>
+                    </div>
+                    <form method="post" action="{% url 'register:admin_comment_moderate' %}" class="admin-moderation-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="kind" value="opinion">
+                        <input type="hidden" name="object_id" value="{{ opinion.pk }}">
+                        <textarea name="response" rows="3" class="admin-input" placeholder="{% trans 'پاسخ مدیر (اختیاری)' %}"></textarea>
+                        <div class="admin-result-card__actions">
+                            <button type="submit" name="action" value="approve" class="admin-primary-btn admin-primary-btn--small">{% trans 'تایید و انتشار' %}</button>
+                            <button type="submit" name="action" value="reject" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'رد و عدم انتشار' %}</button>
+                            <button type="submit" name="action" value="respond" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'ثبت پاسخ' %}</button>
+                        </div>
+                    </form>
+                </article>
+            {% empty %}
+                <article class="admin-empty admin-empty--center"><strong>{% trans 'نظر جدیدی در انتظار بررسی نیست.' %}</strong></article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="admin-recent-panel">
+        <h2>{% blocktrans with count=pending_comments|length %}دیدگاه‌های دوره‌ها ({{ count }}){% endblocktrans %}</h2>
+        <div class="admin-result-list">
+            {% for comment in pending_comments %}
+                <article class="admin-result-card admin-notification-card admin-moderation-card">
+                    <header class="admin-notification-card__header">
+                        <div class="admin-notification-user">
+                            <span class="admin-notification-user__avatar" aria-hidden="true">💬</span>
+                            <div class="admin-notification-user__identity">
+                                <span class="account-eyebrow">{% trans 'دیدگاه دوره' %}</span>
+                                <strong>{{ comment.user.fullname|default:comment.user.phone }}</strong>
+                                {% if comment.series %}<span>{{ comment.series.title }}</span>{% endif %}
+                            </div>
+                        </div>
+                        <time datetime="{{ comment.created_at|date:'c' }}">{{ comment.created_at|date:"Y/m/d" }}</time>
+                    </header>
+                    <div class="admin-notification-card__summary">
+                        <span>{% trans 'متن دیدگاه' %}</span>
+                        <p>{{ comment.text }}</p>
+                    </div>
+                    <form method="post" action="{% url 'register:admin_comment_moderate' %}" class="admin-moderation-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="kind" value="comment">
+                        <input type="hidden" name="object_id" value="{{ comment.pk }}">
+                        <textarea name="response" rows="3" class="admin-input" placeholder="{% trans 'پاسخ مدیر (اختیاری)' %}"></textarea>
+                        <div class="admin-result-card__actions">
+                            <button type="submit" name="action" value="approve" class="admin-primary-btn admin-primary-btn--small">{% trans 'تایید و انتشار' %}</button>
+                            <button type="submit" name="action" value="reject" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'رد و عدم انتشار' %}</button>
+                            <button type="submit" name="action" value="respond" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'ثبت پاسخ' %}</button>
+                        </div>
+                    </form>
+                </article>
+            {% empty %}
+                <article class="admin-empty admin-empty--center"><strong>{% trans 'دیدگاه جدیدی در انتظار بررسی نیست.' %}</strong></article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="admin-recent-panel">
+        <h2>{% trans '🎉 تولد امروز' %}</h2>
+        <div class="admin-result-list">
+            {% for entry in birthday_users %}
+                <article class="admin-result-card">
+                    <div class="admin-result-card__meta">
+                        <div>
+                            <strong>{{ entry.user.display_name|default:entry.user.fullname }}</strong>
+                            <span dir="ltr">{{ entry.user.phone }}</span>
+                        </div>
+                    </div>
+                    <div class="admin-result-card__actions">
+                        {% if entry.sms_sent %}
+                            <span class="admin-secondary-btn admin-secondary-btn--small">{% trans 'پیامک ارسال شد ✓' %}</span>
+                        {% endif %}
+                        <a href="{% url 'register:admin_user_hub' entry.user.id %}" class="admin-primary-btn admin-primary-btn--small">{% trans 'مشاهده کاربر' %}</a>
+                    </div>
+                </article>
+            {% empty %}
+                <article class="admin-empty admin-empty--center">
+                    <strong>{% trans 'امروز تولدی ثبت نشده است.' %}</strong>
+                </article>
+            {% endfor %}
+        </div>
+    </section>
+</section>
+{% endblock %}

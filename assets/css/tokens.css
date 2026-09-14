@@ -1,0 +1,15 @@
+:root {
+    --primary: #3454d1;
+    --primary-dark: #2f4ecc;
+    --account-brand: var(--primary);
+    --account-brand-dark: var(--primary-dark);
+    --breakpoint-sm: 640px;
+    --breakpoint-md: 900px;
+    --breakpoint-lg: 1180px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+    --radius-pill: 999px;
+}

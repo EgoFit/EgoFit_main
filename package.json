@@ -1,0 +1,11 @@
+{
+  "name": "egofit-frontend-tests",
+  "private": true,
+  "scripts": {
+    "test:frontend": "playwright test",
+    "benchmark:http": "node benchmarks/http_load.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0"
+  }
+}

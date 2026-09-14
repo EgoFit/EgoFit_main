@@ -1,0 +1,49 @@
+{% extends 'admin_portal/_shell.html' %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}{{ page_title }} | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block admin_content %}
+<section class="admin-screen">
+    <header class="admin-screen__header">
+        <a href="{% url 'register:admin_corrective_list' %}" class="admin-back-link" aria-label="{% trans 'بازگشت' %}">→</a>
+        <h1 class="admin-screen__title">{{ page_title }}</h1>
+    </header>
+
+    <form method="post" enctype="multipart/form-data" class="admin-form-grid admin-form-grid--stacked admin-form-grid--cols2">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            <div class="admin-form-errors">
+                {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+            </div>
+        {% endif %}
+        <div class="field-group admin-form-grid__full"><label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>{{ form.name }}{{ form.name.errors }}</div>
+        <div class="field-group"><label for="{{ form.abnormality_type.id_for_label }}">{{ form.abnormality_type.label }}</label>{{ form.abnormality_type }}{{ form.abnormality_type.errors }}</div>
+        <div class="field-group"><label for="{{ form.equipment.id_for_label }}">{{ form.equipment.label }}</label>{{ form.equipment }}{{ form.equipment.errors }}</div>
+        <div class="field-group admin-form-grid__full"><label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>{{ form.description }}{{ form.description.errors }}</div>
+        <div class="field-group admin-form-grid__full">
+            <label for="{{ form.media.id_for_label }}">{{ form.media.label }}</label>
+            {{ form.media }}{{ form.media.errors }}
+        </div>
+        <fieldset class="admin-form-grid__full admin-video-fieldset">
+            <legend>{% trans 'ویدیوهای حرکت اصلاحی' %}</legend>
+            <p class="admin-form-help">{% trans 'برای هر حرکت اصلاحی می‌توانید تا سه ویدیو ثبت کنید.' %}</p>
+            <div class="admin-video-field-grid">
+                <div class="field-group">
+                    <label for="{{ form.video_1.id_for_label }}">{{ form.video_1.label }}</label>
+                    {{ form.video_1 }}{{ form.video_1.errors }}
+                </div>
+                <div class="field-group">
+                    <label for="{{ form.video_2.id_for_label }}">{{ form.video_2.label }}</label>
+                    {{ form.video_2 }}{{ form.video_2.errors }}
+                </div>
+                <div class="field-group">
+                    <label for="{{ form.video_3.id_for_label }}">{{ form.video_3.label }}</label>
+                    {{ form.video_3 }}{{ form.video_3.errors }}
+                </div>
+            </div>
+        </fieldset>
+        <button type="submit" class="admin-primary-btn">{% trans 'ثبت' %}</button>
+    </form>
+</section>
+{% endblock %}

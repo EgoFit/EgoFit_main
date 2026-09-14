@@ -1,0 +1,38 @@
+{% extends 'account/_shell.html' %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}دیدگاه‌های من | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block account_content %}
+<section class="profile-screen">
+    <header class="profile-screen__header">
+        <h2 class="profile-screen__title">{{ account_title }}</h2>
+    </header>
+    <p class="profile-screen__lead">{{ account_description }}</p>
+
+    <section class="profile-panel-card">
+        <div class="timeline-list">
+            {% for comment in comments %}
+                <article class="timeline-item">
+                    <div class="flex items-center justify-between gap-3">
+                        <strong>{{ comment.series.title }}</strong>
+                        <span class="account-chip {% if comment.is_active %}is-active{% endif %}">
+                            {% if comment.is_active %}{% trans 'منتشر شده' %}{% else %}{% trans 'در انتظار تایید' %}{% endif %}
+                        </span>
+                    </div>
+                    <p class="mt-2">{{ comment.text }}</p>
+                    <div class="mt-4 flex items-center justify-between gap-3">
+                        <span>{% blocktrans with time=comment.created_at|timesince %}{{ time }} پیش{% endblocktrans %}</span>
+                        <a href="{% url 'home:course_detail' comment.series.id %}" class="secondary-action">{% trans 'مشاهده دوره' %}</a>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="empty-state">
+                    <h3>{% trans 'هنوز دیدگاهی ثبت نکرده‌اید' %}</h3>
+                    <p>{% trans 'وقتی روی دوره‌ها نظر بگذارید، این بخش به‌صورت خودکار تکمیل می‌شود.' %}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+</section>
+{% endblock %}

@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load my_tags %}
+
+{% block page_wrapper_class %}bg-secondary{% endblock %}
+
+{% block content %}
+<main class="flex-auto py-5">
+    <div class="shell-container page-stack">
+        <section class="section-card modern-surface" data-reveal x-data="{ offcanvasOpen: false }">
+            <div class="section-heading">
+                <div class="section-heading__copy">
+                    <span class="eyebrow">نتایج جستجوی مقالات</span>
+                    <h1 class="section-heading__title">کتابخانه محتوای آموزشی</h1>
+                    <div class="section-heading__text">مقالات، دسته‌بندی‌ها و نویسنده‌ها با یک تجربه جستجوی سریع و شفاف در دسترس هستند.</div>
+                </div>
+                <button type="button" class="cta-secondary md:hidden" x-on:click="offcanvasOpen = true">فیلترها</button>
+            </div>
+
+            <div class="search-results-head mb-6">
+                <div class="space-y-3">
+                    <span class="eyebrow">خلاصه جستجو</span>
+                    {% if search %}
+                        <h2>نتایج جستجو برای «{{ search }}»</h2>
+                        <div>{{ result_count }} مقاله مرتبط پیدا شد.</div>
+                    {% else %}
+                        <h2>برای مشاهده مقالات، جستجو را شروع کنید</h2>
+                        <div>با انتخاب دسته یا وارد کردن عنوان، مقالات دقیق‌تر را ببینید.</div>
+                    {% endif %}
+                </div>
+
+                <div class="archive-results__chips">
+                    {% if search %}
+                        <span class="archive-chip">{{ result_count }} نتیجه</span>
+                    {% endif %}
+                    <span class="archive-chip archive-chip--muted">مرتب‌سازی بر اساس ارتباط</span>
+                </div>
+            </div>
+
+            {% if messages %}
+                <div class="space-y-4" data-auto-dismiss-messages>
+                    {% for message in messages %}
+                        <div class="relative bg-red-200 text-red-700 px-4 py-2 rounded-lg shadow-md opacity-0 message-box">
+                            {{ message }}
+                            <button class="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center dismiss-button">
+                                <span>&times;</span>
+                            </button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="filters-layout">
+                <aside class="filter-panel modern-surface md:flex hidden">
+                    <div class="filter-block">
+                        <span class="font-bold text-sm text-foreground">جستجوی مقاله</span>
+                        <form method="post" action="{% url 'home:blog_search' %}">
+                            {% csrf_token %}
+                            <div class="search-input-shell">
+                                <input type="text" name="search" value="{{ search|default:'' }}" placeholder="عنوان مقاله">
+                                <span class="search-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                                        <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </span>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="filter-block">
+                        <span class="font-bold text-sm text-foreground">دسته‌بندی مقالات</span>
+                        <form method="get">
+                            <div class="space-y-3">
+                                {% for category in categories %}
+                                    <label class="filter-radio">
+                                        <input type="radio" name="category" value="{{ category.title }}" {% if request.GET.category == category.title %}checked{% endif %}>
+                                        <span>{{ category.title }}</span>
+                                    </label>
+                                {% empty %}
+                                    <div class="empty-state compact">
+                                    <div>هنوز دسته‌بندی مقاله‌ای ثبت نشده است.</div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <button type="submit" class="cta-primary w-full mt-4">اعمال فیلتر</button>
+                        </form>
+                    </div>
+                </aside>
+
+                <div class="space-y-5">
+                    {% if error_message %}
+                        <div class="empty-state">{{ error_message }}</div>
+                    {% elif blog %}
+                        <div class="results-grid">
+                            {% for article in blog %}
+                                <article class="modern-blog-card modern-blog-card--compact">
+                                    <div class="modern-blog-card__media">
+                                        <a href="{% url 'home:article_detail' article.slug %}">
+                                            <img src="{{ article.image|public_media_url }}" alt="{{ article.title }}" loading="lazy">
+                                        </a>
+                                    </div>
+                                    <div class="modern-blog-card__body">
+                                        <a href="{% url 'home:blog' %}" class="pill-link pill-link--compact">
+                                            <span class="font-bold text-xs">{{ article.language_kinds }}</span>
+                                        </a>
+                                        <h2 class="modern-blog-card__title">
+                                            <a href="{% url 'home:article_detail' article.slug %}" class="transition-colors hover:text-primary">{{ article.title }}</a>
+                                        </h2>
+                                        {% if article.article_excerpt %}
+                                            <div class="modern-blog-card__excerpt modern-blog-card__excerpt--block line-clamp-2">{{ article.article_excerpt|linebreaksbr }}</div>
+                                        {% endif %}
+                                        <div class="flex items-center justify-between gap-4 flex-wrap">
+                                            <div class="modern-blog-card__author">
+                                                <img src="{{ article.author_image|public_media_url }}" alt="{{ article.author }}" loading="lazy">
+                                                <span class="font-bold text-sm text-foreground">{{ article.author }}</span>
+                                            </div>
+                                            <div class="modern-blog-card__meta modern-blog-card__meta--dense">
+                                                <span class="font-semibold text-xs">زمان مطالعه {{ article.reading_time }} دقیقه</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            {% if search %}
+                                <div class="font-semibold text-sm">برای این جستجو مقاله‌ای پیدا نشد. عبارت دقیق‌تر یا کوتاه‌تری را امتحان کنید.</div>
+                            {% else %}
+                                <div class="font-semibold text-sm">هنوز عبارتی برای جستجو وارد نشده است.</div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div x-cloak>
+                <div class="fixed inset-y-0 right-0 xs:w-80 w-72 h-screen modern-offcanvas__panel rounded-l-3xl overflow-y-auto transition-transform z-50"
+                     x-bind:class="offcanvasOpen ? '!translate-x-0' : 'translate-x-full'">
+                    <div class="flex items-center justify-between gap-4 sticky top-0 bg-background/90 backdrop-blur-xl p-4 z-10">
+                        <span class="font-bold text-sm text-foreground">فیلتر مقالات</span>
+                        <button type="button" class="modern-icon-btn" x-on:click="offcanvasOpen = false">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="p-4 space-y-5">
+                        <div class="filter-block">
+                            <span class="font-bold text-sm text-foreground">جستجوی مقاله</span>
+                            <form method="post" action="{% url 'home:blog_search' %}">
+                                {% csrf_token %}
+                                <div class="search-input-shell">
+                                    <input type="text" name="search" value="{{ search|default:'' }}" placeholder="عنوان مقاله">
+                                    <span class="search-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                                            <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    </span>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="filter-block">
+                            <span class="font-bold text-sm text-foreground">دسته‌بندی مقالات</span>
+                            <form method="get">
+                                <div class="space-y-3">
+                                    {% for category in categories %}
+                                        <label class="filter-radio">
+                                            <input type="radio" name="category" value="{{ category.title }}" {% if request.GET.category == category.title %}checked{% endif %}>
+                                            <span>{{ category.title }}</span>
+                                        </label>
+                                    {% empty %}
+                                        <div class="empty-state compact">
+                                            <div>هنوز دسته‌بندی مقاله‌ای ثبت نشده است.</div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <button type="submit" class="cta-primary w-full mt-4">اعمال فیلتر</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="fixed inset-0 bg-secondary/80 cursor-pointer transition-all duration-300 z-40"
+                     x-bind:class="offcanvasOpen ? 'opacity-100 visible' : 'opacity-0 invisible'"
+                     x-on:click="offcanvasOpen = false"></div>
+            </div>
+        </section>
+    </div>
+</main>
+{% endblock %}

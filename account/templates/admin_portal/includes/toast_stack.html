@@ -1,0 +1,11 @@
+{% load i18n %}
+{% if messages %}
+    <div class="admin-toast-stack" role="status" aria-live="polite">
+        {% for message in messages %}
+            <div class="admin-toast {% if message.tags %}admin-toast--{{ message.tags }}{% endif %}" data-admin-toast>
+                <span>{{ message }}</span>
+                <button type="button" class="admin-toast__close" data-admin-toast-close aria-label="{% trans 'بستن' %}">×</button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}

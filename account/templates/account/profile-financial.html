@@ -1,0 +1,47 @@
+{% extends 'account/_shell.html' %}
+{% load my_tags %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}مالی و سفارش‌ها | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block account_content %}
+<section class="profile-screen">
+    <header class="profile-screen__header">
+        <h2 class="profile-screen__title">{{ account_title }}</h2>
+    </header>
+    <p class="profile-screen__lead">{{ account_description }}</p>
+
+    <section class="profile-panel-card">
+        <div class="timeline-list">
+            {% for order in orders %}
+                <article class="timeline-item">
+                    <div class="flex items-center justify-between gap-3">
+                        <strong>#{{ order.id }}</strong>
+                        <span class="account-chip {% if order.is_paid %}is-active{% endif %}">
+                            {% if order.is_paid %}{% trans 'موفق' %}{% else %}{% trans 'در انتظار پرداخت' %}{% endif %}
+                        </span>
+                    </div>
+
+                    <p class="mt-2">
+                        {% for item in order.items.all %}
+                            <span class="block leading-7">{{ item.product.title }}</span>
+                        {% empty %}
+                            <span>{% trans 'بدون آیتم' %}</span>
+                        {% endfor %}
+                    </p>
+
+                    <div class="mt-4 flex items-center justify-between gap-3">
+                        <strong>{% blocktrans with price=order.total_price %}{{ price }} تومان{% endblocktrans %}</strong>
+                        <span>{{ order.created_at|to_jalali }}</span>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="empty-state">
+                    <h3>{% trans 'تراکنشی ثبت نشده است' %}</h3>
+                    <p>{% trans 'پس از خرید دوره‌ها، سابقه پرداخت شما در اینجا نمایش داده می‌شود.' %}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+</section>
+{% endblock %}

@@ -1,0 +1,116 @@
+{% extends 'admin_portal/_shell.html' %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}ثبت اطلاعات کاربر | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block admin_content %}
+<section class="admin-screen admin-record-screen">
+    <header class="admin-screen__header admin-screen__header--split">
+        <a href="{% url 'register:admin_search' %}" class="admin-back-link" aria-label="{% trans 'بازگشت' %}">→</a>
+        <h1 class="admin-screen__title">{% trans 'ثبت اطلاعات کاربر' %}</h1>
+    </header>
+
+    <article class="admin-user-summary">
+        <div>
+            <span>{% trans 'کاربر انتخاب‌شده' %}</span>
+            <strong>{{ target_user.fullname }}</strong>
+            <small>{{ target_user.phone }}</small>
+        </div>
+        <div class="admin-user-summary__actions">
+            <form method="post" action="{% url 'register:admin_role_toggle' target_user.id %}" class="admin-role-form">
+                {% csrf_token %}
+                <input type="hidden" name="is_admin" value="on">
+                <button type="submit" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'اعطای نقش ادمین' %}</button>
+            </form>
+            <a href="{% url 'register:admin_user_analysis' target_user.id %}" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'آنالیز' %}</a>
+            <form method="post" action="{% url 'register:admin_user_delete' target_user.id %}" onsubmit="return confirm('{% trans "آیا از حذف این کاربر اطمینان دارید؟ این عمل غیرقابل بازگشت است." %}');">
+                {% csrf_token %}
+                <button type="submit" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'حذف کاربر' %}</button>
+            </form>
+        </div>
+    </article>
+
+    <section class="admin-menu-list">
+        <a href="{% url 'register:admin_personal_info' target_user.id %}" class="admin-menu-item">
+            <span>{% trans 'ثبت اطلاعات شخصی' %}</span>
+            <span aria-hidden="true">‹</span>
+        </a>
+        <a href="{% url 'register:admin_circumference' target_user.id %}" class="admin-menu-item">
+            <span>{% trans 'ثبت اندازه‌گیری محیط بدن (Circumference)' %}</span>
+            <span aria-hidden="true">‹</span>
+        </a>
+        <a href="{% url 'register:admin_caliper' target_user.id %}" class="admin-menu-item">
+            <span>{% trans 'ثبت کالیپر (Caliper)' %}</span>
+            <span aria-hidden="true">‹</span>
+        </a>
+        <a href="{% url 'register:admin_upload' target_user.id %}" class="admin-menu-item">
+            <span>{% trans 'آپلود فایل/برنامه برای کاربر' %}</span>
+            <span aria-hidden="true">‹</span>
+        </a>
+        <a href="{% url 'register:admin_program_list' target_user.id %}" class="admin-menu-item">
+            <span>{% trans 'برنامه بدنسازی' %}</span>
+            <span aria-hidden="true">‹</span>
+        </a>
+        <a href="{% url 'register:admin_measurement_history' target_user.id %}" class="admin-menu-item">
+            <span>{% trans 'تاریخچه و ویرایش اندازه‌گیری‌ها' %}</span>
+            <span aria-hidden="true">‹</span>
+        </a>
+    </section>
+
+    <section class="admin-data-preview">
+        <article>
+            <span>{% trans 'آخرین محیط بدن' %}</span>
+            <strong>{% if latest_circumference %}{% trans 'ثبت شده' %}{% else %}{% trans 'ثبت نشده' %}{% endif %}</strong>
+        </article>
+        <article>
+            <span>{% trans 'آخرین کالیپر' %}</span>
+            <strong>{% if latest_caliper %}{% trans 'ثبت شده' %}{% else %}{% trans 'ثبت نشده' %}{% endif %}</strong>
+        </article>
+        <article>
+            <span>{% trans 'فایل‌ها' %}</span>
+            <strong>{{ latest_media|length }}</strong>
+        </article>
+        <article>
+            <span>{% trans 'برنامه‌ها' %}</span>
+            <strong>{{ latest_documents|length }}</strong>
+        </article>
+        <article>
+            <span>{% trans 'برنامه بدنسازی' %}</span>
+            <strong>{{ latest_workout_programs|length }}</strong>
+        </article>
+    </section>
+
+    {% if coach_requests %}
+        <section class="admin-recent-panel">
+            <h2>{% trans 'درخواست‌های این کاربر از مربی' %}</h2>
+            <div class="admin-result-list">
+                {% for coach_request in coach_requests %}
+                    <article class="admin-result-card">
+                        <div class="admin-result-card__meta">
+                            <div>
+                                <strong>{{ coach_request.get_status_display }}</strong>
+                                <span>{{ coach_request.get_sessions_per_week_display }} —
+                                    {% if coach_request.wants_diet %}{% trans 'برنامه غذایی' %}{% endif %}
+                                    {% if coach_request.wants_workout %}{% trans 'برنامه تمرینی' %}{% endif %}
+                                    ({{ coach_request.created_at|date:"Y/m/d" }})
+                                </span>
+                            </div>
+                        </div>
+                        {% if coach_request.status == "pending" %}
+                            <div class="admin-result-card__actions">
+                                <form method="post" action="{% url 'register:admin_coach_request_handled' coach_request.pk %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{% url 'register:admin_user_hub' target_user.id %}">
+                                    <button type="submit" class="admin-primary-btn admin-primary-btn--small">{% trans 'بررسی شد' %}</button>
+                                </form>
+                            </div>
+                        {% endif %}
+                    </article>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+
+    <a href="{% url 'register:admin_search' %}?query={{ target_user.fullname|urlencode }}" class="admin-primary-btn">{% trans 'جستجو' %}</a>
+</section>
+{% endblock %}

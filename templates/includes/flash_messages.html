@@ -1,0 +1,12 @@
+{% if messages %}
+    <div class="flash-stack" role="status" aria-live="polite" data-auto-dismiss-messages>
+        {% for message in messages %}
+            <div class="flash-message{% if message.tags %} is-{{ message.tags }}{% endif %} message-box" role="alert">
+                <span class="flash-message__text">{{ message }}</span>
+                <button type="button" class="flash-message__close dismiss-button" aria-label="بستن پیام">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}

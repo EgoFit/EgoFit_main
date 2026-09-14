@@ -1,0 +1,42 @@
+{% extends 'admin_portal/_shell.html' %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}{{ page_title }} | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block admin_content %}
+<section class="admin-screen">
+    <header class="admin-screen__header">
+        {% if is_edit %}
+            <a href="{% url 'register:admin_measurement_history' target_user.id %}" class="admin-back-link" aria-label="{% trans 'بازگشت' %}">→</a>
+        {% else %}
+            <a href="{% url 'register:admin_user_hub' target_user.id %}" class="admin-back-link" aria-label="{% trans 'بازگشت' %}">→</a>
+        {% endif %}
+        <h1 class="admin-screen__title">{{ page_title }}</h1>
+    </header>
+
+    <p class="admin-screen__note">{% trans 'اندازه‌ها را بر اساس میلی‌متر ثبت کنید.' %}</p>
+
+    <form method="post" class="admin-form-grid admin-form-grid--stacked admin-form-grid--cols2">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            <div class="admin-form-errors">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <div class="field-group admin-form-grid__full"><label for="{{ form.measured_at_jalali.id_for_label }}">{{ form.measured_at_jalali.label }}</label>{{ form.measured_at_jalali }}{{ form.measured_at_jalali.errors }}</div>
+        <div class="field-group"><label for="{{ form.chest_armpit_men_mm.id_for_label }}">{{ form.chest_armpit_men_mm.label }}</label>{{ form.chest_armpit_men_mm }}{{ form.chest_armpit_men_mm.errors }}</div>
+        <div class="field-group"><label for="{{ form.axilla_mm.id_for_label }}">{{ form.axilla_mm.label }}</label>{{ form.axilla_mm }}{{ form.axilla_mm.errors }}</div>
+        <div class="field-group"><label for="{{ form.subscapular_mm.id_for_label }}">{{ form.subscapular_mm.label }}</label>{{ form.subscapular_mm }}{{ form.subscapular_mm.errors }}</div>
+        <div class="field-group"><label for="{{ form.abdominal_mm.id_for_label }}">{{ form.abdominal_mm.label }}</label>{{ form.abdominal_mm }}{{ form.abdominal_mm.errors }}</div>
+        <div class="field-group"><label for="{{ form.suprailiac_mm.id_for_label }}">{{ form.suprailiac_mm.label }}</label>{{ form.suprailiac_mm }}{{ form.suprailiac_mm.errors }}</div>
+        <div class="field-group"><label for="{{ form.chest_mm.id_for_label }}">{{ form.chest_mm.label }}</label>{{ form.chest_mm }}{{ form.chest_mm.errors }}</div>
+        <div class="field-group"><label for="{{ form.biceps_mm.id_for_label }}">{{ form.biceps_mm.label }}</label>{{ form.biceps_mm }}{{ form.biceps_mm.errors }}</div>
+        <div class="field-group"><label for="{{ form.triceps_mm.id_for_label }}">{{ form.triceps_mm.label }}</label>{{ form.triceps_mm }}{{ form.triceps_mm.errors }}</div>
+        <div class="field-group"><label for="{{ form.thigh_mm.id_for_label }}">{{ form.thigh_mm.label }}</label>{{ form.thigh_mm }}{{ form.thigh_mm.errors }}</div>
+        <div class="field-group"><label for="{{ form.calf_mm.id_for_label }}">{{ form.calf_mm.label }}</label>{{ form.calf_mm }}{{ form.calf_mm.errors }}</div>
+        <button type="submit" class="admin-primary-btn">{% if is_edit %}{% trans 'به‌روزرسانی' %}{% else %}{% trans 'ثبت' %}{% endif %}</button>
+    </form>
+</section>
+{% endblock %}

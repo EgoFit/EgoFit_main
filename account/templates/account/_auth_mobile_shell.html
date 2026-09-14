@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block skip_link %}{% endblock %}
+
+{% block body_class %}auth-page{% endblock %}
+
+{% block public_ui_css %}{% endblock %}
+{% block public_ui_js %}{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/account.css' %}">
+    <link rel="stylesheet" href="{% static 'css/auth-refactor.css' %}">
+    <link rel="stylesheet" href="{% static 'css/account-mobile.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="auth-mobile-main">
+    <div class="auth-mobile-frame">
+        {% block auth_content %}{% endblock %}
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'js/auth-refactor.js' %}"></script>
+{% endblock %}

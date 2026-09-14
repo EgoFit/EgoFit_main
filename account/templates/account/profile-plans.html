@@ -1,0 +1,89 @@
+{% extends 'account/_shell.html' %}
+{% load my_tags %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}برنامه من | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block account_content %}
+<section class="profile-screen profile-screen--wide">
+    <header class="profile-screen__header">
+        <h2 class="profile-screen__title">{% trans 'برنامه های من' %}</h2>
+    </header>
+
+    {% if workout_programs %}
+        <section class="account-card workout-plans-shortcut" aria-labelledby="workout-plans-title">
+            <div class="workout-plans-shortcut__glow" aria-hidden="true"></div>
+            <div class="workout-plans-shortcut__content">
+                <div class="workout-plans-shortcut__icon" aria-hidden="true">↗</div>
+                <div>
+                    <span class="account-eyebrow">{% trans 'برنامه‌های بدنسازی' %}</span>
+                    <h2 id="workout-plans-title">{% trans 'تمرین امروزت را شروع کن' %}</h2>
+                    <p>{% trans 'برنامه را انتخاب کن، رکورد هر ست را ثبت کن و پیشرفتت را قدم‌به‌قدم دنبال کن.' %}</p>
+                    <div class="workout-plans-shortcut__stats" aria-label="{% trans 'اطلاعات برنامه‌ها' %}">
+                        <span><strong>{{ workout_programs|length }}</strong> {% trans 'برنامه فعال' %}</span>
+                        <span class="workout-plans-shortcut__stat"><i aria-hidden="true"></i>{% trans 'ثبت رکورد در هر حرکت' %}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="workout-plans-shortcut__actions">
+                <label>
+                    <span>{% trans 'انتخاب برنامه' %}</span>
+                    <select data-workout-plan-select>
+                        {% for program in workout_programs %}
+                            <option value="{% url 'register:profile_workout_programs' %}#workout-program-{{ program.pk }}">{{ program.title }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                        <a href="{% url 'register:profile_workout_programs' %}" class="cta-primary workout-plans-shortcut__cta" data-workout-plan-link aria-label="{% trans 'مشاهده برنامه و ثبت رکورد تمرین' %}">
+                    <span>{% trans 'مشاهده و ثبت رکورد' %}</span>
+                    <span aria-hidden="true">←</span>
+                </a>
+            </div>
+        </section>
+    {% endif %}
+
+    <section class="course-library-grid">
+        {% for document in documents %}
+            <article class="account-card">
+                <div class="mt-4 grid gap-3">
+                    <h2 class="text-xl font-black">{{ document.title }}</h2>
+                    <p class="text-sm text-slate-500">{% blocktrans with uploaded_at=document.uploaded_at|date:"Y/m/d" %}ارسال‌شده در {{ uploaded_at }}{% endblocktrans %}{% if document.uploaded_by %} {% blocktrans with uploader=document.uploaded_by.display_name|default:document.uploaded_by.fullname %}توسط {{ uploader }}{% endblocktrans %}{% endif %}</p>
+                    {% if document.pk in paid_document_ids or not document.requires_payment %}
+                        <a href="{% url 'register:profile_document_download' document.pk %}" class="cta-primary">{% trans 'دانلود فایل' %}</a>
+                    {% else %}
+                        <form method="post" action="{% url 'register:profile_document_pay' document.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="cta-primary">{% blocktrans with price=document.price %}پرداخت {{ price }} تومان و دانلود{% endblocktrans %}</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </article>
+        {% empty %}
+            <section class="account-card col-span-full">
+                <div class="empty-state">
+                    <h3>{% trans 'هنوز برنامه‌ای برای شما ارسال نشده است' %}</h3>
+                    <p>{% trans 'وقتی مربی برنامه تمرینی یا غذایی برای شما ارسال کند، اینجا نمایش داده می‌شود.' %}</p>
+                </div>
+            </section>
+        {% endfor %}
+    </section>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var select = document.querySelector("[data-workout-plan-select]");
+            var link = document.querySelector("[data-workout-plan-link]");
+            if (!select || !link) {
+                return;
+            }
+            function syncPlanLink() {
+                link.href = select.value;
+            }
+            select.addEventListener("change", syncPlanLink);
+            syncPlanLink();
+        });
+    </script>
+{% endblock %}

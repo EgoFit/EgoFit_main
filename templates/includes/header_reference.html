@@ -1,0 +1,28 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" x-bind:class="darkMode ? 'dark' : ''" x-data="{
+    darkMode: (() => {
+        const stored = localStorage.getItem('darkMode');
+        if (stored === null) return false;
+        return stored === 'true';
+    })(),
+    init() {
+        this.$watch('darkMode', value => {
+            localStorage.setItem('darkMode', value);
+        });
+    }
+}" x-init="init()">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="v6H0hnvakLzKOhJkiGbzBU-nR-5J7n0HA2672yzoa2A" />
+      <link rel="icon" type="image/webp" href="{% static 'images/logoimageego.webp' %}" />
+
+    <link rel="stylesheet" href="{% static 'css/dependencies/swiper-bundle.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/dependencies/plyr.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/fonts.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/app.css' %}" />
+    <title>ایگوفیت</title>
+</head>

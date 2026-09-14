@@ -1,0 +1,35 @@
+{% extends 'account/_shell.html' %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}ویرایش شماره تماس | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block account_content %}
+<section class="profile-screen">
+    <header class="profile-screen__header">
+        <h2 class="profile-screen__title">{{ account_title }}</h2>
+    </header>
+    <p class="profile-screen__lead">{{ account_description }}</p>
+
+    <section class="profile-panel-card">
+        {% if messages %}
+            <div class="form-messages mb-4">
+                {% for message in messages %}
+                    <div class="form-message {% if message.tags %}is-{{ message.tags }}{% endif %}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="post" class="stack-form">
+            {% csrf_token %}
+            <div class="field-group">
+                <label>{% trans 'شماره تماس جدید' %}</label>
+                {{ form.phone_number_new }}
+                {{ form.phone_number_new.errors }}
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="cta-primary cta-primary--strong">{% trans 'ارسال کد تایید' %}</button>
+            </div>
+        </form>
+    </section>
+</section>
+{% endblock %}

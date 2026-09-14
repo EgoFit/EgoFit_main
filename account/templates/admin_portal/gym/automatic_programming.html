@@ -1,0 +1,2039 @@
+{% extends 'admin_portal/_shell.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'برنامه‌ریزی خودکار | ایگوفیت' %}{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    /*
+     * The automatic designer is intentionally scoped to this page. The
+     * shared admin stylesheet keeps common controls consistent, while this
+     * layer gives the workflow enough width and hierarchy on larger screens.
+     */
+    .admin-screen.admin-program-screen {
+        width: 100% !important;
+        max-width: 1120px;
+        min-width: 0;
+    }
+
+    .automatic-program-header {
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 4px 2px 2px;
+    }
+
+    .automatic-program-header__copy {
+        display: grid;
+        gap: 6px;
+        min-width: 0;
+    }
+
+    .automatic-program-header__eyebrow,
+    .automatic-section-eyebrow {
+        margin: 0;
+        color: #3454d1;
+        font-size: .72rem;
+        font-weight: 900;
+        letter-spacing: .04em;
+    }
+
+    .automatic-program-header .admin-screen__title {
+        font-size: clamp(1.15rem, 1.2vw + .8rem, 1.65rem);
+        line-height: 1.35;
+    }
+
+    .automatic-program-header .admin-screen__note {
+        max-width: 760px;
+        line-height: 1.9;
+    }
+
+    .automatic-program-header__badge,
+    .automatic-session-target__badge,
+    .automatic-day__count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        min-height: 30px;
+        padding: 0 10px;
+        border: 1px solid rgba(52, 84, 209, .16);
+        border-radius: 999px;
+        background: rgba(52, 84, 209, .07);
+        color: #3454d1;
+        font-size: .72rem;
+        font-weight: 850;
+        white-space: nowrap;
+    }
+
+    .automatic-program-header__badge {
+        flex-wrap: wrap;
+    }
+
+    .automatic-program-steps {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .automatic-program-step {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        min-width: 0;
+        min-height: 52px;
+        padding: 9px 12px;
+        border: 1px solid rgba(229, 231, 235, .95);
+        border-radius: 15px;
+        background: rgba(255, 255, 255, .75);
+    }
+
+    .automatic-program-step__number {
+        display: inline-grid;
+        flex: 0 0 auto;
+        place-items: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 10px;
+        background: #eef2ff;
+        color: #3454d1;
+        font-size: .78rem;
+        font-weight: 900;
+    }
+
+    .automatic-program-step__copy {
+        display: grid;
+        gap: 2px;
+        min-width: 0;
+    }
+
+    .automatic-program-step strong,
+    .automatic-program-step small {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .automatic-program-step strong {
+        color: #111827;
+        font-size: .78rem;
+    }
+
+    .automatic-program-step small {
+        color: #64748b;
+        font-size: .69rem;
+    }
+
+    .automatic-design-panel {
+        gap: 18px;
+    }
+
+    .automatic-design-panel .field-group {
+        min-width: 0;
+    }
+
+    .automatic-design-panel .field-group > label,
+    .automatic-target-library > label,
+    .automatic-date-field > label {
+        color: #334155;
+        font-size: .78rem;
+        font-weight: 800;
+    }
+
+    .automatic-design-panel .field-group > small,
+    .automatic-target-library > small,
+    .automatic-date-field > small {
+        color: #64748b;
+        font-size: .72rem;
+        line-height: 1.7;
+    }
+
+    .automatic-design-panel select[multiple] {
+        min-height: 132px;
+        padding: 8px;
+        line-height: 1.65;
+    }
+
+    .automatic-design-panel textarea,
+    .automatic-program-meta textarea {
+        min-height: 82px;
+        padding-block: 11px;
+        line-height: 1.7;
+        resize: vertical;
+    }
+
+    .automatic-athlete-picker__search .admin-input {
+        padding-inline-start: 42px;
+    }
+
+    .automatic-athlete-picker > select {
+        height: 116px;
+        min-height: 116px;
+        padding: 8px;
+    }
+
+    .automatic-athlete-picker > select option {
+        padding: 10px;
+    }
+
+    .automatic-session-targets {
+        gap: 14px;
+        padding: clamp(12px, 1.5vw, 18px);
+        border-radius: 18px;
+    }
+
+    .automatic-session-targets__header {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: end;
+        gap: 12px;
+    }
+
+    .automatic-session-targets__header-copy {
+        display: grid;
+        gap: 4px;
+        min-width: 0;
+    }
+
+    .automatic-session-targets__header h2 {
+        margin: 0;
+        color: #111827;
+        font-size: 1rem;
+        font-weight: 900;
+    }
+
+    .automatic-session-targets__header p {
+        max-width: 780px;
+        line-height: 1.8;
+    }
+
+    .automatic-target-library {
+        display: grid;
+        gap: 7px;
+        padding: 12px;
+        border: 1px dashed rgba(52, 84, 209, .28);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, .62);
+    }
+
+    .automatic-target-library select {
+        width: 100%;
+        min-height: 104px;
+        padding: 7px;
+    }
+
+    .automatic-target-library option {
+        padding: 8px;
+    }
+
+    .automatic-session-target-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: start;
+        gap: 10px;
+    }
+
+    .automatic-session-target {
+        min-width: 0;
+        padding: 14px;
+        border-color: #dbe2ea;
+        box-shadow: 0 7px 18px rgba(15, 23, 42, .035);
+    }
+
+    .automatic-session-target__head {
+        align-items: center;
+    }
+
+    .automatic-session-target__head-copy {
+        display: grid;
+        gap: 3px;
+        min-width: 0;
+    }
+
+    .automatic-session-target__head-copy strong {
+        color: #111827;
+        font-size: .9rem;
+    }
+
+    .automatic-session-target__head-copy small {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .automatic-session-target__counts {
+        gap: 9px;
+    }
+
+    .automatic-session-target__row {
+        grid-template-columns: minmax(0, 1fr) minmax(104px, .34fr) auto;
+        padding: 9px;
+    }
+
+    .automatic-session-target__row select,
+    .automatic-session-target__row input {
+        min-height: 42px;
+    }
+
+    .automatic-session-target__row select:focus-visible,
+    .automatic-session-target__row input:focus-visible,
+    .automatic-target-library select:focus-visible {
+        outline: 2px solid rgba(52, 84, 209, .45);
+        outline-offset: 2px;
+    }
+
+    .automatic-session-target__add {
+        width: 100%;
+        min-height: 42px;
+    }
+
+    .automatic-program-meta {
+        gap: 12px;
+    }
+
+    .automatic-program-meta .field-group {
+        min-width: 0;
+    }
+
+    .automatic-date-field input {
+        direction: ltr;
+        text-align: left;
+    }
+
+    .automatic-preview-panel {
+        gap: 18px;
+    }
+
+    .automatic-preview-summary {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 9px;
+    }
+
+    .automatic-preview-stat {
+        display: grid;
+        gap: 4px;
+        min-width: 0;
+        padding: 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        background: #f8fafc;
+    }
+
+    .automatic-preview-stat span {
+        color: #64748b;
+        font-size: .72rem;
+        font-weight: 750;
+    }
+
+    .automatic-preview-stat strong {
+        overflow: hidden;
+        color: #111827;
+        font-size: 1.05rem;
+        font-weight: 900;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .automatic-preview-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 12px;
+        border: 1px solid rgba(52, 84, 209, .13);
+        border-radius: 13px;
+        background: rgba(52, 84, 209, .045);
+    }
+
+    .automatic-preview-toolbar p {
+        margin: 0;
+        color: #475569;
+        font-size: .76rem;
+        line-height: 1.7;
+    }
+
+    .automatic-preview-toolbar button,
+    .automatic-day__toggle,
+    .automatic-day__remove,
+    .automatic-program-item__remove,
+    .automatic-corrective__remove {
+        min-height: 40px;
+        white-space: nowrap;
+    }
+
+    .automatic-days {
+        gap: 14px;
+    }
+
+    .automatic-day {
+        gap: 14px;
+        padding: clamp(12px, 1.5vw, 18px);
+        background: linear-gradient(180deg, #f8fafc 0%, #f5f8fc 100%);
+        border-color: #dbe2ea;
+        overflow: hidden;
+    }
+
+    .automatic-day__head {
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .automatic-day__heading {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        min-width: 0;
+    }
+
+    .automatic-day__number {
+        display: inline-grid;
+        flex: 0 0 auto;
+        place-items: center;
+        width: 31px;
+        height: 31px;
+        border-radius: 11px;
+        background: #3454d1;
+        color: #fff;
+        font-size: .78rem;
+        font-weight: 900;
+    }
+
+    .automatic-day__title-field {
+        display: grid;
+        gap: 3px;
+        min-width: 0;
+    }
+
+    .automatic-day__title-field span {
+        color: #64748b;
+        font-size: .69rem;
+        font-weight: 750;
+    }
+
+    .automatic-day__title-field input {
+        min-width: 0;
+        min-height: 42px;
+        font-weight: 850;
+    }
+
+    .automatic-day__actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 7px;
+    }
+
+    .automatic-day__body {
+        display: grid;
+        gap: 12px;
+    }
+
+    .automatic-day.is-collapsed .automatic-day__body {
+        display: none;
+    }
+
+    .automatic-day__notes {
+        width: 100%;
+        min-height: 66px;
+        padding: 10px 12px;
+        border: 1px solid #dbe2ea;
+        border-radius: 12px;
+        background: #fff;
+        resize: vertical;
+    }
+
+    .automatic-program-item {
+        gap: 12px;
+        padding: 13px;
+        border-color: #e2e8f0;
+        box-shadow: 0 5px 14px rgba(15, 23, 42, .025);
+    }
+
+    .automatic-program-item__top {
+        align-items: center;
+    }
+
+    .automatic-program-item__identity {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    .automatic-program-item__identity strong {
+        color: #334155;
+        font-size: .83rem;
+    }
+
+    .automatic-program-item__grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .automatic-program-item__grid label {
+        display: grid;
+        gap: 5px;
+        min-width: 0;
+        color: #475569;
+        font-size: .72rem;
+        font-weight: 800;
+    }
+
+    .automatic-program-item__grid .automatic-program-item__main {
+        grid-column: 1 / -1;
+    }
+
+    .automatic-program-item__grid select,
+    .automatic-program-item__grid input {
+        min-width: 0;
+        min-height: 42px;
+        padding-inline: 10px;
+    }
+
+    .automatic-program-item__config-label {
+        grid-column: 1 / -1;
+        margin-top: 3px;
+        padding: 9px 10px 4px;
+        border-top: 1px solid #e2e8f0;
+        color: #3454d1;
+        font-size: .75rem;
+        font-weight: 900;
+    }
+
+    .automatic-program-item__config-label:first-of-type {
+        padding-top: 0;
+        border-top: 0;
+    }
+
+    .automatic-correctives-editor {
+        display: grid;
+        gap: 12px;
+    }
+
+    .automatic-correctives-editor__head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .automatic-correctives-editor__head-copy {
+        display: grid;
+        gap: 4px;
+    }
+
+    .automatic-correctives-editor__head h2 {
+        margin: 0;
+        color: #111827;
+        font-size: 1rem;
+        font-weight: 900;
+    }
+
+    .automatic-correctives-editor__head p,
+    .automatic-correctives-editor__empty {
+        margin: 0;
+        color: #64748b;
+        font-size: .76rem;
+        line-height: 1.7;
+    }
+
+    .automatic-corrective {
+        display: grid;
+        grid-template-columns: minmax(0, 1.55fr) minmax(120px, .9fr) minmax(100px, .7fr) minmax(120px, .9fr) minmax(0, 1.25fr) auto;
+        gap: 9px;
+        align-items: end;
+        padding: 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        background: #f8fafc;
+    }
+
+    .automatic-corrective label {
+        display: grid;
+        gap: 5px;
+        min-width: 0;
+        color: #475569;
+        font-size: .72rem;
+        font-weight: 800;
+    }
+
+    .automatic-corrective select,
+    .automatic-corrective input {
+        width: 100%;
+        min-width: 0;
+        min-height: 42px;
+        padding-inline: 10px;
+        border: 1px solid #dbe2ea;
+        border-radius: 10px;
+        background: #fff;
+        color: #111827;
+    }
+
+    .automatic-form-tip {
+        display: flex;
+        align-items: flex-start;
+        gap: 9px;
+        padding: 10px 12px;
+        border: 1px solid rgba(52, 84, 209, .13);
+        border-radius: 13px;
+        background: rgba(52, 84, 209, .045);
+    }
+
+    .automatic-form-tip > span {
+        display: inline-grid;
+        flex: 0 0 auto;
+        place-items: center;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: #eef2ff;
+        color: #3454d1;
+        font-size: .75rem;
+        font-weight: 900;
+    }
+
+    .automatic-form-tip p {
+        margin: 0;
+        color: #475569;
+        font-size: .76rem;
+        line-height: 1.7;
+    }
+
+    .automatic-form-status {
+        display: none;
+        padding: 10px 12px;
+        border: 1px solid rgba(239, 68, 68, .25);
+        border-radius: 12px;
+        background: #fff5f5;
+        color: #b42318;
+        font-size: .78rem;
+        font-weight: 750;
+        line-height: 1.7;
+    }
+
+    .automatic-form-status.is-visible {
+        display: block;
+    }
+
+    .automatic-form-status.is-success {
+        border-color: rgba(16, 185, 129, .22);
+        background: #f0fdf4;
+        color: #166534;
+    }
+
+    .automatic-program-actions {
+        position: sticky;
+        bottom: 10px;
+        z-index: 4;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 9px;
+        padding: 10px;
+        border: 1px solid rgba(209, 213, 219, .9);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, .9);
+        box-shadow: 0 14px 28px rgba(15, 23, 42, .13);
+        backdrop-filter: blur(12px);
+    }
+
+    .automatic-program-actions > button {
+        min-width: 170px;
+    }
+
+    .automatic-empty-state {
+        display: grid;
+        gap: 8px;
+        padding: 18px;
+        border: 1px dashed rgba(52, 84, 209, .28);
+        border-radius: 16px;
+        background: rgba(52, 84, 209, .045);
+        color: #475569;
+        line-height: 1.8;
+    }
+
+    .automatic-empty-state strong {
+        color: #263f9d;
+    }
+
+    .automatic-empty-state p {
+        margin: 0;
+        font-size: .8rem;
+    }
+
+    .automatic-program-screen button:disabled {
+        cursor: not-allowed;
+        opacity: .58;
+    }
+
+    .automatic-program-screen .is-invalid {
+        border-color: #dc2626 !important;
+        box-shadow: 0 0 0 3px rgba(220, 38, 38, .1);
+    }
+
+    .dark .admin-dashboard .automatic-program-step,
+    .dark .admin-dashboard .automatic-target-library,
+    .dark .admin-dashboard .automatic-preview-stat,
+    .dark .admin-dashboard .automatic-preview-toolbar,
+    .dark .admin-dashboard .automatic-form-tip,
+    .dark .admin-dashboard .automatic-form-status,
+    .dark .admin-dashboard .automatic-empty-state {
+        background: rgba(2, 6, 23, .46);
+        border-color: rgba(148, 163, 184, .28);
+        color: #e2e8f0;
+    }
+
+    .dark .admin-dashboard .automatic-session-targets,
+    .dark .admin-dashboard .automatic-program-meta,
+    .dark .admin-dashboard .automatic-design-panel,
+    .dark .admin-dashboard .automatic-preview-panel {
+        background:
+            linear-gradient(145deg, rgba(125, 211, 252, .08), transparent 38%),
+            rgba(15, 23, 42, .72);
+        border-color: rgba(148, 163, 184, .28);
+    }
+
+    .dark .admin-dashboard .automatic-session-target,
+    .dark .admin-dashboard .automatic-day,
+    .dark .admin-dashboard .automatic-program-item,
+    .dark .admin-dashboard .automatic-corrective {
+        background: rgba(15, 23, 42, .7);
+        border-color: rgba(148, 163, 184, .28);
+    }
+
+    .dark .admin-dashboard .automatic-program-step strong,
+    .dark .admin-dashboard .automatic-preview-stat strong,
+    .dark .admin-dashboard .automatic-session-target__head-copy strong,
+    .dark .admin-dashboard .automatic-correctives-editor__head h2,
+    .dark .admin-dashboard .automatic-target-library > label,
+    .dark .admin-dashboard .automatic-design-panel .field-group > label,
+    .dark .admin-dashboard .automatic-date-field > label {
+        color: #f8fafc;
+    }
+
+    .dark .admin-dashboard .automatic-program-item__grid select,
+    .dark .admin-dashboard .automatic-program-item__grid input,
+    .dark .admin-dashboard .automatic-program-item__grid textarea,
+    .dark .admin-dashboard .automatic-day__notes,
+    .dark .admin-dashboard .automatic-corrective select,
+    .dark .admin-dashboard .automatic-corrective input,
+    .dark .admin-dashboard .automatic-session-target__row select,
+    .dark .admin-dashboard .automatic-session-target__row input,
+    .dark .admin-dashboard .automatic-target-library select {
+        background: rgba(2, 6, 23, .58);
+        border-color: rgba(148, 163, 184, .32);
+        color: #f8fafc;
+    }
+
+    .dark .admin-dashboard .automatic-program-actions {
+        background: rgba(15, 23, 42, .88);
+        border-color: rgba(148, 163, 184, .3);
+    }
+
+    /* Controls and nested cards that do not use the shared form selectors. */
+    .dark .admin-dashboard .automatic-athlete-picker__search .admin-input,
+    .dark .admin-dashboard .admin-program-screen input:not([type="checkbox"]),
+    .dark .admin-dashboard .admin-program-screen select,
+    .dark .admin-dashboard .admin-program-screen textarea,
+    .dark .admin-dashboard .automatic-day__title-field input,
+    .dark .admin-dashboard .automatic-day__notes,
+    .dark .admin-dashboard .automatic-corrective select,
+    .dark .admin-dashboard .automatic-corrective input {
+        background: rgba(2, 6, 23, .58);
+        border-color: rgba(148, 163, 184, .32);
+        color: #f8fafc;
+    }
+
+    .dark .admin-dashboard .automatic-session-targets__header h2,
+    .dark .admin-dashboard .automatic-session-target__head-copy strong,
+    .dark .admin-dashboard .automatic-program-item__identity strong,
+    .dark .admin-dashboard .automatic-correctives-editor__head h2 {
+        color: #f8fafc;
+    }
+
+    .dark .admin-dashboard .automatic-program-item__grid label,
+    .dark .admin-dashboard .automatic-corrective label,
+    .dark .admin-dashboard .automatic-correctives-editor__head p,
+    .dark .admin-dashboard .automatic-corrective__empty,
+    .dark .admin-dashboard .automatic-preview-toolbar p,
+    .dark .admin-dashboard .automatic-form-tip p {
+        color: #cbd5e1;
+    }
+
+    .dark .admin-dashboard .automatic-day,
+    .dark .admin-dashboard .automatic-corrective {
+        background: rgba(15, 23, 42, .7);
+        border-color: rgba(148, 163, 184, .28);
+    }
+
+    @media (min-width: 901px) {
+        .automatic-design-panel {
+            padding: 22px;
+        }
+
+        .automatic-design-panel .admin-form-grid--cols2 {
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+        }
+
+        .automatic-design-panel .admin-form-grid--cols2 > .field-group {
+            grid-column: span 3;
+        }
+
+        .automatic-design-panel .admin-form-grid--cols2 > .automatic-field--abnormalities,
+        .automatic-design-panel .admin-form-grid--cols2 > .admin-form-grid__full {
+            grid-column: 1 / -1;
+        }
+
+        .automatic-design-panel .admin-form-grid--cols2 > .automatic-field--sessions,
+        .automatic-design-panel .admin-form-grid--cols2 > .automatic-field--goal,
+        .automatic-design-panel .admin-form-grid--cols2 > .automatic-field--title {
+            grid-column: span 2;
+        }
+    }
+
+    @media (max-width: 900px) {
+        .automatic-session-target-list {
+            grid-template-columns: 1fr;
+        }
+
+        .automatic-corrective {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .automatic-corrective label:first-child,
+        .automatic-corrective label:last-of-type {
+            grid-column: 1 / -1;
+        }
+
+        .automatic-corrective__remove {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 700px) {
+        .automatic-program-header,
+        .automatic-correctives-editor__head {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .automatic-program-header {
+            display: grid;
+        }
+
+        .automatic-program-header__badge {
+            justify-self: start;
+        }
+
+        .automatic-program-steps {
+            grid-template-columns: 1fr;
+        }
+
+        .automatic-program-step {
+            min-height: 46px;
+        }
+
+        .automatic-session-targets__header {
+            grid-template-columns: 1fr;
+            align-items: stretch;
+        }
+
+        .automatic-preview-summary {
+            grid-template-columns: 1fr;
+        }
+
+        .automatic-preview-toolbar,
+        .automatic-day__head,
+        .automatic-program-item__top {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .automatic-preview-toolbar button,
+        .automatic-day__actions,
+        .automatic-day__actions > button,
+        .automatic-program-item__remove,
+        .automatic-correctives-editor__head > button {
+            width: 100%;
+        }
+
+        .automatic-day__heading {
+            align-items: flex-start;
+        }
+
+        .automatic-program-item__grid,
+        .automatic-corrective {
+            grid-template-columns: 1fr;
+        }
+
+        .automatic-program-item__grid .automatic-program-item__main,
+        .automatic-program-item__config-label {
+            grid-column: auto;
+        }
+
+        .automatic-corrective label:first-child,
+        .automatic-corrective label:last-of-type {
+            grid-column: auto;
+        }
+
+        .automatic-session-target__row {
+            grid-template-columns: 1fr;
+        }
+
+        .automatic-session-target__row .automatic-session-target__remove {
+            width: 100%;
+        }
+
+        .automatic-program-actions {
+            bottom: calc(78px + env(safe-area-inset-bottom, 0px));
+            flex-direction: column;
+        }
+
+        .automatic-program-actions > button {
+            width: 100%;
+            min-width: 0;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .automatic-program-screen *,
+        .automatic-program-screen *::before,
+        .automatic-program-screen *::after {
+            scroll-behavior: auto !important;
+            transition-duration: .01ms !important;
+            animation-duration: .01ms !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+<section class="admin-screen admin-program-screen">
+    <header class="admin-screen__header automatic-program-header">
+        <div class="automatic-program-header__copy">
+            <p class="automatic-program-header__eyebrow">{% trans 'طراحی برنامه با کمک کتابخانه حرکات' %}</p>
+            <h1 class="admin-screen__title">{% trans 'Automatic Programming' %}</h1>
+            <p class="admin-screen__note">{% trans 'با تنظیم ورزشکار، سطح، هدف و تقسیم هر جلسه، یک پیش‌نمایش قابل ویرایش بسازید و پس از بررسی برای کاربر منتشر کنید.' %}</p>
+        </div>
+        <span class="automatic-program-header__badge">
+            <span>{% trans 'قابل ویرایش پیش از انتشار' %}</span>
+            <span data-design-summary aria-live="polite">{% trans 'در حال آماده‌سازی…' %}</span>
+        </span>
+    </header>
+
+    <nav class="automatic-program-steps" aria-label="{% trans 'مراحل طراحی برنامه' %}">
+        <div class="automatic-program-step">
+            <span class="automatic-program-step__number">۱</span>
+            <span class="automatic-program-step__copy"><strong>{% trans 'انتخاب پارامترها' %}</strong><small>{% trans 'ورزشکار و هدف' %}</small></span>
+        </div>
+        <div class="automatic-program-step">
+            <span class="automatic-program-step__number">۲</span>
+            <span class="automatic-program-step__copy"><strong>{% trans 'تقسیم جلسه‌ها' %}</strong><small>{% trans 'بخش هدف و تعداد حرکت' %}</small></span>
+        </div>
+        <div class="automatic-program-step">
+            <span class="automatic-program-step__number">۳</span>
+            <span class="automatic-program-step__copy"><strong>{% trans 'بازبینی و انتشار' %}</strong><small>{% trans 'ویرایش جزئیات برنامه' %}</small></span>
+        </div>
+    </nav>
+
+    <form method="post" id="automatic-program-editor" class="admin-program-editor" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            <div class="admin-form-errors">
+                {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+            </div>
+        {% endif %}
+
+        <section class="admin-form-panel automatic-design-panel">
+            <div class="admin-program-section-head">
+                <div>
+                    <p class="automatic-section-eyebrow">{% trans 'مرحله اول' %}</p>
+                    <h2>{% trans 'پارامترهای طراحی برنامه' %}</h2>
+                    <p>{% trans 'ورودی‌ها را انتخاب کنید؛ سطح انتخاب‌شده و سطح‌های ساده‌تر برای پیشنهاد حرکت‌ها استفاده می‌شوند.' %}</p>
+                </div>
+            </div>
+
+            <div class="admin-form-grid admin-form-grid--cols2">
+                {% for field in form %}
+                    {% if field.name == 'movements_per_session' %}
+                        {{ field.as_hidden }}
+                    {% elif field.name != 'secondary_movement_counts_json' and field.name != 'session_movement_targets_json' and field.name != 'target_secondary_movement_types' %}
+                        <div class="field-group {% if field.name == 'abnormalities' %}admin-form-grid__full automatic-field--abnormalities{% endif %} {% if field.name == 'sessions_per_week' %}automatic-field--sessions{% endif %} {% if field.name == 'goal' %}automatic-field--goal{% endif %} {% if field.name == 'title' %}automatic-field--title{% endif %} {% if field.name == 'is_published' or field.name == 'requires_payment' %}admin-checkbox-field{% endif %}">
+                            {% if field.name == 'user' %}
+                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                <div class="automatic-athlete-picker" data-athlete-picker>
+                                    <div class="automatic-athlete-picker__search">
+                                        <span class="automatic-athlete-picker__search-icon" aria-hidden="true">⌕</span>
+                                        <input type="search" id="automatic-athlete-search" class="admin-input" placeholder="{% trans 'جستجو با نام، نام خانوادگی یا شماره تماس' %}" autocomplete="off" aria-controls="{{ field.id_for_label }}" aria-describedby="automatic-athlete-help">
+                                        <button type="button" class="automatic-athlete-picker__clear" data-athlete-search-clear hidden aria-label="{% trans 'پاک کردن جستجوی ورزشکار' %}">×</button>
+                                    </div>
+                                    <div class="automatic-athlete-picker__toolbar">
+                                        <small id="automatic-athlete-help" data-athlete-search-status role="status" aria-live="polite"></small>
+                                        <button type="button" class="automatic-athlete-picker__reset" data-athlete-search-reset hidden>{% trans 'نمایش همه' %}</button>
+                                    </div>
+                                    {{ field }}
+                                    <div class="automatic-athlete-picker__selected" data-athlete-selection role="status" aria-live="polite"></div>
+                                </div>
+                            {% elif field.name == 'is_published' or field.name == 'requires_payment' %}
+                                <label for="{{ field.id_for_label }}" class="automatic-publish-toggle">
+                                    {{ field }}
+                                    <span>{{ field.label }}</span>
+                                </label>
+                            {% else %}
+                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {{ field }}
+                            {% endif %}
+                            {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+                            {{ field.errors }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <div class="automatic-form-tip">
+                <span aria-hidden="true">i</span>
+                <p>{% trans 'برای پیشنهادهای دقیق‌تر، بخش هدف جلسه‌ها را جداگانه تنظیم کنید. اگر کتابخانه برای سطح انتخاب‌شده حرکت نداشته باشد، سیستم از سطح‌های ساده‌تر استفاده می‌کند.' %}</p>
+            </div>
+        </section>
+
+        <section id="session-movement-targets" class="admin-form-panel automatic-session-targets">
+            <div class="automatic-session-targets__header">
+                <div class="automatic-session-targets__header-copy">
+                    <p class="automatic-section-eyebrow">{% trans 'مرحله دوم' %}</p>
+                    <h2>{% trans 'تقسیم هدف و تعداد حرکت‌ها در هر جلسه' %}</h2>
+                    <p>{% trans 'برای هر جلسه ردیف‌های مستقل بسازید. ترتیب ردیف‌ها ترتیب پیشنهاد حرکت‌ها را مشخص می‌کند، حرکت‌های شکم در انتها قرار می‌گیرند و حرکت تکراری در یک جلسه یا بین جلسه‌های هم‌عضله پیشنهاد نمی‌شود.' %}</p>
+                </div>
+                <button type="button" class="admin-secondary-btn admin-secondary-btn--small" data-session-copy>{% trans 'کپی جلسه اول برای همه' %}</button>
+            </div>
+
+            <div class="automatic-target-library">
+                <label for="id_target_secondary_movement_types">{{ form.target_secondary_movement_types.label }}</label>
+                {{ form.target_secondary_movement_types }}
+                <small>{% trans 'این فهرست به‌صورت خودکار از بخش‌های انتخاب‌شده در جلسه‌ها ساخته می‌شود و برای کنترل سریع هدف‌های فعال استفاده می‌شود.' %}</small>
+                {{ form.target_secondary_movement_types.errors }}
+            </div>
+
+            <div id="session-movement-target-list" class="automatic-session-target-list"></div>
+            {{ form.session_movement_targets_json }}
+        </section>
+
+        <section class="admin-form-panel automatic-program-meta">
+            <div class="admin-program-section-head">
+                <div>
+                    <p class="automatic-section-eyebrow">{% trans 'اطلاعات انتشار' %}</p>
+                    <h2>{% trans 'عنوان، زمان‌بندی و توضیحات' %}</h2>
+                    <p>{% trans 'این اطلاعات همراه برنامه ذخیره می‌شوند و در ویرایش و نمایش کاربر قابل استفاده هستند.' %}</p>
+                </div>
+            </div>
+            <div class="admin-form-grid admin-form-grid--cols2">
+                <div class="field-group automatic-date-field">
+                    <label for="id_start_date">{% trans 'تاریخ شروع' %}</label>
+                    <input class="admin-input" type="date" name="start_date" id="id_start_date" value="{{ request.POST.start_date|default:default_start_date }}" required>
+                </div>
+                <div class="field-group automatic-date-field">
+                    <label for="id_end_date">{% trans 'تاریخ پایان' %}</label>
+                    <input class="admin-input" type="date" name="end_date" id="id_end_date" value="{{ request.POST.end_date }}">
+                    <small>{% trans 'اختیاری؛ نباید قبل از تاریخ شروع باشد.' %}</small>
+                </div>
+                <div class="field-group admin-form-grid__full">
+                    <label for="id_notes">{% trans 'یادداشت برنامه' %}</label>
+                    <textarea class="admin-input" name="notes" id="id_notes" rows="3" placeholder="{% trans 'توضیحات کلی برنامه' %}">{{ request.POST.notes }}</textarea>
+                </div>
+                <div class="field-group">
+                    <label for="id_supplements_note">{% trans 'مکمل و نکات تغذیه‌ای' %}</label>
+                    <textarea class="admin-input" name="supplements_note" id="id_supplements_note" rows="3" placeholder="{% trans 'اختیاری' %}">{{ request.POST.supplements_note }}</textarea>
+                </div>
+                <div class="field-group">
+                    <label for="id_warmup_notes">{% trans 'توضیحات گرم کردن' %}</label>
+                    <textarea class="admin-input" name="warmup_notes" id="id_warmup_notes" rows="3" placeholder="{% trans 'اختیاری' %}">{{ request.POST.warmup_notes }}</textarea>
+                </div>
+                <div class="field-group">
+                    <label for="id_cooldown_notes">{% trans 'توضیحات سرد کردن' %}</label>
+                    <textarea class="admin-input" name="cooldown_notes" id="id_cooldown_notes" rows="3" placeholder="{% trans 'اختیاری' %}">{{ request.POST.cooldown_notes }}</textarea>
+                </div>
+            </div>
+        </section>
+
+        {% if preview.days %}
+            <section class="admin-form-panel automatic-preview-panel">
+                <div class="admin-program-section-head">
+                    <div>
+                        <p class="automatic-section-eyebrow">{% trans 'مرحله سوم' %}</p>
+                        <h2>{% trans 'پیش‌نمایش قابل ویرایش' %}</h2>
+                        <p>{% trans 'حرکت‌ها، ست‌ها، تکرارها، استراحت، سوپرست‌ها و توضیحات را پیش از انتشار بررسی کنید.' %}</p>
+                    </div>
+                </div>
+
+                <div id="automatic-preview-summary" class="automatic-preview-summary" aria-live="polite"></div>
+
+                <div class="automatic-preview-toolbar">
+                    <p>{% trans 'تغییرات شما تا زمان فشردن «ذخیره و ارسال به کاربر» فقط در همین پیش‌نمایش باقی می‌ماند.' %}</p>
+                    <button type="button" class="admin-secondary-btn admin-secondary-btn--small" data-preview-toggle>{% trans 'جمع کردن همه روزها' %}</button>
+                </div>
+
+                <div id="automatic-days" class="admin-program-days automatic-days"></div>
+                <div id="automatic-correctives-editor" class="automatic-correctives-editor"></div>
+                <input type="hidden" name="days_json" id="id_days_json">
+                <input type="hidden" name="correctives_json" id="id_correctives_json">
+
+                <div class="automatic-form-status" data-form-status role="alert" aria-live="assertive"></div>
+                <div class="automatic-program-actions">
+                    <button type="submit" name="action" value="save" class="admin-primary-btn" data-busy-text="{% trans 'در حال انتشار…' %}">{% trans 'ذخیره و ارسال به کاربر' %}</button>
+                    <button type="submit" name="action" value="generate" class="admin-secondary-btn" data-busy-text="{% trans 'در حال تولید…' %}">{% trans 'تولید دوباره' %}</button>
+                </div>
+            </section>
+        {% else %}
+            {% if form.is_bound and not form.errors %}
+                <div class="automatic-empty-state">
+                    <strong>{% trans 'برای ترکیب انتخاب‌شده حرکتی پیدا نشد.' %}</strong>
+                    <p>{% trans 'سطح دشواری، هدف‌های جلسه یا کتابخانه حرکات را بررسی کنید و دوباره تولید را بزنید.' %}</p>
+                </div>
+            {% endif %}
+            <div class="automatic-form-status" data-form-status role="alert" aria-live="assertive"></div>
+            <button type="submit" name="action" value="generate" class="admin-primary-btn" data-busy-text="{% trans 'در حال تولید…' %}">{% trans 'ساخت برنامه خودکار' %}</button>
+        {% endif %}
+    </form>
+</section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var toggle = document.querySelector("[data-payment-toggle]");
+        var price = document.querySelector("[data-payment-price]");
+        if (!toggle || !price) return;
+        function syncPaymentFields() {
+            price.disabled = !toggle.checked;
+            price.required = toggle.checked;
+            if (!toggle.checked) price.value = "0";
+        }
+        toggle.addEventListener("change", syncPaymentFields);
+        syncPaymentFields();
+    });
+</script>
+
+{{ preview|json_script:"automatic-preview" }}
+{{ exercise_catalog|json_script:"automatic-exercises" }}
+{{ corrective_catalog|json_script:"automatic-corrective-catalog" }}
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+(function () {
+    "use strict";
+
+    const previewNode = document.getElementById("automatic-preview");
+    const exerciseNode = document.getElementById("automatic-exercises");
+    const correctiveNode = document.getElementById("automatic-corrective-catalog");
+    const preview = parseJson(previewNode ? previewNode.textContent : "", {days: [], correctives: []});
+    const exercises = parseJson(exerciseNode ? exerciseNode.textContent : "", []);
+    const correctiveCatalog = parseJson(correctiveNode ? correctiveNode.textContent : "", []);
+    const editor = document.getElementById("automatic-program-editor");
+    const movementTypeCatalog = document.getElementById("id_target_secondary_movement_types");
+    const sessionTargetsList = document.getElementById("session-movement-target-list");
+    const sessionTargetsInput = document.getElementById("id_session_movement_targets_json");
+    const sessionsInput = document.getElementById("id_sessions_per_week");
+    const athleteSearch = document.getElementById("automatic-athlete-search");
+    const athleteSelect = document.getElementById("id_user");
+    const daysRoot = document.getElementById("automatic-days");
+    const correctiveRoot = document.getElementById("automatic-correctives-editor");
+    const daysInput = document.getElementById("id_days_json");
+    const correctivesInput = document.getElementById("id_correctives_json");
+    const previewSummary = document.getElementById("automatic-preview-summary");
+    const formStatusNodes = Array.from(document.querySelectorAll("[data-form-status]"));
+    const startDateInput = document.getElementById("id_start_date");
+    const endDateInput = document.getElementById("id_end_date");
+    const sessionCopyButton = document.querySelector("[data-session-copy]");
+    const previewToggleButton = document.querySelector("[data-preview-toggle]");
+
+    const text = {
+        noAthlete: "{% trans 'هنوز ورزشکاری انتخاب نشده است.' %}",
+        athletesFound: "{% trans 'ورزشکار مطابق جستجو' %}",
+        athletesAvailable: "{% trans 'ورزشکار قابل انتخاب' %}",
+        sections: "{% trans 'بخش هدف' %}",
+        movements: "{% trans 'حرکت' %}",
+        sessions: "{% trans 'جلسه' %}",
+        selectSection: "{% trans 'انتخاب بخش' %}",
+        selectExercise: "{% trans 'حرکت اصلی را انتخاب کنید' %}",
+        noSuperset: "{% trans 'بدون حرکت دوم سوپرست' %}",
+        noThird: "{% trans 'بدون حرکت سوم' %}",
+        remove: "{% trans 'حذف' %}",
+        removeDay: "{% trans 'حذف روز' %}",
+        addMovement: "{% trans 'افزودن حرکت' %}",
+        addCorrective: "{% trans 'افزودن حرکت اصلاحی' %}",
+        warmup: "{% trans 'حین گرم کردن' %}",
+        cooldown: "{% trans 'حین سرد کردن' %}",
+        noCorrectives: "{% trans 'حرکت اصلاحی برای این پیش‌نمایش پیشنهاد نشده است؛ در صورت نیاز می‌توانید موردی اضافه کنید.' %}",
+        dayTitle: "{% trans 'عنوان روز' %}",
+        dayNotes: "{% trans 'توضیحات روز' %}",
+        movementMain: "{% trans 'حرکت اصلی' %}",
+        movementSecond: "{% trans 'حرکت دوم سوپرست' %}",
+        movementThird: "{% trans 'حرکت سوم' %}",
+        setsMain: "{% trans 'ست حرکت اصلی' %}",
+        repsMain: "{% trans 'تکرار حرکت اصلی' %}",
+        restMain: "{% trans 'استراحت حرکت اصلی' %}",
+        setsSecond: "{% trans 'ست حرکت دوم' %}",
+        repsSecond: "{% trans 'تکرار حرکت دوم' %}",
+        restSecond: "{% trans 'استراحت حرکت دوم' %}",
+        setsThird: "{% trans 'ست حرکت سوم' %}",
+        repsThird: "{% trans 'تکرار حرکت سوم' %}",
+        restThird: "{% trans 'استراحت حرکت سوم' %}",
+        note: "{% trans 'نکته' %}",
+        mainSettings: "{% trans 'تنظیمات حرکت اصلی' %}",
+        secondSettings: "{% trans 'تنظیمات حرکت دوم' %}",
+        thirdSettings: "{% trans 'تنظیمات حرکت سوم' %}",
+        corrective: "{% trans 'حرکت اصلاحی' %}",
+        phase: "{% trans 'مرحله اجرا' %}",
+        repsOrTime: "{% trans 'تکرار / مدت' %}",
+        previewDays: "{% trans 'روز برنامه' %}",
+        previewMovements: "{% trans 'حرکت برنامه' %}",
+        previewCorrectives: "{% trans 'حرکت اصلاحی' %}",
+        invalidPreview: "{% trans 'برای ذخیره، حرکت‌های اصلی و موارد اصلاحی انتخاب‌شده را کامل کنید.' %}",
+        invalidTargets: "{% trans 'حداقل یک بخش هدف برای جلسه‌ها انتخاب کنید.' %}",
+        invalidDay: "{% trans 'هر روز برنامه باید حداقل یک حرکت اصلی داشته باشد.' %}",
+        invalidExercise: "{% trans 'یکی از حرکت‌های اصلی انتخاب نشده است.' %}",
+        invalidCorrective: "{% trans 'یکی از حرکت‌های اصلاحی انتخاب نشده است.' %}",
+        invalidDate: "{% trans 'تاریخ پایان نمی‌تواند قبل از تاریخ شروع باشد.' %}",
+        copied: "{% trans 'تنظیمات جلسه اول برای همه جلسه‌ها کپی شد.' %}",
+        expandAll: "{% trans 'باز کردن همه روزها' %}",
+        collapseAll: "{% trans 'جمع کردن همه روزها' %}",
+        saving: "{% trans 'در حال انتشار…' %}",
+    };
+
+    let sessionTargetState = [];
+    let allDaysCollapsed = false;
+
+    function parseJson(value, fallback) {
+        try {
+            const parsed = JSON.parse(value || "");
+            return parsed === null || parsed === undefined ? fallback : parsed;
+        } catch (error) {
+            return fallback;
+        }
+    }
+
+    function esc(value) {
+        return String(value === null || value === undefined ? "" : value).replace(/[&<>"']/g, function (character) {
+            return {"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"}[character];
+        });
+    }
+
+    function stringId(value) {
+        return value === null || value === undefined ? "" : String(value);
+    }
+
+    function clampCount(value, fallback) {
+        const parsed = Number(value);
+        if (!Number.isFinite(parsed)) return fallback;
+        return Math.max(0, Math.min(20, Math.round(parsed)));
+    }
+
+    function sessionCount() {
+        return Math.max(1, Math.min(7, Number(sessionsInput && sessionsInput.value) || 1));
+    }
+
+    function movementOptions() {
+        if (!movementTypeCatalog) return [];
+        return Array.from(movementTypeCatalog.options).map(function (option) {
+            return {id: stringId(option.value), label: option.textContent.trim()};
+        }).filter(function (option) {
+            return option.id;
+        });
+    }
+
+    function targetEntries(target) {
+        if (!target || typeof target !== "object") return [];
+        if (Array.isArray(target.targets)) {
+            return target.targets.map(function (entry) {
+                return {
+                    movement_type: stringId(entry && (entry.movement_type ?? entry.movement_type_id ?? entry.target_section)),
+                    count: Math.max(0, Math.min(20, clampCount(entry && (entry.count ?? entry.movement_count ?? entry.movements), 0))),
+                };
+            }).filter(function (entry) {
+                return entry.movement_type;
+            });
+        }
+
+        const movementTypes = Array.isArray(target.movement_types) ? target.movement_types : [];
+        const counts = target.counts && typeof target.counts === "object" ? target.counts : {};
+        return movementTypes.map(function (value) {
+            const movementType = stringId(value);
+            return {
+                movement_type: movementType,
+                count: Math.max(0, Math.min(20, clampCount(
+                    counts[movementType] !== undefined ? counts[movementType] : counts[Number(movementType)],
+                    0
+                ))),
+            };
+        }).filter(function (entry) {
+            return entry.movement_type;
+        });
+    }
+
+    function sessionTargetData() {
+        return Array.isArray(sessionTargetState) ? sessionTargetState.map(function (target) {
+            const entries = targetEntries(target);
+            const movementTypes = [];
+            const counts = {};
+            entries.forEach(function (entry) {
+                if (movementTypes.indexOf(entry.movement_type) !== -1) return;
+                movementTypes.push(entry.movement_type);
+                counts[entry.movement_type] = entry.count;
+            });
+            return {targets: entries, movement_types: movementTypes, counts: counts};
+        }) : [];
+    }
+
+    function syncSelectedMovementTypes() {
+        if (!movementTypeCatalog) return;
+        const selected = new Set();
+        sessionTargetState.forEach(function (target) {
+            targetEntries(target).forEach(function (entry) {
+                selected.add(entry.movement_type);
+            });
+        });
+        Array.from(movementTypeCatalog.options).forEach(function (option) {
+            option.selected = selected.has(stringId(option.value));
+        });
+    }
+
+    function collectSessionTargets() {
+        if (!sessionTargetsList) return sessionTargetData();
+        Array.from(sessionTargetsList.querySelectorAll("[data-session-target]")).forEach(function (card) {
+            const index = Number(card.dataset.sessionTarget);
+            const targets = Array.from(card.querySelectorAll("[data-session-target-row]")).map(function (row) {
+                const typeInput = row.querySelector("[data-session-target-type]");
+                const countInput = row.querySelector("[data-session-target-count]");
+                return {
+                    movement_type: stringId(typeInput && typeInput.value),
+                    count: Math.max(0, Math.min(20, clampCount(countInput && countInput.value, 0))),
+                };
+            }).filter(function (target) {
+                return target.movement_type;
+            });
+            sessionTargetState[index] = {targets: targets};
+        });
+        sessionTargetState = sessionTargetState.slice(0, sessionCount());
+        const data = sessionTargetData();
+        if (sessionTargetsInput) sessionTargetsInput.value = JSON.stringify(data);
+        syncSelectedMovementTypes();
+        updateDesignSummary();
+        return data;
+    }
+
+    function normalizedSessionTargets() {
+        const options = movementOptions();
+        const available = new Set(options.map(function (item) { return item.id; }));
+        const initiallySelected = movementTypeCatalog
+            ? Array.from(movementTypeCatalog.selectedOptions).map(function (option) {
+                return stringId(option.value);
+            }).filter(function (id) { return available.has(id); })
+            : [];
+        const saved = sessionTargetState.length
+            ? sessionTargetData()
+            : parseJson(sessionTargetsInput && sessionTargetsInput.value, []);
+
+        return Array.from({length: sessionCount()}, function (_, index) {
+            const current = Array.isArray(saved) && saved[index] && typeof saved[index] === "object"
+                ? saved[index]
+                : {};
+            const currentEntries = targetEntries(current).filter(function (entry) {
+                return available.has(entry.movement_type);
+            });
+            if (currentEntries.length) return {targets: currentEntries};
+            const defaultTypes = initiallySelected.length ? initiallySelected : (options.length ? [options[0].id] : []);
+            return {
+                targets: defaultTypes.map(function (id) {
+                    return {movement_type: id, count: 1};
+                }),
+            };
+        });
+    }
+
+    function refreshSessionTargetCard(card) {
+        if (!card) return;
+        const rows = Array.from(card.querySelectorAll("[data-session-target-row]"));
+        const selected = new Set();
+        let total = 0;
+        rows.forEach(function (row) {
+            const select = row.querySelector("[data-session-target-type]");
+            const count = row.querySelector("[data-session-target-count]");
+            if (!select || !select.value) return;
+            if (selected.has(select.value)) {
+                select.value = "";
+                return;
+            }
+            selected.add(select.value);
+            total += Math.max(0, clampCount(count && count.value, 0));
+        });
+        rows.forEach(function (row) {
+            const select = row.querySelector("[data-session-target-type]");
+            if (!select) return;
+            Array.from(select.options).forEach(function (option) {
+                option.disabled = Boolean(
+                    option.value && selected.has(option.value) && option.value !== select.value
+                );
+            });
+        });
+        const selectedLabel = card.querySelector("[data-session-selected-label]");
+        if (selectedLabel) {
+            selectedLabel.textContent = selected.size + " " + text.sections + " • " + total + " " + text.movements;
+        }
+        card.querySelectorAll("[data-session-target-remove]").forEach(function (button) {
+            button.disabled = rows.length <= 1;
+        });
+        const addButton = card.querySelector("[data-session-target-add]");
+        if (addButton) addButton.disabled = selected.size >= movementOptions().length;
+    }
+
+    function targetRowMarkup(options, target) {
+        const selected = target && target.movement_type ? stringId(target.movement_type) : "";
+        const count = target && target.count !== undefined ? target.count : 1;
+        return '<div class="automatic-session-target__row" data-session-target-row>' +
+            '<label><span>' + esc(text.sections) + '</span><select class="admin-input" data-session-target-type aria-label="' + esc(text.sections) + '">' +
+                '<option value="">' + esc(text.selectSection) + '</option>' +
+                options.map(function (option) {
+                    return '<option value="' + esc(option.id) + '"' + (option.id === selected ? ' selected' : '') + '>' + esc(option.label) + '</option>';
+                }).join("") +
+            '</select></label>' +
+            '<label><span>' + esc(text.movements) + '</span><input class="admin-input" type="number" min="1" max="20" inputmode="numeric" dir="ltr" data-session-target-count aria-label="' + esc(text.movements) + '" value="' + esc(Math.max(1, Math.min(20, clampCount(count, 1)))) + '"></label>' +
+            '<button type="button" class="admin-secondary-btn automatic-session-target__remove" data-session-target-remove aria-label="' + esc(text.remove) + '">' + esc(text.remove) + '</button>' +
+        '</div>';
+    }
+
+    function renderSessionTargets() {
+        if (!sessionTargetsList) return;
+        const options = movementOptions();
+        if (!options.length) {
+            sessionTargetsList.innerHTML = '<p class="automatic-session-targets__empty">' + esc("{% trans 'هیچ بخش هدفی برای انتخاب وجود ندارد.' %}") + '</p>';
+            sessionTargetState = [];
+            if (sessionTargetsInput) sessionTargetsInput.value = "[]";
+            syncSelectedMovementTypes();
+            return;
+        }
+
+        sessionTargetState = normalizedSessionTargets();
+        sessionTargetsList.innerHTML = sessionTargetState.map(function (target, index) {
+            return '<article class="automatic-session-target" data-session-target="' + index + '">' +
+                '<div class="automatic-session-target__head">' +
+                    '<div class="automatic-session-target__head-copy"><strong>' + esc(text.sessions) + ' ' + (index + 1) + '</strong><small>' + esc("{% trans 'هر جلسه تنظیمات مستقل دارد' %}") + '</small></div>' +
+                    '<span class="automatic-session-target__badge" data-session-selected-label></span>' +
+                '</div>' +
+                '<div class="automatic-session-target__counts" data-session-target-rows>' +
+                    targetEntries(target).map(function (entry) { return targetRowMarkup(options, entry); }).join("") +
+                '</div>' +
+                '<button type="button" class="admin-secondary-btn automatic-session-target__add" data-session-target-add>+ ' + esc("{% trans 'افزودن بخش هدف' %}") + '</button>' +
+            '</article>';
+        }).join("");
+
+        sessionTargetsList.querySelectorAll("[data-session-target]").forEach(function (card) {
+            refreshSessionTargetCard(card);
+        });
+        collectSessionTargets();
+    }
+
+    function exerciseById(value) {
+        const wanted = stringId(value);
+        return exercises.find(function (item) { return stringId(item.id) === wanted; }) || null;
+    }
+
+    function exerciseLabel(item) {
+        if (!item) return "";
+        return [item.name, item.secondary_movement_type, item.difficulty_level].filter(Boolean).join(" — ");
+    }
+
+    function exerciseOptionMarkup(selected, allowEmpty, emptyLabel) {
+        const selectedId = stringId(selected);
+        let html = allowEmpty
+            ? '<option value="">' + esc(emptyLabel || "") + '</option>'
+            : '<option value="">' + esc(text.selectExercise) + '</option>';
+        const selectedItem = exerciseById(selectedId);
+        if (selectedId && !selectedItem) {
+            html += '<option value="' + esc(selectedId) + '" selected>' + esc(selectedId) + '</option>';
+        } else if (selectedItem) {
+            html += '<option value="' + esc(selectedId) + '" selected>' + esc(exerciseLabel(selectedItem)) + '</option>';
+        }
+        return html;
+    }
+
+    function hydrateExerciseSelect(select) {
+        if (!select || select.dataset.loaded === "true") return;
+        const selected = stringId(select.value);
+        const allowEmpty = select.dataset.allowEmpty === "true";
+        const emptyLabel = select.dataset.emptyLabel || "";
+        let html = allowEmpty
+            ? '<option value="">' + esc(emptyLabel) + '</option>'
+            : '<option value="">' + esc(text.selectExercise) + '</option>';
+        exercises.forEach(function (item) {
+            html += '<option value="' + esc(item.id) + '">' + esc(exerciseLabel(item)) + '</option>';
+        });
+        select.innerHTML = html;
+        select.value = selected;
+        select.dataset.loaded = "true";
+    }
+
+    function exerciseSelectMarkup(selected, allowEmpty, emptyLabel, role) {
+        return '<select class="admin-input" data-exercise-select data-key="' + esc(role || "exercise") + '" data-loaded="false" data-allow-empty="' + (allowEmpty ? "true" : "false") + '" data-empty-label="' + esc(emptyLabel || "") + '"' + (!allowEmpty ? " required" : "") + '>' +
+            exerciseOptionMarkup(selected, allowEmpty, emptyLabel) +
+        '</select>';
+    }
+
+    function correctiveOptions(selected) {
+        const selectedId = stringId(selected);
+        let html = '<option value="">' + esc(text.corrective) + '</option>';
+        let found = false;
+        correctiveCatalog.forEach(function (item) {
+            const itemId = stringId(item.id);
+            const isSelected = itemId === selectedId;
+            found = found || isSelected;
+            html += '<option value="' + esc(itemId) + '"' + (isSelected ? " selected" : "") + '>' + esc(item.name) + '</option>';
+        });
+        if (selectedId && !found) {
+            html += '<option value="' + esc(selectedId) + '" selected>' + esc(selectedId) + '</option>';
+        }
+        return html;
+    }
+
+    function itemValue(item, key, fallbackKey) {
+        if (!item || item[key] === null || item[key] === undefined) {
+            return fallbackKey ? (item && item[fallbackKey] ? item[fallbackKey] : "") : "";
+        }
+        return item[key];
+    }
+
+    function inputMarkup(label, key, value, placeholder) {
+        return '<label><span>' + esc(label) + '</span><input class="admin-input" data-key="' + esc(key) + '" value="' + esc(value) + '" placeholder="' + esc(placeholder || "") + '" dir="auto"></label>';
+    }
+
+    function renderPreview() {
+        if (!daysRoot) return;
+        const days = Array.isArray(preview.days) ? preview.days : [];
+        daysRoot.innerHTML = days.map(function (day, dayIndex) {
+            const items = Array.isArray(day.items) ? day.items : [];
+            return '<article class="admin-program-day automatic-day" data-day="' + dayIndex + '">' +
+                '<div class="admin-program-day__head automatic-day__head">' +
+                    '<div class="automatic-day__heading">' +
+                        '<span class="automatic-day__number">' + (dayIndex + 1) + '</span>' +
+                        '<label class="automatic-day__title-field"><span>' + esc(text.dayTitle) + '</span><input class="admin-input automatic-day__name" data-day-name value="' + esc(day.name || (text.sessions + " " + (dayIndex + 1))) + '" required></label>' +
+                        '<span class="automatic-day__count" data-day-item-count>' + items.length + ' ' + esc(text.movements) + '</span>' +
+                    '</div>' +
+                    '<div class="automatic-day__actions">' +
+                        '<button type="button" class="admin-secondary-btn admin-secondary-btn--small automatic-day__toggle" data-day-toggle aria-expanded="true">' + esc(text.collapseAll) + '</button>' +
+                        '<button type="button" class="admin-secondary-btn admin-secondary-btn--small automatic-day__remove" data-day-remove' + (days.length <= 1 ? " disabled" : "") + '>' + esc(text.removeDay) + '</button>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="automatic-day__body">' +
+                    '<label><span>' + esc(text.dayNotes) + '</span><textarea class="automatic-day__notes" data-day-notes rows="2" placeholder="' + esc(text.dayNotes) + '">' + esc(day.notes || "") + '</textarea></label>' +
+                    '<div class="admin-program-items">' +
+                        items.map(function (item, itemIndex) {
+                            return '<div class="admin-program-item automatic-program-item" data-item="' + itemIndex + '">' +
+                                '<div class="admin-program-item__top">' +
+                                    '<div class="automatic-program-item__identity"><strong>' + esc(text.movement) + ' ' + (itemIndex + 1) + '</strong></div>' +
+                                    '<button type="button" class="admin-secondary-btn admin-secondary-btn--small automatic-program-item__remove" data-item-remove>' + esc(text.remove) + '</button>' +
+                                '</div>' +
+                                '<div class="automatic-program-item__grid">' +
+                                    '<label class="automatic-program-item__main"><span>' + esc(text.movementMain) + '</span>' + exerciseSelectMarkup(item.exercise, false, "", "exercise") + '</label>' +
+                                    '<label><span>' + esc(text.movementSecond) + '</span>' + exerciseSelectMarkup(item.superset_exercise, true, text.noSuperset, "superset_exercise") + '</label>' +
+                                    '<label><span>' + esc(text.movementThird) + '</span>' + exerciseSelectMarkup(item.third_exercise, true, text.noThird, "third_exercise") + '</label>' +
+                                    '<div class="automatic-program-item__config-label">' + esc(text.mainSettings) + '</div>' +
+                                    inputMarkup(text.setsMain, "sets", itemValue(item, "sets"), "{% trans 'مثلاً ۳' %}") +
+                                    inputMarkup(text.repsMain, "reps", itemValue(item, "reps"), "{% trans 'مثلاً ۸ تا ۱۲' %}") +
+                                    inputMarkup(text.restMain, "rest", itemValue(item, "rest"), "{% trans 'مثلاً ۶۰ ثانیه' %}") +
+                                    '<div class="automatic-program-item__config-label">' + esc(text.secondSettings) + '</div>' +
+                                    inputMarkup(text.setsSecond, "superset_sets", itemValue(item, "superset_sets", "sets"), "{% trans 'اختیاری' %}") +
+                                    inputMarkup(text.repsSecond, "superset_reps", itemValue(item, "superset_reps", "reps"), "{% trans 'اختیاری' %}") +
+                                    inputMarkup(text.restSecond, "superset_rest", itemValue(item, "superset_rest", "rest"), "{% trans 'اختیاری' %}") +
+                                    '<div class="automatic-program-item__config-label">' + esc(text.thirdSettings) + '</div>' +
+                                    inputMarkup(text.setsThird, "third_sets", itemValue(item, "third_sets", "sets"), "{% trans 'اختیاری' %}") +
+                                    inputMarkup(text.repsThird, "third_reps", itemValue(item, "third_reps", "reps"), "{% trans 'اختیاری' %}") +
+                                    inputMarkup(text.restThird, "third_rest", itemValue(item, "third_rest", "rest"), "{% trans 'اختیاری' %}") +
+                                    inputMarkup(text.note, "note", item.note || "", "{% trans 'نکته یا توضیح حرکت' %}") +
+                                '</div>' +
+                            '</div>';
+                        }).join("") +
+                    '</div>' +
+                    '<button type="button" class="admin-secondary-btn admin-secondary-btn--small automatic-day__add" data-day-add>+ ' + esc(text.addMovement) + '</button>' +
+                '</div>' +
+            '</article>';
+        }).join("");
+
+        if (allDaysCollapsed) {
+            daysRoot.querySelectorAll(".automatic-day").forEach(function (day) {
+                setDayCollapsed(day, true);
+            });
+        }
+        updatePreviewSummary();
+    }
+
+    function renderCorrectives() {
+        if (!correctiveRoot) return;
+        const correctives = Array.isArray(preview.correctives) ? preview.correctives : [];
+        correctiveRoot.innerHTML =
+            '<div class="automatic-correctives-editor__head">' +
+                '<div class="automatic-correctives-editor__head-copy"><p class="automatic-section-eyebrow">' + esc("{% trans 'در صورت نیاز' %}") + '</p><h2>' + esc("{% trans 'حرکات اصلاحی پیشنهادی' %}") + '</h2><p>' + esc(text.noCorrectives) + '</p></div>' +
+                '<button type="button" class="admin-secondary-btn admin-secondary-btn--small" data-corrective-add>+ ' + esc(text.addCorrective) + '</button>' +
+            '</div>' +
+            (correctives.length
+                ? correctives.map(function (item, index) {
+                    return '<div class="automatic-corrective" data-corrective="' + index + '">' +
+                        '<label><span>' + esc(text.corrective) + '</span><select class="admin-input" data-key="corrective_exercise" required>' + correctiveOptions(item.corrective_exercise) + '</select></label>' +
+                        '<label><span>' + esc(text.phase) + '</span><select class="admin-input" data-key="phase"><option value="warmup"' + (item.phase === "warmup" ? " selected" : "") + '>' + esc(text.warmup) + '</option><option value="cooldown"' + (item.phase === "cooldown" ? " selected" : "") + '>' + esc(text.cooldown) + '</option></select></label>' +
+                        '<label><span>' + esc(text.setsMain) + '</span><input class="admin-input" data-key="sets" value="' + esc(item.sets || "") + '" placeholder="' + esc("{% trans 'اختیاری' %}") + '"></label>' +
+                        '<label><span>' + esc(text.repsOrTime) + '</span><input class="admin-input" data-key="reps" value="' + esc(item.reps || "") + '" placeholder="' + esc("{% trans 'مثلاً ۱۰ تا ۱۲' %}") + '"></label>' +
+                        '<label><span>' + esc(text.note) + '</span><input class="admin-input" data-key="note" value="' + esc(item.note || "") + '" placeholder="' + esc("{% trans 'اختیاری' %}") + '"></label>' +
+                        '<button type="button" class="admin-secondary-btn admin-secondary-btn--small automatic-corrective__remove" data-corrective-remove>' + esc(text.remove) + '</button>' +
+                    '</div>';
+                }).join("")
+                : '<p class="automatic-correctives-editor__empty">' + esc(text.noCorrectives) + '</p>');
+    }
+
+    function collectPreview() {
+        if (!daysRoot || !daysInput) return;
+        preview.days = Array.from(daysRoot.querySelectorAll(".automatic-day")).map(function (day) {
+            return {
+                name: (day.querySelector("[data-day-name]") || {}).value?.trim() || "",
+                notes: (day.querySelector("[data-day-notes]") || {}).value?.trim() || "",
+                items: Array.from(day.querySelectorAll(".automatic-program-item")).map(function (item) {
+                    const value = {};
+                    item.querySelectorAll("[data-key]").forEach(function (element) {
+                        value[element.dataset.key] = element.value;
+                    });
+                    return value;
+                }),
+            };
+        });
+        preview.correctives = correctiveRoot
+            ? Array.from(correctiveRoot.querySelectorAll("[data-corrective]")).map(function (row) {
+                const value = {};
+                row.querySelectorAll("[data-key]").forEach(function (element) {
+                    value[element.dataset.key] = element.value;
+                });
+                return value;
+            })
+            : [];
+        daysInput.value = JSON.stringify(preview.days);
+        if (correctivesInput) correctivesInput.value = JSON.stringify(preview.correctives);
+        updatePreviewSummary();
+    }
+
+    function updatePreviewSummary() {
+        if (!previewSummary) return;
+        const days = Array.isArray(preview.days) ? preview.days : [];
+        const movementCount = days.reduce(function (total, day) {
+            return total + (Array.isArray(day.items) ? day.items.length : 0);
+        }, 0);
+        const correctiveCount = Array.isArray(preview.correctives) ? preview.correctives.length : 0;
+        previewSummary.innerHTML =
+            '<div class="automatic-preview-stat"><span>' + esc(text.previewDays) + '</span><strong>' + days.length + '</strong></div>' +
+            '<div class="automatic-preview-stat"><span>' + esc(text.previewMovements) + '</span><strong>' + movementCount + '</strong></div>' +
+            '<div class="automatic-preview-stat"><span>' + esc(text.previewCorrectives) + '</span><strong>' + correctiveCount + '</strong></div>';
+    }
+
+    function updateDesignSummary() {
+        const summaryNode = document.querySelector("[data-design-summary]");
+        if (!summaryNode) return;
+        const targetData = sessionTargetData();
+        const selectedSections = new Set();
+        let plannedMovements = 0;
+        targetData.forEach(function (session) {
+            targetEntries(session).forEach(function (entry) {
+                selectedSections.add(entry.movement_type);
+                plannedMovements += entry.count;
+            });
+        });
+        summaryNode.textContent = sessionCount() + " " + text.sessions + " • " + selectedSections.size + " " + text.sections + " • " + plannedMovements + " " + text.movements;
+    }
+
+    function setDayCollapsed(day, collapsed) {
+        if (!day) return;
+        day.classList.toggle("is-collapsed", collapsed);
+        const toggle = day.querySelector("[data-day-toggle]");
+        if (toggle) {
+            toggle.setAttribute("aria-expanded", collapsed ? "false" : "true");
+            toggle.textContent = collapsed ? text.expandAll : text.collapseAll;
+        }
+    }
+
+    function setFormStatus(message, success) {
+        formStatusNodes.forEach(function (node) {
+            node.textContent = message || "";
+            node.classList.toggle("is-visible", Boolean(message));
+            node.classList.toggle("is-success", Boolean(success));
+        });
+    }
+
+    function clearInvalidFields() {
+        document.querySelectorAll(".automatic-program-screen .is-invalid").forEach(function (element) {
+            element.classList.remove("is-invalid");
+            element.removeAttribute("aria-invalid");
+        });
+    }
+
+    function validateBeforeSave() {
+        clearInvalidFields();
+        collectSessionTargets();
+        collectPreview();
+
+        if (!athleteSelect || !athleteSelect.value) {
+            setFormStatus(text.invalidPreview);
+            if (athleteSelect) {
+                athleteSelect.classList.add("is-invalid");
+                athleteSelect.setAttribute("aria-invalid", "true");
+                athleteSelect.focus();
+            }
+            return false;
+        }
+
+        if (movementTypeCatalog && !movementTypeCatalog.selectedOptions.length) {
+            setFormStatus(text.invalidTargets);
+            movementTypeCatalog.classList.add("is-invalid");
+            movementTypeCatalog.setAttribute("aria-invalid", "true");
+            movementTypeCatalog.focus();
+            return false;
+        }
+
+        const days = Array.isArray(preview.days) ? preview.days : [];
+        if (!days.length) {
+            setFormStatus(text.invalidPreview);
+            return false;
+        }
+
+        for (const day of days) {
+            if (!Array.isArray(day.items) || !day.items.length) {
+                setFormStatus(text.invalidDay);
+                const emptyDay = Array.from(daysRoot.querySelectorAll(".automatic-day")).find(function (element) {
+                    return element.querySelectorAll(".automatic-program-item").length === 0;
+                });
+                if (emptyDay) {
+                    setDayCollapsed(emptyDay, false);
+                    const addButton = emptyDay.querySelector("[data-day-add]");
+                    if (addButton) addButton.focus();
+                }
+                return false;
+            }
+            for (const item of day.items) {
+                if (!item.exercise) {
+                    setFormStatus(text.invalidExercise);
+                    const index = days.indexOf(day);
+                    const dayElement = daysRoot.querySelector('[data-day="' + index + '"]');
+                    const itemElement = dayElement && dayElement.querySelector(".automatic-program-item select[data-key='exercise']");
+                    if (itemElement) {
+                        setDayCollapsed(dayElement, false);
+                        itemElement.classList.add("is-invalid");
+                        itemElement.setAttribute("aria-invalid", "true");
+                        hydrateExerciseSelect(itemElement);
+                        itemElement.focus();
+                    }
+                    return false;
+                }
+            }
+        }
+
+        const correctiveRows = correctiveRoot ? correctiveRoot.querySelectorAll("[data-corrective]") : [];
+        for (const row of correctiveRows) {
+            const correctiveSelect = row.querySelector("[data-key='corrective_exercise']");
+            if (correctiveSelect && !correctiveSelect.value) {
+                setFormStatus(text.invalidCorrective);
+                correctiveSelect.classList.add("is-invalid");
+                correctiveSelect.setAttribute("aria-invalid", "true");
+                correctiveSelect.focus();
+                return false;
+            }
+        }
+
+        if (startDateInput && endDateInput && startDateInput.value && endDateInput.value && endDateInput.value < startDateInput.value) {
+            setFormStatus(text.invalidDate);
+            endDateInput.classList.add("is-invalid");
+            endDateInput.setAttribute("aria-invalid", "true");
+            endDateInput.focus();
+            return false;
+        }
+
+        setFormStatus("");
+        return true;
+    }
+
+    function updateDateConstraint() {
+        if (!startDateInput || !endDateInput) return;
+        endDateInput.min = startDateInput.value || "";
+        const invalid = Boolean(startDateInput.value && endDateInput.value && endDateInput.value < startDateInput.value);
+        endDateInput.setCustomValidity(invalid ? text.invalidDate : "");
+        endDateInput.classList.toggle("is-invalid", invalid);
+    }
+
+    if (sessionTargetsList) {
+        sessionTargetsList.addEventListener("change", function (event) {
+            const card = event.target.closest("[data-session-target]");
+            if (!card) return;
+            if (event.target.matches("[data-session-target-type]")) refreshSessionTargetCard(card);
+            collectSessionTargets();
+        });
+        sessionTargetsList.addEventListener("input", function (event) {
+            if (event.target.matches("[data-session-target-count]")) {
+                const card = event.target.closest("[data-session-target]");
+                refreshSessionTargetCard(card);
+                collectSessionTargets();
+            }
+        });
+        sessionTargetsList.addEventListener("click", function (event) {
+            const card = event.target.closest("[data-session-target]");
+            if (!card) return;
+            if (event.target.matches("[data-session-target-add]")) {
+                const used = new Set(Array.from(card.querySelectorAll("[data-session-target-type]")).map(function (select) {
+                    return select.value;
+                }).filter(Boolean));
+                const next = movementOptions().find(function (option) { return !used.has(option.id); });
+                if (!next) return;
+                const rowsRoot = card.querySelector("[data-session-target-rows]");
+                rowsRoot.insertAdjacentHTML("beforeend", targetRowMarkup(movementOptions(), {movement_type: next.id, count: 1}));
+                refreshSessionTargetCard(card);
+                collectSessionTargets();
+            } else if (event.target.matches("[data-session-target-remove]")) {
+                const row = event.target.closest("[data-session-target-row]");
+                if (row && card.querySelectorAll("[data-session-target-row]").length > 1) {
+                    row.remove();
+                    refreshSessionTargetCard(card);
+                    collectSessionTargets();
+                }
+            }
+        });
+    }
+
+    if (sessionsInput) {
+        sessionsInput.addEventListener("input", function () {
+            collectSessionTargets();
+            renderSessionTargets();
+        });
+        sessionsInput.addEventListener("change", function () {
+            collectSessionTargets();
+            renderSessionTargets();
+        });
+    }
+
+    if (sessionCopyButton) {
+        sessionCopyButton.addEventListener("click", function () {
+            collectSessionTargets();
+            const first = targetEntries(sessionTargetState[0]);
+            if (!first.length) return;
+            sessionTargetState = Array.from({length: sessionCount()}, function () {
+                return {targets: first.map(function (entry) {
+                    return {movement_type: entry.movement_type, count: entry.count};
+                })};
+            });
+            renderSessionTargets();
+            setFormStatus(text.copied, true);
+            window.setTimeout(function () { setFormStatus(""); }, 2600);
+        });
+    }
+
+    if (movementTypeCatalog) {
+        movementTypeCatalog.addEventListener("change", function () {
+            updateDesignSummary();
+        });
+    }
+
+    const athleteClear = document.querySelector("[data-athlete-search-clear]");
+    const athleteReset = document.querySelector("[data-athlete-search-reset]");
+    const athleteStatus = document.querySelector("[data-athlete-search-status]");
+    const athleteSelection = document.querySelector("[data-athlete-selection]");
+    if (athleteSearch && athleteSelect) {
+        const options = Array.from(athleteSelect.options);
+        const athleteOptions = options.filter(function (option) { return option.value; });
+        const normalizeSearch = function (value) {
+            return String(value || "")
+                .replace(/[۰-۹]/g, function (digit) { return String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)); })
+                .replace(/[٠-٩]/g, function (digit) { return String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)); })
+                .replace(/[يى]/g, "ی")
+                .replace(/ك/g, "ک")
+                .trim()
+                .toLocaleLowerCase();
+        };
+        const updateAthleteSelection = function () {
+            const selected = athleteSelect.selectedOptions[0];
+            if (!athleteSelection) return;
+            if (!selected || !selected.value) {
+                athleteSelection.innerHTML = '<span class="automatic-athlete-picker__selected-empty">' + esc(text.noAthlete) + '</span>';
+                return;
+            }
+            const parts = selected.textContent.split("—");
+            const name = esc((parts.shift() || "").trim());
+            const phone = esc(parts.join("—").trim());
+            athleteSelection.innerHTML = '<span class="automatic-athlete-picker__selected-mark" aria-hidden="true">✓</span><span><strong>' + name + '</strong><small dir="ltr">' + phone + '</small></span>';
+        };
+        const updateAthleteSearch = function () {
+            const query = normalizeSearch(athleteSearch.value);
+            let visible = 0;
+            options.forEach(function (option) {
+                const isSelected = option.value && option.value === athleteSelect.value;
+                const matches = !query || normalizeSearch(option.textContent).indexOf(query) !== -1;
+                option.hidden = !matches && !isSelected;
+                if (matches && option.value) visible += 1;
+            });
+            if (athleteStatus) {
+                athleteStatus.textContent = query
+                    ? visible + " " + text.athletesFound
+                    : athleteOptions.length + " " + text.athletesAvailable;
+                athleteStatus.classList.toggle("is-empty", Boolean(query && !visible));
+            }
+            if (athleteClear) athleteClear.hidden = !query;
+            if (athleteReset) athleteReset.hidden = !query;
+            athleteSelect.classList.toggle("is-filtered", Boolean(query));
+        };
+        athleteSearch.addEventListener("input", updateAthleteSearch);
+        athleteSelect.addEventListener("change", function () {
+            updateAthleteSelection();
+            updateAthleteSearch();
+        });
+        if (athleteClear) athleteClear.addEventListener("click", function () {
+            athleteSearch.value = "";
+            updateAthleteSearch();
+            athleteSearch.focus();
+        });
+        if (athleteReset) athleteReset.addEventListener("click", function () {
+            athleteSearch.value = "";
+            updateAthleteSearch();
+            athleteSelect.focus();
+        });
+        updateAthleteSearch();
+        updateAthleteSelection();
+    }
+
+    if (daysRoot) {
+        daysRoot.addEventListener("focusin", function (event) {
+            if (event.target.matches("[data-exercise-select]")) hydrateExerciseSelect(event.target);
+        });
+        daysRoot.addEventListener("change", function (event) {
+            if (event.target.matches("[data-exercise-select]")) hydrateExerciseSelect(event.target);
+            if (event.target.matches("[data-day-name]")) collectPreview();
+            updatePreviewSummary();
+        });
+        daysRoot.addEventListener("input", function () {
+            updatePreviewSummary();
+        });
+        daysRoot.addEventListener("click", function (event) {
+            const day = event.target.closest(".automatic-day");
+            if (!day) return;
+            if (event.target.matches("[data-day-toggle]")) {
+                setDayCollapsed(day, !day.classList.contains("is-collapsed"));
+                return;
+            }
+            if (event.target.matches("[data-day-remove]")) {
+                collectPreview();
+                const index = Number(day.dataset.day);
+                if (preview.days.length > 1) {
+                    preview.days.splice(index, 1);
+                    renderPreview();
+                    collectPreview();
+                }
+                return;
+            }
+            if (event.target.matches("[data-day-add]")) {
+                collectPreview();
+                const index = Number(day.dataset.day);
+                preview.days[index].items.push({
+                    exercise: "",
+                    superset_exercise: "",
+                    third_exercise: "",
+                    sets: "",
+                    reps: "",
+                    rest: "",
+                    superset_sets: "",
+                    superset_reps: "",
+                    superset_rest: "",
+                    third_sets: "",
+                    third_reps: "",
+                    third_rest: "",
+                    note: "",
+                });
+                renderPreview();
+                collectPreview();
+                return;
+            }
+            if (event.target.matches("[data-item-remove]")) {
+                collectPreview();
+                const item = event.target.closest(".automatic-program-item");
+                const index = Number(day.dataset.day);
+                const itemIndex = Number(item && item.dataset.item);
+                if (Number.isInteger(itemIndex)) {
+                    preview.days[index].items.splice(itemIndex, 1);
+                    renderPreview();
+                    collectPreview();
+                }
+            }
+        });
+    }
+
+    if (correctiveRoot) {
+        correctiveRoot.addEventListener("click", function (event) {
+            if (event.target.matches("[data-corrective-add]")) {
+                collectPreview();
+                preview.correctives.push({corrective_exercise: "", phase: "warmup", sets: "", reps: "", note: ""});
+                renderCorrectives();
+                collectPreview();
+                const first = correctiveRoot.querySelector("[data-corrective] select");
+                if (first) first.focus();
+            } else if (event.target.matches("[data-corrective-remove]")) {
+                collectPreview();
+                const row = event.target.closest("[data-corrective]");
+                const index = Number(row && row.dataset.corrective);
+                if (Number.isInteger(index)) {
+                    preview.correctives.splice(index, 1);
+                    renderCorrectives();
+                    collectPreview();
+                }
+            }
+        });
+        correctiveRoot.addEventListener("input", updatePreviewSummary);
+        correctiveRoot.addEventListener("change", updatePreviewSummary);
+    }
+
+    if (previewToggleButton && daysRoot) {
+        previewToggleButton.addEventListener("click", function () {
+            allDaysCollapsed = !allDaysCollapsed;
+            daysRoot.querySelectorAll(".automatic-day").forEach(function (day) {
+                setDayCollapsed(day, allDaysCollapsed);
+            });
+            previewToggleButton.textContent = allDaysCollapsed ? text.expandAll : text.collapseAll;
+        });
+    }
+
+    if (startDateInput) startDateInput.addEventListener("change", updateDateConstraint);
+    if (endDateInput) endDateInput.addEventListener("change", updateDateConstraint);
+    updateDateConstraint();
+
+    if (editor) {
+        editor.addEventListener("submit", function (event) {
+            collectSessionTargets();
+            const submitter = event.submitter;
+            const action = submitter ? submitter.value : "generate";
+            if (action === "save" && !validateBeforeSave()) {
+                event.preventDefault();
+                return;
+            }
+            collectPreview();
+            /*
+             * Keep the clicked action in the submitted form even when the
+             * submit button is disabled below. Disabled controls are omitted
+             * from the form data set, which would otherwise make the view
+             * fall back to "generate" instead of saving and publishing.
+             */
+            const actionInput = document.createElement("input");
+            actionInput.type = "hidden";
+            actionInput.name = "action";
+            actionInput.value = action;
+            editor.appendChild(actionInput);
+            if (submitter) {
+                submitter.disabled = true;
+                submitter.textContent = submitter.dataset.busyText || text.saving;
+            }
+        });
+    }
+
+    renderSessionTargets();
+    renderPreview();
+    renderCorrectives();
+})();
+</script>
+{% endblock %}

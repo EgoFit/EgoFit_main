@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{{ page_title }} | {% trans 'کتابخانه تمرینات' %}{% endblock %}
+{% block content %}
+<main class="workout-library-page">
+    <div class="shell-container page-stack">
+        <header class="workout-library-hero">
+            <a href="{% url 'home:workout_library' %}" class="secondary-action">← {% trans 'کتابخانه تمرینات' %}</a>
+            <div class="workout-library-hero__copy">
+                <span class="eyebrow">{% trans 'دانش بدن' %}</span>
+                <h1>{{ page_title }}</h1>
+                <p>{% trans 'شناخت مبدا، انتها، عصب و عملکرد عضلات بدن.' %}</p>
+            </div>
+            <form method="get" class="workout-library-search">
+                <label class="sr-only" for="library-muscle-search">{% trans 'جستجو در عضلات' %}</label>
+                <input id="library-muscle-search" type="search" name="q" value="{{ query }}" placeholder="{% trans 'جستجو در عضلات' %}">
+                <button class="cta-primary" type="submit">{% trans 'جستجو' %}</button>
+            </form>
+        </header>
+
+        <section class="workout-library-section" aria-labelledby="library-muscle-heading">
+            <div class="workout-library-section__heading">
+                <div>
+                    <span class="workout-library-kicker">{% trans 'اطلس عضلات' %}</span>
+                    <h2 id="library-muscle-heading">{{ muscles|length }} {% trans 'عضله' %}</h2>
+                </div>
+            </div>
+            <div class="workout-library-grid workout-library-grid--items">
+                {% for muscle in muscles %}
+                    <a class="workout-library-detail-card workout-library-detail-card--muscle" href="{% url 'home:workout_muscle' muscle.pk %}" data-library-modal-trigger aria-haspopup="dialog" aria-label="{% trans 'مشاهده جزئیات' %}: {{ muscle.name }}">
+                        {% if muscle.image %}<img src="{{ muscle.image.url }}" alt="{{ muscle.name }}" loading="lazy">{% else %}<div class="workout-library-media-placeholder" aria-hidden="true">🫀</div>{% endif %}
+                        <div class="workout-library-card__eyebrow">{% trans 'عضله' %}</div>
+                        <h2>{{ muscle.name }}</h2>
+                        <p>{{ muscle.function_note|default:'اطلاعات عملکرد این عضله در دست تکمیل است.' }}</p>
+                        <dl>
+                            <dt>{% trans 'مبدا' %}</dt><dd>{{ muscle.origin|default:'—' }}</dd>
+                            <dt>{% trans 'انتها' %}</dt><dd>{{ muscle.insertion|default:'—' }}</dd>
+                            <dt>{% trans 'عصب' %}</dt><dd>{{ muscle.nerve|default:'—' }}</dd>
+                        </dl>
+                        <span class="workout-library-card__link">{% trans 'مشاهده جزئیات' %} ←</span>
+                        <template class="workout-library-modal-template">
+                            <div class="workout-library-modal__eyebrow">{% trans 'اطلس عضلات' %}</div>
+                            <h2>{{ muscle.name }}</h2>
+                            {% if muscle.image %}<img class="workout-library-modal__image" src="{{ muscle.image.url }}" alt="{{ muscle.name }}">{% endif %}
+                            <p class="workout-library-modal__description">{{ muscle.function_note|default:'اطلاعات عملکرد این عضله در دست تکمیل است.' }}</p>
+                            <dl class="workout-library-modal__details">
+                                <dt>{% trans 'مبدا' %}</dt><dd>{{ muscle.origin|default:'—' }}</dd>
+                                <dt>{% trans 'انتها' %}</dt><dd>{{ muscle.insertion|default:'—' }}</dd>
+                                <dt>{% trans 'عصب' %}</dt><dd>{{ muscle.nerve|default:'—' }}</dd>
+                            </dl>
+                            <div class="workout-library-modal__actions">
+                                <a href="{% url 'home:workout_musculology' %}" class="secondary-action">← {% trans 'بازگشت به کتابخانه عضلات' %}</a>
+                            </div>
+                        </template>
+                    </a>
+                {% empty %}
+                    <p class="workout-library-empty">{% trans 'عضله‌ای پیدا نشد.' %}</p>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+</main>
+{% endblock %}

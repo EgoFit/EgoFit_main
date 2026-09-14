@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load my_tags %}
+{% load i18n %}
+
+{% block page_wrapper_class %}bg-secondary{% endblock %}
+
+{% block content %}
+{% trans 'تماس با ما' as default_hero_eyebrow %}
+{% trans 'ارتباط سریع، شفاف و قابل پیگیری' as default_hero_title %}
+{% trans 'برای انتخاب مسیر آموزشی، پشتیبانی خرید، همکاری یا مشاوره تخصصی پیام بگذارید. پیام‌ها ساختارمند ثبت می‌شوند تا تیم بتواند دقیق‌تر پاسخ دهد.' as default_hero_description %}
+{% trans 'پشتیبانی حرفه‌ای' as default_status_title %}
+{% trans 'فرآیند ارتباطی تمیز، سریع و قابل اتکا' as default_status_description %}
+<main class="flex-auto py-5">
+    <div class="shell-container page-stack page-stack--contact">
+        <section class="contact-hero modern-surface" data-reveal>
+            <div class="contact-hero__copy">
+                <span class="eyebrow">{{ contact_page.hero_eyebrow|default_cms:default_hero_eyebrow }}</span>
+                <h1>{{ contact_page.hero_title|default_cms:default_hero_title }}</h1>
+                <p>{{ contact_page.hero_description|default_cms:default_hero_description }}</p>
+                <div class="contact-hero__chips">
+                    {% if contact_page.signals.all %}
+                        {% for signal in contact_page.signals.all %}
+                            <span>{{ signal.text }}</span>
+                        {% endfor %}
+                    {% else %}
+                        <span>{% trans 'پاسخ‌گویی در ساعات کاری' %}</span>
+                        <span>{% trans 'ثبت امن درخواست' %}</span>
+                        <span>{% trans 'مناسب پشتیبانی و مشاوره' %}</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="contact-hero__status">
+                <strong>{{ contact_page.status_title|default_cms:default_status_title }}</strong>
+                <span>{{ contact_page.status_description|default_cms:default_status_description }}</span>
+            </div>
+        </section>
+
+        <section class="contact-layout">
+            <div class="contact-info-stack">
+                <article class="contact-info-card modern-surface" data-reveal>
+                    <span class="contact-info-card__icon">۱</span>
+                    <div>
+                        <h2>{% trans 'شماره تماس' %}</h2>
+                        {% if footer and footer.phone_number %}
+                            <a href="tel:{{ footer.phone_number }}" dir="ltr">{{ footer.phone_number }}</a>
+                        {% else %}
+                            <p>{% trans 'شماره تماس هنوز ثبت نشده است.' %}</p>
+                        {% endif %}
+                    </div>
+                </article>
+
+                <article class="contact-info-card modern-surface" data-reveal>
+                    <span class="contact-info-card__icon">۲</span>
+                    <div>
+                        <h2>{% trans 'ساعات کاری' %}</h2>
+                        {% trans 'در حال بروزرسانی' as default_working_hours %}
+                        <p>{{ footer.working_hours|default:default_working_hours }}</p>
+                    </div>
+                </article>
+
+                <article class="contact-info-card modern-surface" data-reveal>
+                    <span class="contact-info-card__icon">۳</span>
+                    <div>
+                        <h2>{% trans 'آدرس' %}</h2>
+                        {% trans 'آدرس هنوز ثبت نشده است.' as default_address %}
+                        <p>{{ footer.address|default:default_address }}</p>
+                    </div>
+                </article>
+
+                <article class="contact-social-card modern-surface" data-reveal>
+                    <div>
+                        <span class="eyebrow">{% trans 'شبکه‌های اجتماعی' %}</span>
+                        <h2>{% trans 'کانال‌های رسمی' %}</h2>
+                    </div>
+                    <div class="modern-footer__social">
+                        {% if footer and footer.social_media.telegram %}
+                            <a href="{{ footer.social_media.telegram }}" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'تلگرام' %}">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20" aria-hidden="true">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+                                </svg>
+                            </a>
+                        {% endif %}
+                        {% if footer and footer.social_media.youtube %}
+                            <a href="{{ footer.social_media.youtube }}" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'یوتیوب' %}">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20" aria-hidden="true">
+                                    <path d="M21.58 7.19a2.47 2.47 0 0 0-1.74-1.75C18.25 5 12 5 12 5s-6.25 0-7.84.44A2.47 2.47 0 0 0 2.42 7.19 26.27 26.27 0 0 0 2 12a26.27 26.27 0 0 0 .42 4.81 2.47 2.47 0 0 0 1.74 1.75C5.75 19 12 19 12 19s6.25 0 7.84-.44a2.47 2.47 0 0 0 1.74-1.75A26.27 26.27 0 0 0 22 12a26.27 26.27 0 0 0-.42-4.81zM10 15.02V8.98L15.5 12 10 15.02z"/>
+                                </svg>
+                            </a>
+                        {% endif %}
+                    </div>
+                </article>
+            </div>
+
+            <aside class="contact-form-card modern-surface" data-reveal>
+                <div class="contact-form-card__header">
+                    <span class="eyebrow">{% trans 'درخواست' %}</span>
+                    <h2>{% trans 'ارسال پیام' %}</h2>
+                    <p>{% trans 'فیلدها را دقیق پر کنید تا پاسخ‌گویی سریع‌تر انجام شود.' %}</p>
+                </div>
+
+                {% if messages %}
+                    <div class="form-messages">
+                        {% for message in messages %}
+                            <div class="form-message {% if message.tags %}is-{{ message.tags }}{% endif %}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <form class="contact-form" method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="field-group field-group--full contact-phone-field">
+                        <label for="{{ form.name.id_for_label }}">{% trans 'نام و نام خانوادگی' %}</label>
+                        {{ form.name }}
+                        {{ form.name.errors }}
+                    </div>
+                    <div class="field-group">
+                        <label for="{{ form.email.id_for_label }}">{% trans 'ایمیل' %}</label>
+                        {{ form.email }}
+                        {{ form.email.errors }}
+                    </div>
+                    <div class="field-group">
+                        <label for="{{ form.phone.id_for_label }}">{% trans 'شماره تماس' %}</label>
+                        {{ form.phone }}
+                        {{ form.phone.errors }}
+                    </div>
+                    <div class="field-group field-group--full">
+                        <label for="{{ form.comment.id_for_label }}">{% trans 'متن پیام' %}</label>
+                        {{ form.comment }}
+                        {{ form.comment.errors }}
+                    </div>
+                    <button type="submit" class="cta-primary cta-primary--strong w-full">{% trans 'ارسال پیام' %}</button>
+                </form>
+            </aside>
+        </section>
+    </div>
+</main>
+{% endblock %}

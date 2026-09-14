@@ -1,0 +1,767 @@
+/*
+ * Narrow viewport hardening for every account template.
+ *
+ * The account and admin pages use shared shells, so this file is loaded once
+ * by those shells and keeps all child templates usable at 360 x 760.
+ */
+
+@media (max-width: 420px) {
+    html,
+    body {
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    .site-shell,
+    .site-content,
+    .account-app,
+    .admin-app,
+    .auth-main,
+    .auth-mobile-main,
+    .account-app__layout,
+    .admin-app__layout,
+    .account-app__content,
+    .admin-app__content {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .account-app *,
+    .admin-app *,
+    .auth-main *,
+    .auth-mobile-main * {
+        min-width: 0;
+    }
+
+    .account-app img,
+    .account-app video,
+    .account-app canvas,
+    .admin-app img,
+    .admin-app video,
+    .admin-app canvas,
+    .auth-main img,
+    .auth-mobile-main img {
+        max-width: 100%;
+    }
+
+    .account-app input:not([type="checkbox"]):not([type="radio"]),
+    .account-app select,
+    .account-app textarea,
+    .admin-app input:not([type="checkbox"]):not([type="radio"]),
+    .admin-app select,
+    .admin-app textarea,
+    .auth-main input:not([type="checkbox"]):not([type="radio"]),
+    .auth-main select,
+    .auth-main textarea,
+    .auth-mobile-main input:not([type="checkbox"]):not([type="radio"]),
+    .auth-mobile-main select,
+    .auth-mobile-main textarea {
+        width: 100%;
+        max-width: 100%;
+        font-size: 16px;
+    }
+
+    .account-app button,
+    .account-app .cta-primary,
+    .admin-app button,
+    .admin-app .admin-primary-btn,
+    .admin-app .admin-secondary-btn {
+        max-width: 100%;
+    }
+
+    /* Shared dashboard chrome */
+    .dashboard-glass-header {
+        padding: 6px 0;
+    }
+
+    .dashboard-glass-header__inner {
+        width: calc(100% - 12px);
+        min-height: 58px;
+        gap: 6px;
+        padding: 8px 10px;
+        border-radius: 18px;
+    }
+
+    .dashboard-glass-header__logo {
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+    }
+
+    .dashboard-glass-header__brand,
+    .dashboard-glass-header__actions {
+        gap: 6px;
+    }
+
+    .dashboard-glass-header__brand-copy strong,
+    .dashboard-glass-header__title h1 {
+        font-size: 0.86rem;
+    }
+
+    .dashboard-glass-header__title {
+        padding-top: 2px;
+    }
+
+    .dashboard-glass-header__title span {
+        display: none;
+    }
+
+    .dashboard-glass-header__icon-action,
+    .dashboard-glass-header__actions .modern-icon-btn,
+    .dashboard-glass-header__actions button {
+        width: 36px;
+        min-width: 36px;
+        min-height: 36px;
+        height: 36px;
+        border-radius: 12px;
+    }
+
+    .account-app {
+        padding: 0 0 calc(88px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .account-app__layout,
+    .admin-app__layout {
+        width: calc(100% - 12px);
+        gap: 10px;
+    }
+
+    .account-app__content,
+    .admin-app__content {
+        overflow: visible;
+    }
+
+    .account-bottom-nav,
+    .admin-bottom-nav {
+        inset-inline: 4px;
+        bottom: calc(4px + env(safe-area-inset-bottom, 0px));
+        gap: 2px;
+        padding: 4px;
+        padding-bottom: calc(4px + env(safe-area-inset-bottom, 0px));
+        border-radius: 18px;
+    }
+
+    .account-bottom-nav__item,
+    .admin-bottom-nav__item {
+        min-height: 54px;
+        padding: 5px 2px;
+        gap: 2px;
+        border-radius: 12px;
+    }
+
+    .account-bottom-nav__icon,
+    .admin-bottom-nav__icon {
+        width: 20px;
+        height: 20px;
+    }
+
+    .account-bottom-nav__icon svg,
+    .admin-bottom-nav__icon svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .account-bottom-nav__label,
+    .admin-bottom-nav__label {
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 0.62rem;
+        line-height: 1.1;
+    }
+
+    /* Account/profile screens */
+    .profile-screen,
+    .analysis-screen,
+    .metric-screen,
+    .workout-program-screen,
+    .workout-movement-screen {
+        width: 100%;
+        max-width: none;
+        gap: 10px;
+    }
+
+    .profile-screen__header,
+    .analysis-screen__header {
+        gap: 8px;
+    }
+
+    .profile-screen__title,
+    .analysis-screen__title {
+        font-size: 1rem;
+        overflow-wrap: anywhere;
+    }
+
+    .profile-screen__lead {
+        font-size: 0.82rem;
+        line-height: 1.75;
+    }
+
+    .profile-panel-card,
+    .account-card,
+    .account-panel,
+    .auth-card,
+    .auth-shell {
+        padding: 12px;
+        border-radius: 16px;
+    }
+
+    .profile-identity-card {
+        gap: 10px;
+        padding: 12px;
+        border-radius: 16px;
+    }
+
+    .profile-identity-card__avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+    }
+
+    .profile-identity-card__meta strong {
+        font-size: 0.9rem;
+    }
+
+    .profile-identity-card__phone {
+        font-size: 0.78rem;
+    }
+
+    .profile-metric-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .profile-metric-card,
+    .profile-blood-card {
+        gap: 8px;
+        padding: 10px;
+        border-radius: 14px;
+    }
+
+    .profile-metric-card__icon,
+    .profile-blood-card__icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 10px;
+    }
+
+    .profile-metric-card__label,
+    .profile-blood-card__label {
+        font-size: 0.7rem;
+    }
+
+    .profile-metric-card__value,
+    .profile-blood-card__value {
+        font-size: 0.82rem;
+    }
+
+    .dashboard-courses__head {
+        align-items: flex-start;
+    }
+
+    .dashboard-courses__title {
+        font-size: 0.92rem;
+    }
+
+    .dashboard-courses__list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .dashboard-course-card {
+        padding: 8px;
+        border-radius: 14px;
+    }
+
+    .dashboard-course-card__title {
+        font-size: 0.76rem;
+    }
+
+    .dashboard-course-card__meta {
+        font-size: 0.68rem;
+    }
+
+    .profile-form-grid,
+    .coach-measure-grid,
+    .coach-measure-grid--pair {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions,
+    .coach-actions,
+    .profile-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+        width: 100%;
+    }
+
+    .form-actions > *,
+    .coach-actions > *,
+    .profile-actions > * {
+        width: 100%;
+    }
+
+    .coach-fieldset {
+        padding: 10px;
+        border-radius: 14px;
+    }
+
+    .coach-check-row {
+        display: grid;
+        gap: 8px;
+    }
+
+    .coach-dropzone {
+        padding: 16px 10px;
+    }
+
+    .coach-dropzone__title,
+    .coach-dropzone__hint {
+        overflow-wrap: anywhere;
+    }
+
+    .blood-group-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 6px;
+    }
+
+    .blood-group-chip {
+        min-height: 40px;
+        font-size: 0.76rem;
+    }
+
+    /* Analysis and workout data remain readable without widening the page. */
+    .analysis-dashboard {
+        gap: 10px;
+    }
+
+    .analysis-stats-grid,
+    .analysis-gauge-grid,
+    .analysis-chart-grid,
+    .analysis-tables {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .analysis-result-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .analysis-stat-card,
+    .analysis-gauge-card,
+    .analysis-chart-box,
+    .analysis-table-card,
+    .analysis-metric-explorer,
+    .analysis-datepicker,
+    .analysis-result-tile {
+        padding: 10px;
+        border-radius: 14px;
+    }
+
+    .analysis-canvas {
+        height: 145px;
+    }
+
+    .analysis-canvas--lg {
+        height: 205px;
+    }
+
+    .analysis-table-card {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .analysis-table {
+        min-width: 300px;
+        font-size: 0.76rem;
+    }
+
+    .analysis-table th,
+    .analysis-table td {
+        padding: 8px 7px;
+    }
+
+    .workout-plans-shortcut,
+    .workout-program-card,
+    .workout-performance-form {
+        padding: 12px;
+        border-radius: 16px;
+    }
+
+    .workout-plans-shortcut__actions {
+        padding: 9px;
+        border-radius: 15px;
+    }
+
+    .workout-plans-shortcut__actions label {
+        min-width: 0;
+    }
+
+    .workout-program-list-item {
+        padding: 12px;
+        border-radius: 14px;
+    }
+
+    .workout-program-list__header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+        padding: 14px;
+        border-radius: 16px;
+    }
+
+    .workout-program-list__heading {
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .workout-program-list__icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        font-size: 1rem;
+    }
+
+    .workout-program-list__header h2 {
+        font-size: 0.9rem;
+    }
+
+    .workout-program-list__header p {
+        font-size: 0.74rem;
+    }
+
+    .workout-program-list__count {
+        min-height: 30px;
+        font-size: 0.7rem;
+    }
+
+    .workout-program-list-item {
+        align-items: flex-start;
+        gap: 9px;
+    }
+
+    .workout-program-list-item__index {
+        width: 34px;
+        height: 34px;
+        border-radius: 11px;
+        font-size: 0.74rem;
+    }
+
+    .workout-program-list-item__title {
+        font-size: 0.9rem;
+    }
+
+    .workout-program-list-item__meta {
+        gap: 5px 10px;
+        font-size: 0.72rem;
+    }
+
+    .workout-program-list-item__meta strong {
+        font-size: 0.66rem;
+    }
+
+    .workout-program-list-item__status {
+        margin-top: 8px;
+        font-size: 0.66rem;
+    }
+
+    .workout-program-list-item__arrow {
+        width: 30px;
+        height: 30px;
+        border-radius: 10px;
+        font-size: 0.9rem;
+    }
+
+    .workout-program-card__header,
+    .workout-day__heading,
+    .workout-performance-card__header,
+    .workout-program-feedback__heading {
+        display: grid;
+        gap: 8px;
+    }
+
+    .workout-program-card > section:not(.account-card) {
+        padding: 14px;
+        border-radius: 18px;
+    }
+
+    .workout-program-card > section:not(.account-card)::before {
+        inset-block: 14px;
+    }
+
+    .workout-day {
+        padding: 14px;
+        border-radius: 18px;
+    }
+
+    .workout-day::before {
+        inset-block: 14px;
+    }
+
+    .workout-table-wrap {
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .workout-table {
+        min-width: 580px;
+        font-size: 0.74rem;
+    }
+
+    .workout-set-inputs {
+        grid-template-columns: 1fr;
+    }
+
+    .workout-performance-card__select,
+    .workout-performance-submit {
+        width: 100%;
+        max-width: none;
+    }
+
+    .workout-movement-card__return,
+    .workout-movement-card__body {
+        padding-inline: 12px;
+    }
+
+    .workout-movement-videos {
+        padding: 12px;
+    }
+
+    .workout-movement-return {
+        max-width: 100%;
+        white-space: normal;
+        text-align: center;
+    }
+
+    .workout-muscle-card {
+        margin-inline: 12px;
+    }
+
+    .workout-muscle-details > div {
+        grid-template-columns: 1fr;
+        gap: 3px;
+    }
+
+    /* Admin portal screens */
+    .admin-app {
+        padding: 0 0 calc(88px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .admin-app__content {
+        width: calc(100% - 12px);
+    }
+
+    .admin-screen,
+    .admin-search-screen,
+    .admin-record-screen,
+    .admin-analysis-screen,
+    .admin-program-screen,
+    .admin-notifications-screen {
+        width: 100%;
+        max-width: none;
+        min-height: 0;
+        gap: 10px;
+    }
+
+    .admin-screen__title {
+        font-size: 1rem;
+        overflow-wrap: anywhere;
+    }
+
+    .admin-screen__lead,
+    .admin-screen__note {
+        font-size: 0.82rem;
+    }
+
+    .admin-result-card,
+    .admin-menu-item,
+    .admin-panel-card,
+    .admin-form-panel,
+    .admin-program-card,
+    .admin-user-summary,
+    .admin-recent-panel {
+        padding: 10px;
+        border-radius: 14px;
+    }
+
+    .admin-search-form,
+    .admin-form-grid,
+    .admin-upload-form,
+    .admin-form-grid--cols2 {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-video-field-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-stat-grid,
+    .admin-data-preview {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .admin-data-preview article:last-child {
+        grid-column: 1 / -1;
+    }
+
+    .admin-result-card__actions,
+    .admin-program-card__actions,
+    .admin-user-summary__actions {
+        display: grid;
+        grid-template-columns: 1fr;
+        width: 100%;
+    }
+
+    .admin-result-card__actions > *,
+    .admin-program-card__actions > *,
+    .admin-user-summary__actions > *,
+    .admin-user-summary__actions form {
+        width: 100%;
+    }
+
+    .admin-program-card__head,
+    .admin-program-section-head,
+    .admin-program-day__head,
+    .admin-program-item__top {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .admin-program-item__grid,
+    .admin-program-corrective,
+    .automatic-secondary-movement-counts {
+        grid-template-columns: 1fr;
+    }
+
+    .automatic-session-target__counts {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-program-item__wide,
+    .admin-program-item__config-label {
+        grid-column: auto;
+    }
+
+    .admin-notification-card__header {
+        display: grid;
+    }
+
+    .admin-notification-card__header time {
+        justify-self: start;
+        margin-inline-start: 0;
+    }
+
+    .admin-notification-request-meta {
+        padding-inline-start: 0;
+    }
+
+    .admin-notification-card .admin-result-card__actions {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .admin-body-map {
+        padding: 12px;
+    }
+
+    .admin-screen--modal {
+        padding: 0;
+    }
+
+    .admin-upload-sheet,
+    .metric-screen--modal .metric-sheet {
+        width: 100%;
+        max-width: 100%;
+        max-height: calc(100dvh - 12px);
+        overflow-y: auto;
+        border-radius: 20px 20px 0 0;
+        padding: 12px;
+    }
+
+    /* Auth pages */
+    .auth-mobile-main {
+        align-items: flex-start;
+        min-height: 100dvh;
+        padding: max(8px, env(safe-area-inset-top, 0px)) 8px
+            max(12px, env(safe-area-inset-bottom, 0px));
+    }
+
+    .auth-mobile-frame {
+        width: 100%;
+        max-width: none;
+    }
+
+    .auth-mobile-screen {
+        width: 100%;
+        min-height: 0;
+        gap: 14px;
+        padding: 16px 14px 20px;
+        border-radius: 20px;
+    }
+
+    .auth-mobile-logo-wrap {
+        padding-top: 0;
+    }
+
+    .auth-mobile-logo {
+        width: 72px;
+        height: 72px;
+        border-radius: 20px;
+    }
+
+    .auth-mobile-copy {
+        padding-inline: 2px;
+    }
+
+    .auth-mobile-title {
+        font-size: 1.3rem;
+    }
+
+    .auth-mobile-description {
+        font-size: 0.84rem;
+        line-height: 1.7;
+    }
+
+    .auth-mobile-primary,
+    .auth-mobile-secondary {
+        min-height: 50px;
+        font-size: 0.92rem;
+    }
+
+    .auth-mobile-links {
+        gap: 4px;
+    }
+}
+
+@media (max-width: 370px) {
+    .dashboard-glass-header__brand-copy strong {
+        max-width: 92px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .profile-metric-card,
+    .profile-blood-card {
+        gap: 6px;
+        padding: 8px;
+    }
+
+    .dashboard-courses__list {
+        grid-template-columns: 1fr;
+    }
+
+    .analysis-result-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .account-bottom-nav__label,
+    .admin-bottom-nav__label {
+        font-size: 0.58rem;
+    }
+}

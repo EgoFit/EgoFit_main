@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans 'کتابخانه تمرینات' %}{% endblock %}
+{% block content %}
+<main class="workout-library-page workout-library-page--home">
+    <div class="shell-container page-stack">
+        <header class="workout-library-hero workout-library-hero--home">
+            <div class="workout-library-hero__main">
+                <div class="workout-library-hero__copy">
+                    <span class="eyebrow">{% trans 'تمرین و آناتومی' %}</span>
+                    <h1>{% trans 'کتابخانه تمرینات' %}</h1>
+                    <p>{% trans 'حرکت‌ها، تمرین‌های اصلاحی و شناخت عضلات را یکجا پیدا کنید.' %}</p>
+                </div>
+                <form method="get" class="workout-library-search" role="search">
+                    <label class="sr-only" for="library-search">{% trans 'جستجو در کتابخانه' %}</label>
+                    <input id="library-search" type="search" name="q" value="{{ query }}" placeholder="{% trans 'نام حرکت، عضله یا ناهنجاری را جستجو کنید' %}" enterkeyhint="search">
+                    <button class="cta-primary" type="submit">{% trans 'جستجو' %}</button>
+                </form>
+                <div class="workout-library-hero__metrics" aria-label="{% trans 'ویژگی‌های کتابخانه تمرینات' %}">
+                    <span><strong>۳</strong><small>{% trans 'مسیر تخصصی' %}</small></span>
+                    <span><strong>۱</strong><small>{% trans 'جستجوی یکپارچه' %}</small></span>
+                    <span><strong>∞</strong><small>{% trans 'یادگیری هدفمند' %}</small></span>
+                </div>
+            </div>
+            <aside class="workout-library-hero__navigator" aria-label="{% trans 'راهنمای انتخاب مسیر' %}">
+                <span class="workout-library-hero__navigator-orbit" aria-hidden="true"></span>
+                <span class="workout-library-hero__navigator-kicker">{% trans 'مسیر پیشنهادی' %}</span>
+                <strong>{% trans 'از هدف شروع کنید' %}</strong>
+                <p>{% trans 'مسیر مناسب خود را انتخاب کنید و سریع‌تر به محتوای موردنیاز برسید.' %}</p>
+                <ol class="workout-library-hero__navigator-list">
+                    <li><span>۱</span>{% trans 'تمرین بدنسازی' %}</li>
+                    <li><span>۲</span>{% trans 'حرکات اصلاحی' %}</li>
+                    <li><span>۳</span>{% trans 'آناتومی عضلات' %}</li>
+                </ol>
+            </aside>
+        </header>
+
+        {% if query %}
+        <section class="workout-library-section" aria-labelledby="library-search-results">
+            <div class="workout-library-section__heading">
+                <div><span class="workout-library-kicker">{% trans 'جستجو' %}</span><h2 id="library-search-results">{% trans 'نتایج جستجو' %}</h2></div>
+                <span class="workout-library-count">{{ search_result_count }} {% trans 'نتیجه' %}</span>
+            </div>
+            <div class="workout-library-grid">
+                {% for category in body_parts %}<a class="workout-library-card workout-library-card--strength" href="{% url 'home:workout_body_part' category.pk %}"><span class="workout-library-card__icon">🏋️</span><span class="workout-library-card__eyebrow">{% trans 'بدنسازی' %}</span><strong>{{ category.name }}</strong><span class="workout-library-card__meta">{% trans 'تمرینات این بخش بدن' %}<b aria-hidden="true">←</b></span></a>{% endfor %}
+                {% for category in abnormalities %}<a class="workout-library-card workout-library-card--corrective" href="{% url 'home:workout_abnormality' category.pk %}"><span class="workout-library-card__icon">🧘</span><span class="workout-library-card__eyebrow">{% trans 'اصلاحی' %}</span><strong>{{ category.name }}</strong><span class="workout-library-card__meta">{% trans 'حرکت‌های اصلاحی' %}<b aria-hidden="true">←</b></span></a>{% endfor %}
+                {% for muscle in muscles %}<a class="workout-library-card workout-library-card--anatomy" href="{% url 'home:workout_muscle' muscle.pk %}"><span class="workout-library-card__icon">🫀</span><span class="workout-library-card__eyebrow">{% trans 'آناتومی' %}</span><strong>{{ muscle.name }}</strong><span class="workout-library-card__meta">{% trans 'شناخت عضله' %}<b aria-hidden="true">←</b></span></a>{% endfor %}
+                {% if not body_parts and not abnormalities and not muscles %}<p class="workout-library-empty">{% trans 'موضوعی با این عبارت پیدا نشد.' %}</p>{% endif %}
+            </div>
+        </section>
+        {% endif %}
+
+        <section class="workout-library-section" aria-labelledby="library-specialized">
+            <div class="workout-library-section__heading">
+                <div>
+                    <span class="workout-library-kicker">{% trans 'شروع سریع' %}</span>
+                    <h2 id="library-specialized">{% trans 'کتابخانه‌های تخصصی' %}</h2>
+                    <p class="workout-library-section__description">{% trans 'مسیر موردنظر را انتخاب کنید تا محتوای دقیق و متناسب با هدف‌تان را ببینید.' %}</p>
+                </div>
+                <span class="workout-library-section__hint">{% trans 'انتخاب یک مسیر' %}</span>
+            </div>
+            <div class="workout-library-grid workout-library-grid--featured">
+                <a class="workout-library-card workout-library-card--home workout-library-card--strength" href="{% url 'home:workout_bodybuilding' %}">
+                    <span class="workout-library-card__top"><span class="workout-library-card__icon" aria-hidden="true">🏋️</span><span class="workout-library-card__number">۰۱</span></span>
+                    <span class="workout-library-card__body"><span class="workout-library-card__eyebrow">{% trans 'تمرین' %}</span><strong>{% trans 'تمرینات بدنسازی' %}</strong><span class="workout-library-card__description">{% trans 'حرکت‌ها را بر اساس بخش بدن و هدف تمرینی پیدا کنید.' %}</span></span>
+                    <span class="workout-library-card__meta"><span>{% trans 'مشاهده دسته‌بندی‌ها' %}</span><b aria-hidden="true">←</b></span>
+                </a>
+                <a class="workout-library-card workout-library-card--home workout-library-card--corrective" href="{% url 'home:workout_corrective_library' %}">
+                    <span class="workout-library-card__top"><span class="workout-library-card__icon" aria-hidden="true">🧘</span><span class="workout-library-card__number">۰۲</span></span>
+                    <span class="workout-library-card__body"><span class="workout-library-card__eyebrow">{% trans 'حرکت هدفمند' %}</span><strong>{% trans 'حرکات اصلاحی' %}</strong><span class="workout-library-card__description">{% trans 'بر اساس ناهنجاری، حرکت مناسب را با دقت انتخاب کنید.' %}</span></span>
+                    <span class="workout-library-card__meta"><span>{% trans 'مشاهده دسته‌بندی‌ها' %}</span><b aria-hidden="true">←</b></span>
+                </a>
+                <a class="workout-library-card workout-library-card--home workout-library-card--anatomy" href="{% url 'home:workout_musculology' %}">
+                    <span class="workout-library-card__top"><span class="workout-library-card__icon" aria-hidden="true">🫀</span><span class="workout-library-card__number">۰۳</span></span>
+                    <span class="workout-library-card__body"><span class="workout-library-card__eyebrow">{% trans 'دانش بدن' %}</span><strong>{% trans 'آناتومی عضلات' %}</strong><span class="workout-library-card__description">{% trans 'نقش، عملکرد و ساختار عضلات را عمیق‌تر بشناسید.' %}</span></span>
+                    <span class="workout-library-card__meta"><span>{% trans 'مشاهده عضلات' %}</span><b aria-hidden="true">←</b></span>
+                </a>
+            </div>
+        </section>
+    </div>
+</main>
+{% endblock %}

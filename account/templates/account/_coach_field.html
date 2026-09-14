@@ -1,0 +1,8 @@
+{% load i18n %}{% comment %}Renders one coach-request field group with a required asterisk. Expects `field`.{% endcomment %}
+<div class="field-group coach-measure-field">
+    <label for="{{ field.id_for_label }}">
+        {{ field.label }}{% if field.field.required %} <span class="coach-req" aria-hidden="true">*</span>{% endif %}
+    </label>
+    {{ field }}
+    {{ field.errors }}
+</div>

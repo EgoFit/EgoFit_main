@@ -1,0 +1,37 @@
+{% extends 'account/_shell.html' %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}{{ account_title }} | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block account_content %}
+<section class="metric-screen metric-screen--modal">
+    <a href="{% url 'register:profile' %}" class="metric-overlay" aria-label="{% trans 'بستن' %}"></a>
+
+    <article class="metric-sheet">
+        <header class="metric-sheet__header">
+            <h1>{{ account_title }}</h1>
+            <a href="{% url 'register:profile' %}" class="metric-sheet__close" aria-label="{% trans 'بستن' %}">×</a>
+        </header>
+
+        <p class="metric-sheet__description">{{ account_description }}</p>
+
+        {% if messages %}
+            <div class="form-messages">
+                {% for message in messages %}
+                    <div class="form-message {% if message.tags %}is-{{ message.tags }}{% endif %}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="post" class="metric-sheet__form">
+            {% csrf_token %}
+            <div class="field-group">
+                <label class="sr-only">{{ field_label }}</label>
+                {{ field }}
+                {{ field.errors }}
+            </div>
+            <button type="submit" class="metric-sheet__submit">{% trans 'تایید' %}</button>
+        </form>
+    </article>
+</section>
+{% endblock %}

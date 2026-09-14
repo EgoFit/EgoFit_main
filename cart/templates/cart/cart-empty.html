@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}سبد خرید خالی | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block content %}
+<main class="page-section cart-page">
+    <div class="shell-container">
+        <section class="cart-empty-card modern-surface" data-reveal>
+            <span class="eyebrow">{% trans 'سبد خرید' %}</span>
+            <h1>{% trans 'هنوز دوره‌ای انتخاب نکرده‌اید' %}</h1>
+            <p>{% trans 'برای شروع، دوره مناسب خود را انتخاب کنید و بعد از بررسی جزئیات، فرایند خرید را ادامه دهید.' %}</p>
+            <div class="hero-actions">
+                <a href="{% url 'home:series' %}" class="cta-primary cta-primary--strong">{% trans 'مشاهده دوره‌ها' %}</a>
+                <a href="{% url 'home:home' %}" class="cta-secondary cta-secondary--soft">{% trans 'بازگشت به صفحه اصلی' %}</a>
+            </div>
+        </section>
+    </div>
+</main>
+{% endblock %}

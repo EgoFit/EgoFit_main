@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+*.so
+.Python
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Django / local data
+.env
+env
+db.sqlite3
+*.sqlite3
+media/
+staticfiles/
+tmp/
+
+# Logs and runtime files
+*.log
+celerybeat-schedule
+*.pid
+
+# Test and coverage artifacts
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# Type checking / linting caches
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.tox/
+.nox/
+
+# IDE and OS
+.idea/
+.vscode/
+.cursor/
+.DS_Store
+Thumbs.db
+
+# Packaging / build output
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Project-specific generated files
+account.zip
+data.json
+*.zip
+*.dump

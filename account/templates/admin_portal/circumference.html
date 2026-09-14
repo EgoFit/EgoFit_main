@@ -1,0 +1,87 @@
+{% extends 'admin_portal/_shell.html' %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}{{ page_title }} | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block admin_content %}
+<section class="admin-screen">
+    <header class="admin-screen__header">
+        {% if is_edit %}
+            <a href="{% url 'register:admin_measurement_history' target_user.id %}" class="admin-back-link" aria-label="{% trans 'بازگشت' %}">→</a>
+        {% else %}
+            <a href="{% url 'register:admin_user_hub' target_user.id %}" class="admin-back-link" aria-label="{% trans 'بازگشت' %}">→</a>
+        {% endif %}
+        <h1 class="admin-screen__title">{{ page_title }}</h1>
+    </header>
+
+    <section class="admin-body-map" aria-label="{% trans 'راهنمای اندازه‌گیری' %}">
+        <svg viewBox="0 0 180 420" role="img" aria-label="{% trans 'بدن انسان' %}">
+            <circle cx="90" cy="42" r="24"/>
+            <path d="M70 78C70 64 110 64 110 78L121 190C124 224 113 252 103 286L98 392H82L77 286C67 252 56 224 59 190L70 78Z"/>
+            <path d="M59 105L30 204L43 210L68 132"/>
+            <path d="M121 105L150 204L137 210L112 132"/>
+            <path d="M76 286L54 396H68L86 304"/>
+            <path d="M104 286L126 396H112L94 304"/>
+        </svg>
+        <div class="admin-body-map__labels">
+            <span>{% trans 'سر' %}</span>
+            <span>{% trans 'گردن' %}</span>
+            <span>{% trans 'سینه' %}</span>
+            <span>{% trans 'کمر' %}</span>
+            <span>{% trans 'باسن' %}</span>
+            <span>{% trans 'ران / ساق' %}</span>
+        </div>
+    </section>
+
+    <form method="post" class="admin-form-grid admin-form-grid--stacked admin-form-grid--cols2">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            <div class="admin-form-errors">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <div class="field-group admin-form-grid__full"><label for="{{ form.measured_at_jalali.id_for_label }}">{{ form.measured_at_jalali.label }}</label>{{ form.measured_at_jalali }}{{ form.measured_at_jalali.errors }}</div>
+        <div class="field-group"><label for="{{ form.height_cm.id_for_label }}">{{ form.height_cm.label }}</label>{{ form.height_cm }}{{ form.height_cm.errors }}</div>
+        <div class="field-group"><label for="{{ form.weight_kg.id_for_label }}">{{ form.weight_kg.label }}</label>{{ form.weight_kg }}{{ form.weight_kg.errors }}</div>
+        <div class="field-group"><label for="{{ form.sit_height_cm.id_for_label }}">{{ form.sit_height_cm.label }}</label>{{ form.sit_height_cm }}{{ form.sit_height_cm.errors }}</div>
+        <div class="field-group"><label for="{{ form.leg_length_cm.id_for_label }}">{{ form.leg_length_cm.label }}</label>{{ form.leg_length_cm }}{{ form.leg_length_cm.errors }}</div>
+        <div class="field-group"><label for="{{ form.wrist_cm.id_for_label }}">{{ form.wrist_cm.label }}</label>{{ form.wrist_cm }}{{ form.wrist_cm.errors }}</div>
+        <div class="field-group"><label for="{{ form.forearm_cm.id_for_label }}">{{ form.forearm_cm.label }}</label>{{ form.forearm_cm }}{{ form.forearm_cm.errors }}</div>
+        <div class="field-group"><label for="{{ form.arm_rest_cm.id_for_label }}">{{ form.arm_rest_cm.label }}</label>{{ form.arm_rest_cm }}{{ form.arm_rest_cm.errors }}</div>
+        <div class="field-group"><label for="{{ form.arm_flexed_cm.id_for_label }}">{{ form.arm_flexed_cm.label }}</label>{{ form.arm_flexed_cm }}{{ form.arm_flexed_cm.errors }}</div>
+
+        <p class="admin-screen__lead">{% trans 'دست چپ' %}</p>
+        <div class="field-group"><label for="{{ form.wrist_left_cm.id_for_label }}">{{ form.wrist_left_cm.label }}</label>{{ form.wrist_left_cm }}{{ form.wrist_left_cm.errors }}</div>
+        <div class="field-group"><label for="{{ form.forearm_left_cm.id_for_label }}">{{ form.forearm_left_cm.label }}</label>{{ form.forearm_left_cm }}{{ form.forearm_left_cm.errors }}</div>
+        <div class="field-group"><label for="{{ form.arm_rest_left_cm.id_for_label }}">{{ form.arm_rest_left_cm.label }}</label>{{ form.arm_rest_left_cm }}{{ form.arm_rest_left_cm.errors }}</div>
+        <div class="field-group"><label for="{{ form.arm_flexed_left_cm.id_for_label }}">{{ form.arm_flexed_left_cm.label }}</label>{{ form.arm_flexed_left_cm }}{{ form.arm_flexed_left_cm.errors }}</div>
+
+        <div class="field-group"><label for="{{ form.head_cm.id_for_label }}">{{ form.head_cm.label }}</label>{{ form.head_cm }}{{ form.head_cm.errors }}</div>
+        <div class="field-group"><label for="{{ form.neck_cm.id_for_label }}">{{ form.neck_cm.label }}</label>{{ form.neck_cm }}{{ form.neck_cm.errors }}</div>
+        <div class="field-group"><label for="{{ form.chest_cm.id_for_label }}">{{ form.chest_cm.label }}</label>{{ form.chest_cm }}{{ form.chest_cm.errors }}</div>
+        <div class="field-group"><label for="{{ form.shoulders_cm.id_for_label }}">{{ form.shoulders_cm.label }}</label>{{ form.shoulders_cm }}{{ form.shoulders_cm.errors }}</div>
+        <div class="field-group"><label for="{{ form.waist_cm.id_for_label }}">{{ form.waist_cm.label }}</label>{{ form.waist_cm }}{{ form.waist_cm.errors }}</div>
+        <div class="field-group"><label for="{{ form.abdomen_cm.id_for_label }}">{{ form.abdomen_cm.label }}</label>{{ form.abdomen_cm }}{{ form.abdomen_cm.errors }}</div>
+        <div class="field-group"><label for="{{ form.hips_cm.id_for_label }}">{{ form.hips_cm.label }}</label>{{ form.hips_cm }}{{ form.hips_cm.errors }}</div>
+
+        <p class="admin-screen__lead">{% trans 'پای راست' %}</p>
+        <div class="field-group"><label for="{{ form.thigh_cm.id_for_label }}">{{ form.thigh_cm.label }}</label>{{ form.thigh_cm }}{{ form.thigh_cm.errors }}</div>
+        <div class="field-group"><label for="{{ form.calf_cm.id_for_label }}">{{ form.calf_cm.label }}</label>{{ form.calf_cm }}{{ form.calf_cm.errors }}</div>
+
+        <p class="admin-screen__lead">{% trans 'پای چپ' %}</p>
+        <div class="field-group"><label for="{{ form.thigh_left_cm.id_for_label }}">{{ form.thigh_left_cm.label }}</label>{{ form.thigh_left_cm }}{{ form.thigh_left_cm.errors }}</div>
+        <div class="field-group"><label for="{{ form.calf_left_cm.id_for_label }}">{{ form.calf_left_cm.label }}</label>{{ form.calf_left_cm }}{{ form.calf_left_cm.errors }}</div>
+
+        <p class="admin-screen__lead">{% trans 'اندازه‌های زیر اختیاری‌اند (برای محاسبه سوماتوتایپ و نسبت‌های بدنی) — در صورت خالی ماندن، مقدار پیش‌فرض استاندارد جای آن‌ها استفاده می‌شود.' %}</p>
+        <div class="field-group"><label for="{{ form.shoulder_width_cm.id_for_label }}">{{ form.shoulder_width_cm.label }}</label>{{ form.shoulder_width_cm }}{{ form.shoulder_width_cm.errors }}</div>
+        <div class="field-group"><label for="{{ form.hip_width_cm.id_for_label }}">{{ form.hip_width_cm.label }}</label>{{ form.hip_width_cm }}{{ form.hip_width_cm.errors }}</div>
+        <div class="field-group"><label for="{{ form.elbow_width_cm.id_for_label }}">{{ form.elbow_width_cm.label }}</label>{{ form.elbow_width_cm }}{{ form.elbow_width_cm.errors }}</div>
+        <div class="field-group"><label for="{{ form.knee_width_cm.id_for_label }}">{{ form.knee_width_cm.label }}</label>{{ form.knee_width_cm }}{{ form.knee_width_cm.errors }}</div>
+        <div class="field-group"><label for="{{ form.arm_length_cm.id_for_label }}">{{ form.arm_length_cm.label }}</label>{{ form.arm_length_cm }}{{ form.arm_length_cm.errors }}</div>
+
+        <button type="submit" class="admin-primary-btn">{% if is_edit %}{% trans 'به‌روزرسانی' %}{% else %}{% trans 'ثبت' %}{% endif %}</button>
+    </form>
+</section>
+{% endblock %}

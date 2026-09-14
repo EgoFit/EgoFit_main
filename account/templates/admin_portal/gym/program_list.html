@@ -1,0 +1,71 @@
+{% extends 'admin_portal/_shell.html' %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}برنامه‌های بدنسازی | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block admin_content %}
+<section class="admin-screen admin-program-screen">
+    <header class="admin-screen__header admin-screen__header--split">
+        <a href="{% url 'register:admin_user_hub' target_user.id %}" class="admin-back-link" aria-label="{% trans 'بازگشت' %}">→</a>
+        <h1 class="admin-screen__title">{% trans 'برنامه‌های بدنسازی' %}</h1>
+    </header>
+
+    <article class="admin-user-summary">
+        <div>
+            <span>{% trans 'ورزشکار' %}</span>
+            <strong>{{ target_user.fullname }}</strong>
+            <small>{{ target_user.phone }}</small>
+        </div>
+        <a href="{% url 'register:admin_program_add' target_user.id %}" class="admin-primary-btn admin-primary-btn--small">
+            + {% trans 'افزودن برنامه' %}
+        </a>
+    </article>
+
+    <section class="admin-program-list">
+        {% for program in programs %}
+            <article class="admin-program-card">
+                <div class="admin-program-card__head">
+                    <div>
+                        <h2>{{ program.title }}</h2>
+                        <p>
+                            {% trans 'شروع' %}: {{ program.start_date|date:"Y/m/d" }}
+                            {% if program.end_date %} — {% trans 'پایان' %}: {{ program.end_date|date:"Y/m/d" }}{% endif %}
+                            — {% if program.requires_payment %}{% blocktrans with price=program.price %}پولی، {{ price }} تومان{% endblocktrans %}{% else %}{% trans 'رایگان' %}{% endif %}
+                        </p>
+                    </div>
+                    <span class="admin-program-status {% if program.is_published %}is-published{% endif %}">
+                        {% if program.is_published %}{% trans 'نمایش برای کاربر' %}{% else %}{% trans 'پیش‌نویس' %}{% endif %}
+                    </span>
+                </div>
+                {% if program.notes %}<p class="admin-screen__note">{{ program.notes|truncatechars:180 }}</p>{% endif %}
+                {% if program.user_feedback %}
+                    <p class="admin-screen__note">{% trans 'بازخورد دشواری کاربر' %}: <strong>{{ program.user_feedback.difficulty }}/10</strong></p>
+                {% endif %}
+                <div class="admin-program-card__actions">
+                    <a href="{% url 'register:admin_program_edit' target_user.id program.pk %}" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'ویرایش' %}</a>
+                    <a
+                        href="{% url 'register:admin_program_pdf' target_user.id program.pk %}"
+                        class="admin-secondary-btn admin-secondary-btn--small admin-program-pdf-download"
+                        download
+                        aria-label="{% trans 'دریافت PDF برنامه' %}"
+                    >
+                        <span class="admin-program-pdf-download__icon" aria-hidden="true">⇩</span>
+                        <span>{% trans 'دریافت PDF' %}</span>
+                    </a>
+                    <form method="post" action="{% url 'register:admin_program_delete' target_user.id program.pk %}" onsubmit="return confirm('{% trans "آیا از حذف این برنامه اطمینان دارید؟" %}');">
+                        {% csrf_token %}
+                        <button type="submit" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'حذف' %}</button>
+                    </form>
+                </div>
+            </article>
+        {% empty %}
+            <article class="admin-empty admin-empty--center">
+                <strong>{% trans 'هنوز برنامه بدنسازی برای این کاربر ثبت نشده است.' %}</strong>
+                <p>{% trans 'حرکت‌ها را از کتابخانه انتخاب کنید و برنامه را برای کاربر منتشر کنید.' %}</p>
+            </article>
+        {% endfor %}
+    </section>
+
+    {% include 'admin_portal/gym/_pagination.html' %}
+</section>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% load i18n %}
+<nav class="admin-sidebar-nav" aria-label="{% trans 'پنل ادمین' %}">
+    <ul class="admin-sidebar-nav__list">
+        <li>
+            <a href="{% url 'register:admin_search' %}" class="admin-sidebar-nav__item {% if active_section == 'search' %}is-active{% endif %}">
+                <span class="admin-sidebar-nav__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.8"/><path d="M16 16L20 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                </span>
+                <span>{% trans 'جستجو و داشبورد' %}</span>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'register:admin_user_list' %}" class="admin-sidebar-nav__item {% if active_section == 'clients' %}is-active{% endif %}">
+                <span class="admin-sidebar-nav__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 19V18C3.5 15.8 5.3 14 7.5 14H10.5C12.7 14 14.5 15.8 14.5 18V19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="17" cy="8.5" r="2.3" stroke="currentColor" stroke-width="1.8"/><path d="M15.5 14.2C18 14.2 20 16 20 18.2V19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                </span>
+                <span>{% trans 'لیست کاربران' %}</span>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'register:admin_coach_management' %}" class="admin-sidebar-nav__item {% if active_section == 'coaches' %}is-active{% endif %}">
+                <span class="admin-sidebar-nav__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 19V18C3.5 15.8 5.3 14 7.5 14H10.5C12.7 14 14.5 15.8 14.5 18V19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="17" cy="8.5" r="2.3" stroke="currentColor" stroke-width="1.8"/><path d="M15.5 14.2C18 14.2 20 16 20 18.2V19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                </span>
+                <span>{% trans 'مدیریت مربیان' %}</span>
+            </a>
+        </li>
+        <li>
+            <a href="{% if target_user %}{% url 'register:admin_user_hub' target_user.id %}{% else %}{% url 'register:admin_search' %}{% endif %}" class="admin-sidebar-nav__item {% if active_section == 'records' %}is-active{% endif %}">
+                <span class="admin-sidebar-nav__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M7 5.5H17A2.5 2.5 0 0 1 19.5 8V17A2.5 2.5 0 0 1 17 19.5H7A2.5 2.5 0 0 1 4.5 17V8A2.5 2.5 0 0 1 7 5.5Z" stroke="currentColor" stroke-width="1.8"/></svg>
+                </span>
+                <span>{% trans 'ثبت اطلاعات' %}</span>
+            </a>
+        </li>
+        <li>
+            {% if target_user %}
+                <a href="{% url 'register:admin_user_analysis' target_user.id %}" class="admin-sidebar-nav__item {% if active_section == 'analysis' %}is-active{% endif %}">
+                    <span class="admin-sidebar-nav__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none"><path d="M5 17L9 12L13 14L19 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    <span>{% trans 'آنالیز' %}</span>
+                </a>
+            {% else %}
+                <span class="admin-sidebar-nav__item is-disabled" aria-disabled="true" tabindex="-1">
+                    <span class="admin-sidebar-nav__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none"><path d="M5 17L9 12L13 14L19 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    <span>{% trans 'آنالیز' %}</span>
+                </span>
+            {% endif %}
+        </li>
+        <li>
+            <a href="{% url 'register:admin_gym_library' %}" class="admin-sidebar-nav__item {% if active_section == 'library' %}is-active{% endif %}">
+                <span class="admin-sidebar-nav__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M6 4.5V19.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M18 4.5V19.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6 9H18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6 15H18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                </span>
+                <span>{% trans 'کتابخانه' %}</span>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'register:admin_automatic_programming' %}" class="admin-sidebar-nav__item {% if active_section == 'automatic' %}is-active{% endif %}">
+                <span class="admin-sidebar-nav__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M12 3v18M3 12h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M7 7l10 10M17 7L7 17" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity=".55"/></svg>
+                </span>
+                <span>{% trans 'برنامه‌ریزی خودکار' %}</span>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'register:admin_notifications' %}" class="admin-sidebar-nav__item {% if active_section == 'notifications' %}is-active{% endif %}">
+                <span class="admin-sidebar-nav__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M12 4C9.8 4 8 5.8 8 8V11.2C8 12.3 7.6 13.3 6.9 14.1L6 15.2C5.6 15.7 6 16.5 6.6 16.5H17.4C18 16.5 18.4 15.7 18 15.2L17.1 14.1C16.4 13.3 16 12.3 16 11.2V8C16 5.8 14.2 4 12 4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 19C10.3 19.6 11.1 20 12 20C12.9 20 13.7 19.6 14 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                </span>
+                <span>{% trans 'اعلانات' %}</span>
+            </a>
+        </li>
+    </ul>
+
+    <div class="admin-sidebar-nav__footer">
+        <a href="{% url 'register:admin_password_change' %}" class="admin-sidebar-nav__item {% if active_section == 'settings' %}is-active{% endif %}">
+            <span class="admin-sidebar-nav__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M7 10.5V8.5C7 6.01 9.01 4 11.5 4H12.5C14.99 4 17 6.01 17 8.5V10.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="5" y="10.5" width="14" height="9.5" rx="2.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            </span>
+            <span>{% trans 'تغییر رمز عبور' %}</span>
+        </a>
+        <a href="{% url 'register:logout' %}" class="admin-sidebar-nav__item">
+            <span class="admin-sidebar-nav__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M10 7.5H6.5A2.5 2.5 0 0 0 4 10V14A2.5 2.5 0 0 0 6.5 16.5H10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M14 12H20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M17.5 9.5L20 12L17.5 14.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span>{% trans 'خروج' %}</span>
+        </a>
+    </div>
+</nav>

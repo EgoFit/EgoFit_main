@@ -1,0 +1,81 @@
+{% extends 'account/_shell.html' %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}ویرایش پروفایل | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block account_content %}
+<section class="profile-screen">
+    <header class="profile-screen__header">
+        <h2 class="profile-screen__title">{{ account_title }}</h2>
+    </header>
+    <p class="profile-screen__lead">{{ account_description }}</p>
+
+    <section class="profile-panel-card">
+        {% if messages %}
+            <div class="form-messages mb-4">
+                {% for message in messages %}
+                    <div class="form-message {% if message.tags %}is-{{ message.tags }}{% endif %}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data" class="profile-form-grid">
+            {% csrf_token %}
+            <div class="field-group">
+                <label for="{{ form.first_name.id_for_label }}">{% trans 'نام' %}</label>
+                {{ form.first_name }}
+                {{ form.first_name.errors }}
+            </div>
+            <div class="field-group">
+                <label for="{{ form.last_name.id_for_label }}">{% trans 'نام خانوادگی' %}</label>
+                {{ form.last_name }}
+                {{ form.last_name.errors }}
+            </div>
+            <div class="field-group field-group--full">
+                <label for="{{ form.fullname.id_for_label }}">{% trans 'نام کاربری' %}</label>
+                {{ form.fullname }}
+                <span class="field-hint">{% trans 'این نام به‌صورت یکتا برای شناسایی حساب شما استفاده می‌شود.' %}</span>
+                {{ form.fullname.errors }}
+            </div>
+            <div class="field-group">
+                <label>{% trans 'ایمیل' %}</label>
+                {{ form.email }}
+                {{ form.email.errors }}
+            </div>
+            <div class="field-group field-group--full">
+                <label>{% trans 'درباره من' %}</label>
+                {{ form.biography }}
+                {{ form.biography.errors }}
+            </div>
+            <div class="field-group">
+                <label>{% trans 'وب‌سایت' %}</label>
+                {{ form.web_site }}
+                {{ form.web_site.errors }}
+            </div>
+            <div class="field-group">
+                <label>{% trans 'گیت‌هاب' %}</label>
+                {{ form.github }}
+                {{ form.github.errors }}
+            </div>
+            <div class="field-group">
+                <label>{% trans 'لینکدین' %}</label>
+                {{ form.linkdin }}
+                {{ form.linkdin.errors }}
+            </div>
+            <div class="field-group">
+                <label>{% trans 'تلگرام' %}</label>
+                {{ form.telegram }}
+                {{ form.telegram.errors }}
+            </div>
+            <div class="field-group field-group--full">
+                <label>{% trans 'عکس پروفایل' %}</label>
+                {{ form.profile_picture }}
+                {{ form.profile_picture.errors }}
+            </div>
+            <div class="form-actions field-group--full">
+                <button type="submit" class="cta-primary cta-primary--strong">{% trans 'ذخیره تغییرات' %}</button>
+            </div>
+        </form>
+    </section>
+</section>
+{% endblock %}

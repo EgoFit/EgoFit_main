@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load my_tags %}
+
+{% block page_wrapper_class %}bg-secondary{% endblock %}
+
+{% block content %}
+    <main class="flex-auto py-5">
+        <div class="shell-container page-stack">
+            <section class="section-card modern-surface" data-reveal>
+                <div class="detail-layout">
+                    <div class="detail-main">
+                        <div class="detail-cover">
+                            <img src="{{ articleblogmodel.image|public_media_url }}" alt="{{ articleblogmodel.title }}">
+                        </div>
+
+                        <div class="detail-body">
+                            <span class="eyebrow">مقاله آموزشی</span>
+                            <h1 class="section-heading__title">{{ articleblogmodel.title }}</h1>
+                            <div class="detail-description content-justify">{{ articleblogmodel.article_excerpt|linebreaksbr }}</div>
+                        </div>
+
+                        <article class="content-panel modern-surface rich-content">
+                            {% if articleblogmodel.article_description %}
+                                <div class="rich-content__block">
+                                    <div class="rich-content__text article-rich-text">{{ articleblogmodel.article_description|article_content }}</div>
+                                </div>
+                            {% endif %}
+
+                            {% if articleblogmodel.built_in %}
+                                <section class="rich-content__section">
+                                    <h2 class="rich-content__heading">ساختار مقاله</h2>
+                                    <div class="rich-content__text article-rich-text">{{ articleblogmodel.built_in|article_content }}</div>
+                                </section>
+                            {% endif %}
+
+                            {% if articleblogmodel.article_extra_des1 %}
+                                <section class="rich-content__section">
+                                    <h2 class="rich-content__heading">جزئیات بیشتر</h2>
+                                    <div class="rich-content__text article-rich-text">{{ articleblogmodel.article_extra_des1|article_content }}</div>
+                                </section>
+                            {% endif %}
+
+                            {% if articleblogmodel.article_extra_des2 %}
+                                <section class="rich-content__section">
+                                    <h2 class="rich-content__heading">جمع‌بندی</h2>
+                                    <div class="rich-content__text article-rich-text">{{ articleblogmodel.article_extra_des2|article_content }}</div>
+                                </section>
+                            {% endif %}
+
+                            {% with gallery_images=articleblogmodel.gallery_images.all article_links=articleblogmodel.article_links.all %}
+                                {% if gallery_images %}
+                                    <div class="article-gallery">
+                                        {% for gallery_image in gallery_images %}
+                                            <figure class="rich-content__figure article-gallery__item">
+                                                <img src="{{ gallery_image.image|public_media_url }}" alt="{{ gallery_image.alt_text|default:articleblogmodel.title }}" loading="lazy">
+                                                {% if gallery_image.caption %}
+                                                    <figcaption>{{ gallery_image.caption }}</figcaption>
+                                                {% endif %}
+                                            </figure>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+
+                                {% if article_links %}
+                                    <section class="rich-content__section article-links">
+                                        <h2 class="rich-content__heading">لینک‌های مرتبط</h2>
+                                        <div class="article-links__list">
+                                            {% for article_link in article_links %}
+                                                <a href="{{ article_link.url|article_link_url }}" class="article-links__item"{% if article_link.open_in_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %}>
+                                                    <span>{{ article_link.label }}</span>
+                                                    <span aria-hidden="true">↗</span>
+                                                </a>
+                                            {% endfor %}
+                                        </div>
+                                    </section>
+                                {% endif %}
+                            {% endwith %}
+                        </article>
+                    </div>
+
+                    <aside class="detail-sidebar">
+                        <div class="instructor-card modern-surface">
+                            <div class="space-y-4">
+                                <span class="eyebrow">نویسنده</span>
+                                <div class="instructor-head">
+                                    <img src="{{ articleblogmodel.author_image|public_media_url }}" alt="{{ articleblogmodel.author }}">
+                                    <span class="flex flex-col gap-1">
+                                        <span class="font-black text-base text-foreground">{{ articleblogmodel.author }}</span>
+                                        <a href="{% url 'home:about_us' %}" class="font-semibold text-sm text-primary">مشاهده معرفی</a>
+                                    </span>
+                                </div>
+                                <div class="bg-secondary rounded-3xl text-sm text-muted p-5 leading-7 content-justify">
+                                    {{ articleblogmodel.author_description|linebreaksbr }}
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if related_articles %}
+                            <div class="instructor-card modern-surface">
+                                <div class="space-y-4">
+                                    <span class="eyebrow">مطالب مرتبط</span>
+                                    <div class="space-y-3">
+                                        {% for related in related_articles %}
+                                            <a href="{% url 'home:article_detail' related.slug %}" class="feature-point">
+                                                <span class="feature-point__icon text-primary">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75 6.75 17.25M8.25 6.75h9v9"/>
+                                                    </svg>
+                                                </span>
+                                                <span class="flex flex-col gap-1">
+                                                    <span class="font-bold text-sm text-foreground line-clamp-1">{{ related.title }}</span>
+                                                    <span class="text-xs text-muted">{{ related.reading_time }} دقیقه مطالعه</span>
+                                                </span>
+                                            </a>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </aside>
+                </div>
+            </section>
+        </div>
+    </main>
+{% endblock %}

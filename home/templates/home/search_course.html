@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load my_tags %}
+
+{% block page_wrapper_class %}bg-secondary{% endblock %}
+
+{% block content %}
+<main class="page-section">
+    <div class="shell-container page-stack">
+        <section class="search-hero modern-surface" data-reveal>
+            <div class="search-hero__copy">
+                <span class="eyebrow">جستجوی دوره‌ها</span>
+                <h1>نتایج دقیق‌تر برای مسیر یادگیری شما</h1>
+                <p>عنوان دوره، توضیحات، مدرس و دسته‌بندی‌ها بررسی می‌شوند تا نزدیک‌ترین نتایج به عبارت جستجوی شما نمایش داده شوند.</p>
+            </div>
+
+            <form method="post" action="{% url 'home:search' %}" class="search-hero__form">
+                {% csrf_token %}
+                <div class="modern-search modern-search--wide">
+                    <input type="text" name="search" value="{{ search|default:'' }}" placeholder="نام دوره، مدرس یا موضوع را جستجو کنید" aria-label="جستجوی دوره">
+                    <button type="submit" aria-label="جستجو">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35m0 0A7.5 7.5 0 1 0 5.5 5.5a7.5 7.5 0 0 0 11.15 11.15Z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <section class="section-card modern-surface search-results-shell" data-reveal>
+            <div class="search-results-head">
+                <div class="space-y-3">
+                    <span class="eyebrow">نتایج</span>
+                    {% if search %}
+                        <h2>نتایج جستجو برای «{{ search }}»</h2>
+                        <p>{{ result_count }} نتیجه مرتبط در آرشیو آموزشی پیدا شد.</p>
+                    {% else %}
+                        <h2>آرشیو آموزشی را جستجو کنید</h2>
+                        <p>عبارت مورد نظر خود را وارد کنید تا دوره‌های مرتبط نمایش داده شوند.</p>
+                    {% endif %}
+                </div>
+
+                <div class="archive-results__chips">
+                    {% if search %}
+                        <span class="archive-chip">{{ result_count }} نتیجه</span>
+                        <span class="archive-chip archive-chip--muted">مرتب‌سازی بر اساس ارتباط</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if search %}
+                {% if product %}
+                    <div class="results-grid">
+                        {% for item in product %}
+                            <article class="modern-card modern-card--compact">
+                                <div class="modern-card__media">
+                                    <a href="{% url 'home:course_detail' item.id %}">
+                                        <img src="{{ item.image|public_media_url }}" alt="{{ item.title }}" loading="lazy">
+                                    </a>
+                                    <a href="{% url 'home:series' %}" class="modern-card__badge">
+                                        <span class="font-semibold text-sm">{{ item.language_kinds }}</span>
+                                    </a>
+                                </div>
+
+                                <div class="modern-card__body">
+                                    {% calculate_episodes_and_duration item as episode_data %}
+                                    <div class="modern-card__meta">
+                                        {% if item.is_compeleted %}
+                                            <span class="inline-flex items-center gap-2 font-bold text-xs text-success">
+                                                <span class="block w-2 h-2 rounded-full bg-success"></span>
+                                                تکمیل شده
+                                            </span>
+                                        {% else %}
+                                            <span class="inline-flex items-center gap-2 font-bold text-xs text-warning">
+                                                <span class="block w-2 h-2 rounded-full bg-warning"></span>
+                                                در حال تکمیل
+                                            </span>
+                                        {% endif %}
+                                    </div>
+
+                                    <h3 class="modern-card__title">
+                                        <a href="{% url 'home:course_detail' item.id %}" class="transition-colors hover:text-primary">{{ item.title }}</a>
+                                    </h3>
+
+                                    <div class="modern-card__meta modern-card__meta--dense">
+                                        <span>{{ episode_data.total_episodes }} قسمت</span>
+                                        <span class="block w-1 h-1 rounded-full bg-border"></span>
+                                        <span>{{ episode_data.total_duration }}</span>
+                                    </div>
+
+                                    <div class="flex items-center justify-between gap-4">
+                                        <div class="modern-card__author">
+                                            <img src="{{ item.author_image|public_media_url }}" alt="{{ item.author }}" loading="lazy">
+                                            <span class="flex flex-col gap-1">
+                                                <span class="font-semibold text-xs text-muted">مدرس دوره</span>
+                                                <span class="font-bold text-sm text-foreground">{{ item.author }}</span>
+                                            </span>
+                                        </div>
+
+                                        {% if item.free %}
+                                            <div class="modern-price">
+                                                <span class="font-black text-xl text-success">رایگان</span>
+                                            </div>
+                                        {% else %}
+                                            <div class="modern-price">
+                                                {% if item.main_price %}
+                                                    <span class="line-through text-xs text-muted">{{ item.main_price }}</span>
+                                                {% endif %}
+                                                <span class="font-black text-xl text-foreground">{{ item.discount_price }}</span>
+                                                <span class="text-xs text-muted">تومان</span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <a href="{% url 'home:course_detail' item.id %}" class="cta-primary cta-primary--strong w-full modern-card__cta">
+                                        مشاهده دوره
+                                    </a>
+                                </div>
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <p class="font-semibold text-sm">برای این جستجو نتیجه‌ای پیدا نشد. عبارت دقیق‌تر یا کوتاه‌تری را امتحان کنید.</p>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="empty-state">
+                    <p class="font-semibold text-sm">هنوز عبارتی برای جستجو وارد نشده است.</p>
+                </div>
+            {% endif %}
+        </section>
+    </div>
+</main>
+{% endblock %}

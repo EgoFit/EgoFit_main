@@ -1,0 +1,76 @@
+{% extends 'account/_shell.html' %}
+{% load my_tags %}
+{% load i18n %}
+
+{% block title %}{{ movement.name }} | {% trans 'ایگوفیت' %}{% endblock %}
+
+{% block account_content %}
+<section class="profile-screen workout-movement-screen">
+    <header class="profile-screen__header">
+        {% if return_program %}
+            <a href="{% url 'register:profile_workout_programs' %}#workout-program-{{ return_program.pk }}" class="account-back-link">→</a>
+        {% else %}
+            <a href="{% url 'register:profile_workout_programs' %}" class="account-back-link">→</a>
+        {% endif %}
+        <h2 class="profile-screen__title">{{ movement.name }}</h2>
+    </header>
+
+    <article class="account-card workout-movement-card">
+        {% if movement.image_media %}
+            <img class="workout-movement-image" src="{{ movement.image_media|public_media_url }}" alt="{{ movement.name }}">
+        {% endif %}
+        {% if movement.video_files %}
+            <section class="workout-movement-videos" aria-label="{% trans 'ویدیوهای حرکت' %}">
+                {% for video in movement.video_files %}
+                    <article class="workout-movement-video-card">
+                        <span class="workout-movement-video-card__label">{% trans 'ویدیوی' %} {{ forloop.counter }}</span>
+                        <video class="workout-movement-video" src="{{ video|public_media_url }}" controls playsinline preload="metadata"></video>
+                    </article>
+                {% endfor %}
+            </section>
+        {% elif not movement.image_media %}
+            <div class="workout-movement-empty">{% trans 'برای این حرکت هنوز ویدیو یا تصویر ثبت نشده است.' %}</div>
+        {% endif %}
+
+        <div class="workout-movement-card__return">
+            {% if return_program %}
+                <a href="{% url 'register:profile_workout_programs' %}#workout-program-{{ return_program.pk }}" class="workout-movement-return">
+            {% else %}
+                <a href="{% url 'register:profile_workout_programs' %}" class="workout-movement-return">
+            {% endif %}
+                <span aria-hidden="true">←</span>
+                {% trans 'بازگشت به برنامه و حرکت‌ها' %}
+            </a>
+        </div>
+
+        <div class="workout-movement-card__body">
+            <span class="account-eyebrow">{% if movement_kind == "exercise" %}{% trans 'حرکت تمرینی' %}{% else %}{% trans 'حرکت اصلاحی' %}{% endif %}</span>
+            {% if movement.primary_muscle %}<p><strong>{% trans 'عضله اصلی' %}:</strong> {{ movement.primary_muscle.name }}</p>{% endif %}
+            {% if movement.body_part %}<p><strong>{% trans 'بخش بدن' %}:</strong> {{ movement.body_part.name }}</p>{% endif %}
+            {% if movement.equipment %}<p><strong>{% trans 'تجهیزات' %}:</strong> {{ movement.equipment.name }}</p>{% endif %}
+            {% if movement.description %}<div class="workout-movement-description">{{ movement.description|linebreaksbr }}</div>{% endif %}
+        </div>
+
+        {% if movement.primary_muscle %}
+            {% with muscle=movement.primary_muscle %}
+                <section class="workout-muscle-card">
+                    <div class="workout-muscle-card__heading">
+                        <div>
+                            <span class="account-eyebrow">{% trans 'بانک اطلاعات عضله اصلی' %}</span>
+                            <h3>{{ muscle.name }}</h3>
+                            {% if muscle.name_en %}<p dir="ltr">{{ muscle.name_en }}</p>{% endif %}
+                        </div>
+                        {% if muscle.image %}<img src="{{ muscle.image|public_media_url }}" alt="{{ muscle.name }}" class="workout-muscle-card__image">{% endif %}
+                    </div>
+                    <dl class="workout-muscle-details">
+                        {% if muscle.origin %}<div><dt>{% trans 'مبدا' %}</dt><dd>{{ muscle.origin|linebreaksbr }}</dd></div>{% endif %}
+                        {% if muscle.insertion %}<div><dt>{% trans 'انتها' %}</dt><dd>{{ muscle.insertion|linebreaksbr }}</dd></div>{% endif %}
+                        {% if muscle.nerve %}<div><dt>{% trans 'عصب' %}</dt><dd>{{ muscle.nerve|linebreaksbr }}</dd></div>{% endif %}
+                        {% if muscle.function_note %}<div><dt>{% trans 'عملکرد' %}</dt><dd>{{ muscle.function_note|linebreaksbr }}</dd></div>{% endif %}
+                    </dl>
+                </section>
+            {% endwith %}
+        {% endif %}
+    </article>
+</section>
+{% endblock %}

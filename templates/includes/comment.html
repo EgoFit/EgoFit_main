@@ -1,0 +1,106 @@
+{% load static %}
+{% load my_tags %}
+
+<section class="comments-panel" id="tabThree" data-comment-endpoint="{{ request.path }}">
+    <div class="comments-panel__header">
+        <div>
+            <span class="eyebrow">گفتگو و پرسش</span>
+            <h2>دیدگاه‌ها و پرسش‌های دوره</h2>
+            <p>پرسش‌ها بعد از بررسی نمایش داده می‌شوند تا کیفیت گفتگو و امنیت کاربران حفظ شود.</p>
+        </div>
+        <span class="comments-count">{{ active_comments|length }} دیدگاه</span>
+    </div>
+
+    <div class="comment-composer">
+        {% if request.user.is_authenticated %}
+            <div class="comment-composer__user">
+                <div class="comment-avatar">
+                    {% if request.user.profile_picture %}
+                        <img src="{{ request.user.profile_picture|public_media_url }}" alt="{{ request.user.fullname }}" loading="lazy">
+                    {% else %}
+                        <img src="{% static 'images/avatars/download.png' %}" alt="{{ request.user.fullname }}" loading="lazy">
+                    {% endif %}
+                </div>
+                <div>
+                    <strong>{{ request.user.fullname|default:request.user.phone }}</strong>
+                    <span>سوال یا تجربه خود را شفاف و محترمانه ثبت کنید.</span>
+                </div>
+            </div>
+
+            <form id="comment-form" class="comment-form" method="post">
+                {% csrf_token %}
+                <textarea name="text" id="text" rows="5" class="form-textarea enterprise-input enterprise-textarea" placeholder="دیدگاه یا پرسش خود را بنویسید..."></textarea>
+                <div class="comment-form__actions">
+                    <span>حداقل ۵ کاراکتر، بدون اطلاعات حساس شخصی.</span>
+                    <button type="submit" class="cta-primary cta-primary--strong comment-action">
+                        ثبت دیدگاه
+                    </button>
+                </div>
+            </form>
+        {% else %}
+            <div class="comment-login-card">
+                <div>
+                    <strong>برای ثبت دیدگاه وارد حساب شوید</strong>
+                    <p>مشاهده گفتگو آزاد است، اما ثبت پرسش و پاسخ فقط برای کاربران واردشده فعال است.</p>
+                </div>
+                <a href="{% url 'register:pass_login' %}" class="cta-primary cta-primary--strong">ورود به حساب</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="comments-list">
+        {% for comment in active_comments %}
+            <article class="comment-thread">
+                <header class="comment-thread__header">
+                    <div class="comment-avatar">
+                        {% if comment.user.profile_picture %}
+                            <img src="{{ comment.user.profile_picture|public_media_url }}" alt="{{ comment.user.fullname }}" loading="lazy">
+                        {% else %}
+                            <img src="{% static 'images/avatars/download.png' %}" alt="{{ comment.user.fullname }}" loading="lazy">
+                        {% endif %}
+                    </div>
+                    <div>
+                        <strong>{{ comment.user.fullname|default:comment.user.phone }}</strong>
+                        <span>{{ comment.created_at|to_jalali }}</span>
+                    </div>
+                </header>
+
+                <p class="comment-thread__text">{{ comment.text }}</p>
+
+                <div class="comment-replies">
+                    {% for reply in comment.active_replies %}
+                        <article class="comment-reply">
+                            <header class="comment-thread__header">
+                                <div class="comment-avatar comment-avatar--sm">
+                                    {% if reply.user.profile_picture %}
+                                        <img src="{{ reply.user.profile_picture|public_media_url }}" alt="{{ reply.user.fullname }}" loading="lazy">
+                                    {% else %}
+                                        <img src="{% static 'images/avatars/download.png' %}" alt="{{ reply.user.fullname }}" loading="lazy">
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <strong>{{ reply.user.fullname|default:reply.user.phone }}</strong>
+                                    <span>{{ reply.created_at|to_jalali }}</span>
+                                </div>
+                            </header>
+                            <p class="comment-thread__text">{{ reply.text }}</p>
+                        </article>
+                    {% endfor %}
+
+                    {% if request.user.is_authenticated %}
+                        <form id="reply-form-{{ comment.pk }}" method="post" class="reply-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="comment_id" value="{{ comment.pk }}">
+                            {{ reply_form.text }}
+                            <button type="submit" class="secondary-action">ارسال پاسخ</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </article>
+        {% empty %}
+            <div class="empty-state compact">
+                <p>هنوز دیدگاهی برای این دوره ثبت نشده است. اولین پرسش را شما مطرح کنید.</p>
+            </div>
+        {% endfor %}
+    </div>
+</section>

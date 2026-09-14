@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load my_tags %}
+{% load i18n %}
+
+{% block page_wrapper_class %}bg-secondary{% endblock %}
+
+{% block content %}
+    {% trans 'آرشیو دوره‌ها' as default_hero_eyebrow %}
+    {% trans 'مسیر یادگیری‌ات را با یک آرشیو تمیز و حرفه‌ای انتخاب کن' as default_hero_title %}
+    {% trans 'دوره‌های رایگان و پولی را با فیلترهای سریع، کارت‌های خوانا و نمایی مدرن‌تر مرور کن تا انتخاب نهایی سریع‌تر و دقیق‌تر انجام شود.' as default_hero_description %}
+    <main class="flex-auto py-5">
+        <div class="shell-container page-stack">
+            <section class="section-card modern-surface course-archive-shell" x-data="{ offcanvasOpen: false }">
+                <div class="archive-hero">
+                    <div class="archive-hero__copy">
+                        <span class="eyebrow">{{ series_listing_page.hero_eyebrow|default_cms:default_hero_eyebrow }}</span>
+                        <h1 class="archive-hero__title">{{ series_listing_page.hero_title|default_cms:default_hero_title }}</h1>
+                        <p class="archive-hero__lead">{{ series_listing_page.hero_description|default_cms:default_hero_description }}</p>
+
+                        <div class="archive-hero__actions">
+                            <a href="#series-results" class="cta-primary cta-primary--strong">
+                                <span class="font-semibold text-sm">{% trans 'مشاهده دوره‌ها' %}</span>
+                            </a>
+                            <button type="button" class="cta-secondary cta-secondary--soft md:hidden" x-on:click="offcanvasOpen = true">
+                                <span class="font-semibold text-sm">{% trans 'فیلترها' %}</span>
+                            </button>
+                        </div>
+
+                        <div class="archive-hero__stats">
+                            <div class="archive-stat">
+                                <span class="archive-stat__value">{{ course|length }}</span>
+                                <span class="archive-stat__label">{% trans 'نتیجه فعلی' %}</span>
+                            </div>
+                            <div class="archive-stat">
+                                <span class="archive-stat__value">{{ free_courses_count }}</span>
+                                <span class="archive-stat__label">{% trans 'رایگان' %}</span>
+                            </div>
+                            <div class="archive-stat">
+                                <span class="archive-stat__value">{{ not_free_courses_count }}</span>
+                                <span class="archive-stat__label">{% trans 'پولی' %}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="archive-hero__panel modern-surface">
+                        <div class="archive-hero__panel-grid">
+                            {% if series_listing_page.signals.all %}
+                                {% for signal in series_listing_page.signals.all %}
+                                    <div class="archive-hero__signal">
+                                        <span class="archive-hero__signal-dot"></span>
+                                        <span>{{ signal.text }}</span>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="archive-hero__signal">
+                                    <span class="archive-hero__signal-dot"></span>
+                                    <span>{% trans 'فیلترهای زنده و انتخاب سریع' %}</span>
+                                </div>
+                                <div class="archive-hero__signal">
+                                    <span class="archive-hero__signal-dot"></span>
+                                    <span>{% trans 'کارت‌های خوانا با تمرکز روی تصمیم خرید' %}</span>
+                                </div>
+                                <div class="archive-hero__signal">
+                                    <span class="archive-hero__signal-dot"></span>
+                                    <span>{% trans 'چیدمان مناسب موبایل و دسکتاپ' %}</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if messages %}
+                    {% include 'includes/flash_messages.html' %}
+                {% endif %}
+
+                <div class="filters-layout">
+                    <aside class="filter-panel filter-panel--desktop modern-surface md:flex hidden">
+                        <form method="get" class="archive-filter-form">
+                            <div class="archive-filter-card">
+                                <div class="archive-filter-card__head">
+                                    <span class="archive-filter-card__title">{% trans 'نوع دوره' %}</span>
+                                    <span class="archive-filter-card__meta">{% trans 'تفکیک سریع رایگان و پولی' %}</span>
+                                </div>
+                                <div class="archive-filter-options">
+                                    <label class="filter-radio filter-radio--rich">
+                                        <input type="radio" name="free" value="true" {% if request.GET.free == 'true' %}checked{% endif %}>
+                                        <span class="filter-radio__content">
+                                            <span class="filter-radio__title">{% trans 'رایگان' %}</span>
+                                            <span class="filter-radio__caption">{% trans 'شروع سریع بدون پرداخت' %}</span>
+                                        </span>
+                                        <span class="filter-radio__count">{{ free_courses_count }}</span>
+                                    </label>
+                                    <label class="filter-radio filter-radio--rich">
+                                        <input type="radio" name="free" value="false" {% if request.GET.free == 'false' %}checked{% endif %}>
+                                        <span class="filter-radio__content">
+                                            <span class="filter-radio__title">{% trans 'فقط پولی' %}</span>
+                                            <span class="filter-radio__caption">{% trans 'مناسب دوره‌های کامل‌تر' %}</span>
+                                        </span>
+                                        <span class="filter-radio__count">{{ not_free_courses_count }}</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="archive-filter-card">
+                                <div class="archive-filter-card__head">
+                                    <span class="archive-filter-card__title">{% trans 'دسته‌بندی دوره' %}</span>
+                                    <span class="archive-filter-card__meta">{% trans 'مرور بر اساس موضوع' %}</span>
+                                </div>
+                                <div class="archive-filter-options archive-filter-options--categories">
+                                    {% for category in categories %}
+                                        <label class="filter-radio filter-radio--rich">
+                                            <input type="radio" name="category" value="{{ category.title }}" {% if request.GET.category == category.title %}checked{% endif %}>
+                                            <span class="filter-radio__content">
+                                                <span class="filter-radio__title">{{ category.title }}</span>
+                                            </span>
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="archive-filter-actions">
+                                <button type="submit" class="cta-primary cta-primary--strong w-full">{% trans 'اعمال فیلتر' %}</button>
+                                <a href="{% url 'home:series' %}" class="cta-secondary w-full justify-center">{% trans 'پاک کردن فیلترها' %}</a>
+                            </div>
+                        </form>
+                    </aside>
+
+                    <div class="archive-results" id="series-results">
+                        <div class="archive-results__toolbar modern-surface">
+                            <div class="archive-results__summary">
+                                <span class="eyebrow">{% trans 'نتایج دوره‌ها' %}</span>
+                                <h2 class="archive-results__title">{% blocktrans with course_count=course|length %}{{ course_count }} دوره برای نمایش آماده است{% endblocktrans %}</h2>
+                                <p class="archive-results__text">{% trans 'نمای آرشیو به‌صورت بهینه‌شده برای تصمیم سریع‌تر، مقایسه ساده‌تر و اسکن بصری بهتر طراحی شده است.' %}</p>
+                            </div>
+
+                            <div class="archive-results__chips">
+                                {% if request.GET.free == 'true' %}
+                                    <span class="archive-chip">{% trans 'فقط رایگان' %}</span>
+                                {% elif request.GET.free == 'false' %}
+                                    <span class="archive-chip">{% trans 'فقط پولی' %}</span>
+                                {% endif %}
+
+                                {% if request.GET.category %}
+                                    <span class="archive-chip">{{ request.GET.category }}</span>
+                                {% endif %}
+
+                                {% if not request.GET.free and not request.GET.category %}
+                                    <span class="archive-chip archive-chip--muted">{% trans 'بدون فیلتر' %}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="space-y-5">
+                            {% include 'includes/series.html' %}
+                        </div>
+                    </div>
+                </div>
+
+                <div x-cloak>
+                    <div class="fixed inset-y-0 right-0 xs:w-80 w-72 h-screen modern-offcanvas__panel rounded-l-3xl overflow-y-auto transition-transform z-50"
+                         x-bind:class="offcanvasOpen ? '!translate-x-0' : 'translate-x-full'">
+                        <div class="flex items-center justify-between gap-4 sticky top-0 bg-background/90 backdrop-blur-xl p-4 z-10">
+                            <span class="font-bold text-sm text-foreground">{% trans 'فیلتر دوره‌ها' %}</span>
+                            <button type="button" class="modern-icon-btn" x-on:click="offcanvasOpen = false">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="p-4">
+                            <form method="get" class="archive-filter-form">
+                                <div class="archive-filter-card">
+                                    <div class="archive-filter-card__head">
+                                        <span class="archive-filter-card__title">{% trans 'نوع دوره' %}</span>
+                                    </div>
+                                    <div class="archive-filter-options">
+                                        <label class="filter-radio filter-radio--rich">
+                                            <input type="radio" name="free" value="true" {% if request.GET.free == 'true' %}checked{% endif %}>
+                                            <span class="filter-radio__content">
+                                                <span class="filter-radio__title">{% trans 'رایگان' %}</span>
+                                            </span>
+                                            <span class="filter-radio__count">{{ free_courses_count }}</span>
+                                        </label>
+                                        <label class="filter-radio filter-radio--rich">
+                                            <input type="radio" name="free" value="false" {% if request.GET.free == 'false' %}checked{% endif %}>
+                                            <span class="filter-radio__content">
+                                                <span class="filter-radio__title">{% trans 'فقط پولی' %}</span>
+                                            </span>
+                                            <span class="filter-radio__count">{{ not_free_courses_count }}</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="archive-filter-card">
+                                    <div class="archive-filter-card__head">
+                                        <span class="archive-filter-card__title">{% trans 'دسته‌بندی دوره' %}</span>
+                                    </div>
+                                    <div class="archive-filter-options archive-filter-options--categories">
+                                        {% for category in categories %}
+                                            <label class="filter-radio filter-radio--rich">
+                                                <input type="radio" name="category" value="{{ category.title }}" {% if request.GET.category == category.title %}checked{% endif %}>
+                                                <span class="filter-radio__content">
+                                                    <span class="filter-radio__title">{{ category.title }}</span>
+                                                </span>
+                                            </label>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="archive-filter-actions">
+                                    <button type="submit" class="cta-primary cta-primary--strong w-full">{% trans 'اعمال فیلتر' %}</button>
+                                    <a href="{% url 'home:series' %}" class="cta-secondary w-full justify-center">{% trans 'پاک کردن فیلترها' %}</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="fixed inset-0 bg-secondary/80 cursor-pointer transition-all duration-300 z-40"
+                         x-bind:class="offcanvasOpen ? 'opacity-100 visible' : 'opacity-0 invisible'"
+                         x-on:click="offcanvasOpen = false"></div>
+                </div>
+            </section>
+        </div>
+    </main>
+{% endblock %}

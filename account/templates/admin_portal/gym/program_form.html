@@ -1,0 +1,341 @@
+{% extends 'admin_portal/_shell.html' %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}{{ page_title }} | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block admin_content %}
+<section class="admin-screen admin-program-screen">
+    <header class="admin-screen__header admin-screen__header--split">
+        <a href="{% url 'register:admin_program_list' target_user.id %}" class="admin-back-link" aria-label="{% trans 'بازگشت' %}">→</a>
+        <h1 class="admin-screen__title">{{ page_title }}</h1>
+    </header>
+
+    <article class="admin-user-summary">
+        <div>
+            <span>{% trans 'برنامه برای ورزشکار' %}</span>
+            <strong>{{ target_user.fullname }}</strong>
+            <small>{{ target_user.phone }}</small>
+        </div>
+        {% if program %}
+            <a href="{% url 'register:admin_program_pdf' target_user.id program.pk %}" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'دریافت PDF' %}</a>
+        {% endif %}
+    </article>
+
+    <form method="post" class="admin-program-editor" id="program-editor">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            <div class="admin-form-errors">
+                {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+            </div>
+        {% endif %}
+        {% if payload_form.non_field_errors %}
+            <div class="admin-form-errors">
+                {% for error in payload_form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+            </div>
+        {% endif %}
+
+        <section class="admin-form-panel">
+            <h2>{% trans 'اطلاعات برنامه' %}</h2>
+            <div class="admin-form-grid admin-form-grid--cols2">
+                <div class="field-group">
+                    <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+                    {{ form.title }}{{ form.title.errors }}
+                </div>
+                <div class="field-group admin-checkbox-field">
+                    <label for="{{ form.is_published.id_for_label }}">{{ form.is_published }} {{ form.is_published.label }}</label>
+                    {{ form.is_published.errors }}
+                </div>
+                <div class="field-group admin-checkbox-field">
+                    <label for="{{ form.requires_payment.id_for_label }}">{{ form.requires_payment }} {{ form.requires_payment.label }}</label>
+                    {{ form.requires_payment.errors }}
+                </div>
+                <div class="field-group">
+                    <label for="{{ form.price.id_for_label }}">{{ form.price.label }}</label>
+                    {{ form.price }}{{ form.price.errors }}
+                </div>
+                <div class="field-group">
+                    <label for="{{ form.start_date.id_for_label }}">{{ form.start_date.label }}</label>
+                    {{ form.start_date }}{{ form.start_date.errors }}
+                </div>
+                <div class="field-group">
+                    <label for="{{ form.end_date.id_for_label }}">{{ form.end_date.label }}</label>
+                    {{ form.end_date }}{{ form.end_date.errors }}
+                </div>
+                <div class="field-group admin-form-grid__full">
+                    <label for="{{ form.notes.id_for_label }}">{{ form.notes.label }}</label>
+                    {{ form.notes }}{{ form.notes.errors }}
+                </div>
+                <div class="field-group">
+                    <label for="{{ form.supplements_note.id_for_label }}">{{ form.supplements_note.label }}</label>
+                    {{ form.supplements_note }}{{ form.supplements_note.errors }}
+                </div>
+                <div class="field-group">
+                    <label for="{{ form.warmup_notes.id_for_label }}">{{ form.warmup_notes.label }}</label>
+                    {{ form.warmup_notes }}{{ form.warmup_notes.errors }}
+                </div>
+                <div class="field-group">
+                    <label for="{{ form.cooldown_notes.id_for_label }}">{{ form.cooldown_notes.label }}</label>
+                    {{ form.cooldown_notes }}{{ form.cooldown_notes.errors }}
+                </div>
+            </div>
+        </section>
+
+        <section class="admin-form-panel">
+            <div class="admin-program-section-head">
+                <div>
+                    <h2>{% trans 'روزها و حرکت‌ها' %}</h2>
+                    <p>{% trans 'برای هر ردیف می‌توانید تا سه حرکت را از کتابخانه انتخاب کنید.' %}</p>
+                </div>
+                <button type="button" class="admin-secondary-btn admin-secondary-btn--small" id="add-day">+ {% trans 'روز جدید' %}</button>
+            </div>
+            <div id="program-days" class="admin-program-days"></div>
+        </section>
+
+        <section class="admin-form-panel">
+            <div class="admin-program-section-head">
+                <div>
+                    <h2>{% trans 'حرکت‌های اصلاحی' %}</h2>
+                    <p>{% trans 'حرکت‌های اصلاحی از کتابخانه انتخاب می‌شوند و در گرم کردن یا سرد کردن نمایش داده می‌شوند.' %}</p>
+                </div>
+                <button type="button" class="admin-secondary-btn admin-secondary-btn--small" id="add-corrective">+ {% trans 'افزودن حرکت اصلاحی' %}</button>
+            </div>
+            <div id="program-correctives" class="admin-program-correctives"></div>
+        </section>
+
+        {{ payload_form.days_json }}
+        {{ payload_form.correctives_json }}
+        <button type="submit" class="admin-primary-btn">{% trans 'ذخیره برنامه' %}</button>
+    </form>
+</section>
+
+{{ program_payload|json_script:"program-payload" }}
+{{ exercise_catalog|json_script:"exercise-catalog" }}
+{{ set_catalog|json_script:"set-catalog" }}
+{{ repetition_catalog|json_script:"repetition-catalog" }}
+{{ rest_catalog|json_script:"rest-catalog" }}
+{{ corrective_catalog|json_script:"corrective-catalog" }}
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script>
+        (function () {
+            var toggle = document.getElementById("{{ form.requires_payment.id_for_label }}");
+            var price = document.getElementById("{{ form.price.id_for_label }}");
+            if (!toggle || !price) return;
+            function syncPaymentFields() {
+                price.disabled = !toggle.checked;
+                price.required = toggle.checked;
+                if (!toggle.checked) price.value = "0";
+            }
+            toggle.addEventListener("change", syncPaymentFields);
+            syncPaymentFields();
+        }());
+
+        (function () {
+            const payload = JSON.parse(document.getElementById("program-payload").textContent || "{}");
+            const exercises = JSON.parse(document.getElementById("exercise-catalog").textContent || "[]");
+            const sets = JSON.parse(document.getElementById("set-catalog").textContent || "[]");
+            const repetitions = JSON.parse(document.getElementById("repetition-catalog").textContent || "[]");
+            const rests = JSON.parse(document.getElementById("rest-catalog").textContent || "[]");
+            const correctives = JSON.parse(document.getElementById("corrective-catalog").textContent || "[]");
+            const daysRoot = document.getElementById("program-days");
+            const correctivesRoot = document.getElementById("program-correctives");
+            const daysInput = document.getElementById("id_days_json");
+            const correctivesInput = document.getElementById("id_correctives_json");
+            const editor = document.getElementById("program-editor");
+            const state = {
+                days: Array.isArray(payload.days) && payload.days.length ? payload.days : [
+                    {name: "روز اول", notes: "", items: []}
+                ],
+                correctives: Array.isArray(payload.correctives) ? payload.correctives : []
+            };
+
+            function escapeHtml(value) {
+                return String(value || "").replace(/[&<>"']/g, function (char) {
+                    return {"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"}[char];
+                });
+            }
+
+            function exerciseOptions(selected, allowEmpty, emptyLabel) {
+                let html = allowEmpty
+                    ? '<option value="">' + escapeHtml(emptyLabel || "بدون سوپرست") + '</option>'
+                    : '<option value="">حرکت را انتخاب کنید</option>';
+                exercises.forEach(function (exercise) {
+                    const isSelected = String(exercise.id) === String(selected || "") ? " selected" : "";
+                    html += '<option value="' + exercise.id + '"' + isSelected + '>' +
+                        escapeHtml(exercise.name + (exercise.muscle ? " — " + exercise.muscle : "")) + '</option>';
+                });
+                return html;
+            }
+
+            function lookupOptions(items, selected, allowEmpty, emptyLabel) {
+                let html = allowEmpty ? '<option value="">' + escapeHtml(emptyLabel) + '</option>' : "";
+                const selectedValue = String(selected || "");
+                let selectedExists = false;
+                items.forEach(function (item) {
+                    const value = String(item.value || "");
+                    const isSelected = value === selectedValue ? " selected" : "";
+                    selectedExists = selectedExists || value === selectedValue;
+                    html += '<option value="' + escapeHtml(value) + '"' + isSelected + '>' +
+                        escapeHtml(item.label || value) + '</option>';
+                });
+                if (selectedValue && !selectedExists) {
+                    html += '<option value="' + escapeHtml(selectedValue) + '" selected>' +
+                        escapeHtml(selectedValue) + '</option>';
+                }
+                return html;
+            }
+
+            function movementValue(item, key, fallbackKey) {
+                return item[key] === null || item[key] === undefined
+                    ? (item[fallbackKey] || "")
+                    : item[key];
+            }
+
+            function correctiveOptions(selected) {
+                let html = '<option value="">حرکت اصلاحی را انتخاب کنید</option>';
+                correctives.forEach(function (item) {
+                    const isSelected = String(item.id) === String(selected || "") ? " selected" : "";
+                    html += '<option value="' + item.id + '"' + isSelected + '>' + escapeHtml(item.name) + '</option>';
+                });
+                return html;
+            }
+
+            function render() {
+                daysRoot.innerHTML = state.days.map(function (day, dayIndex) {
+                    const items = Array.isArray(day.items) ? day.items : [];
+                    return '<article class="admin-program-day" data-day-index="' + dayIndex + '">' +
+                        '<div class="admin-program-day__head">' +
+                        '<input class="program-day-name admin-program-day__name" value="' + escapeHtml(day.name || ("روز " + (dayIndex + 1))) + '" placeholder="عنوان روز">' +
+                        '<button type="button" class="admin-secondary-btn admin-secondary-btn--small remove-day">حذف روز</button>' +
+                        '</div>' +
+                        '<textarea class="program-day-notes admin-program-day__notes" rows="2" placeholder="توضیحات روز">' + escapeHtml(day.notes) + '</textarea>' +
+                        '<div class="admin-program-items">' +
+                        items.map(function (item, itemIndex) {
+                            return '<div class="admin-program-item" data-item-index="' + itemIndex + '">' +
+                                '<div class="admin-program-item__top"><strong>حرکت ' + (itemIndex + 1) + '</strong><button type="button" class="admin-secondary-btn admin-secondary-btn--small remove-item">حذف</button></div>' +
+                                '<div class="admin-program-item__grid">' +
+                                '<label>حرکت اصلی<select class="program-item-exercise">' + exerciseOptions(item.exercise, false) + '</select></label>' +
+                                '<label>حرکت دوم سوپرست<select class="program-item-superset">' + exerciseOptions(item.superset_exercise, true) + '</select></label>' +
+                                '<label>حرکت سوم<select class="program-item-third">' + exerciseOptions(item.third_exercise, true, "بدون حرکت سوم") + '</select></label>' +
+                                '<div class="admin-program-item__config-label">تنظیمات حرکت اصلی</div>' +
+                                '<label>ست حرکت اصلی<select class="program-item-sets">' + lookupOptions(sets, item.sets, false, "") + '</select></label>' +
+                                '<label>تکرار حرکت اصلی<select class="program-item-reps">' + lookupOptions(repetitions, item.reps, false, "") + '</select></label>' +
+                                '<label>استراحت حرکت اصلی<select class="program-item-rest">' + lookupOptions(rests, item.rest, true, "بدون استراحت") + '</select></label>' +
+                                '<div class="admin-program-item__config-label">تنظیمات حرکت دوم</div>' +
+                                '<label>ست حرکت دوم<select class="program-item-superset-sets">' + lookupOptions(sets, movementValue(item, "superset_sets", "sets"), false, "") + '</select></label>' +
+                                '<label>تکرار حرکت دوم<select class="program-item-superset-reps">' + lookupOptions(repetitions, movementValue(item, "superset_reps", "reps"), false, "") + '</select></label>' +
+                                '<label>استراحت حرکت دوم<select class="program-item-superset-rest">' + lookupOptions(rests, movementValue(item, "superset_rest", "rest"), true, "بدون استراحت") + '</select></label>' +
+                                '<div class="admin-program-item__config-label">تنظیمات حرکت سوم</div>' +
+                                '<label>ست حرکت سوم<select class="program-item-third-sets">' + lookupOptions(sets, movementValue(item, "third_sets", "sets"), false, "") + '</select></label>' +
+                                '<label>تکرار حرکت سوم<select class="program-item-third-reps">' + lookupOptions(repetitions, movementValue(item, "third_reps", "reps"), false, "") + '</select></label>' +
+                                '<label>استراحت حرکت سوم<select class="program-item-third-rest">' + lookupOptions(rests, movementValue(item, "third_rest", "rest"), true, "بدون استراحت") + '</select></label>' +
+                                '<label class="admin-program-item__wide">نکته<input class="program-item-note" value="' + escapeHtml(item.note || "") + '" placeholder="نکته یا توضیح حرکت"></label>' +
+                                '</div></div>';
+                        }).join("") +
+                        '</div><button type="button" class="admin-secondary-btn admin-secondary-btn--small add-item">+ افزودن حرکت</button>' +
+                        '</article>';
+                }).join("");
+
+                correctivesRoot.innerHTML = state.correctives.map(function (item, index) {
+                    return '<div class="admin-program-corrective" data-corrective-index="' + index + '">' +
+                        '<select class="program-corrective-exercise">' + correctiveOptions(item.corrective_exercise) + '</select>' +
+                        '<select class="program-corrective-phase"><option value="warmup"' + (item.phase === "warmup" ? " selected" : "") + '>حین گرم کردن</option><option value="cooldown"' + (item.phase === "cooldown" ? " selected" : "") + '>حین سرد کردن</option></select>' +
+                        '<select class="program-corrective-sets">' + lookupOptions(sets, item.sets, true, "بدون ست") + '</select>' +
+                        '<select class="program-corrective-reps">' + lookupOptions(repetitions, item.reps, true, "تکرار/مدت") + '</select>' +
+                        '<input class="program-corrective-note" value="' + escapeHtml(item.note || "") + '" placeholder="نکته">' +
+                        '<button type="button" class="admin-secondary-btn admin-secondary-btn--small remove-corrective">حذف</button>' +
+                        '</div>';
+                }).join("");
+            }
+
+            function collect() {
+                state.days = Array.from(daysRoot.querySelectorAll(".admin-program-day")).map(function (dayElement) {
+                    return {
+                        name: dayElement.querySelector(".program-day-name").value.trim(),
+                        notes: dayElement.querySelector(".program-day-notes").value.trim(),
+                        items: Array.from(dayElement.querySelectorAll(".admin-program-item")).map(function (itemElement) {
+                            return {
+                                exercise: itemElement.querySelector(".program-item-exercise").value,
+                                superset_exercise: itemElement.querySelector(".program-item-superset").value,
+                                third_exercise: itemElement.querySelector(".program-item-third").value,
+                                sets: itemElement.querySelector(".program-item-sets").value,
+                                reps: itemElement.querySelector(".program-item-reps").value,
+                                rest: itemElement.querySelector(".program-item-rest").value,
+                                superset_sets: itemElement.querySelector(".program-item-superset-sets").value,
+                                superset_reps: itemElement.querySelector(".program-item-superset-reps").value,
+                                superset_rest: itemElement.querySelector(".program-item-superset-rest").value,
+                                third_sets: itemElement.querySelector(".program-item-third-sets").value,
+                                third_reps: itemElement.querySelector(".program-item-third-reps").value,
+                                third_rest: itemElement.querySelector(".program-item-third-rest").value,
+                                note: itemElement.querySelector(".program-item-note").value.trim()
+                            };
+                        })
+                    };
+                });
+                state.correctives = Array.from(correctivesRoot.querySelectorAll(".admin-program-corrective")).map(function (element) {
+                    return {
+                        corrective_exercise: element.querySelector(".program-corrective-exercise").value,
+                        phase: element.querySelector(".program-corrective-phase").value,
+                        sets: element.querySelector(".program-corrective-sets").value,
+                        reps: element.querySelector(".program-corrective-reps").value,
+                        note: element.querySelector(".program-corrective-note").value.trim()
+                    };
+                });
+                daysInput.value = JSON.stringify(state.days);
+                correctivesInput.value = JSON.stringify(state.correctives);
+            }
+
+            document.getElementById("add-day").addEventListener("click", function () {
+                collect();
+                state.days.push({name: "روز " + (state.days.length + 1), notes: "", items: []});
+                render();
+            });
+            document.getElementById("add-corrective").addEventListener("click", function () {
+                collect();
+                state.correctives.push({corrective_exercise: "", phase: "warmup", sets: "", reps: "", note: ""});
+                render();
+            });
+            daysRoot.addEventListener("click", function (event) {
+                const day = event.target.closest(".admin-program-day");
+                if (!day) return;
+                const action = event.target.closest(".add-item, .remove-item, .remove-day");
+                if (!action) return;
+                collect();
+                const dayIndex = Number(day.dataset.dayIndex);
+                if (action.classList.contains("remove-day")) {
+                    if (state.days.length > 1) state.days.splice(dayIndex, 1);
+                } else if (action.classList.contains("add-item")) {
+                    state.days[dayIndex].items.push({
+                        exercise: "",
+                        superset_exercise: "",
+                        third_exercise: "",
+                        sets: "",
+                        reps: "",
+                        rest: "",
+                        superset_sets: "",
+                        superset_reps: "",
+                        superset_rest: "",
+                        third_sets: "",
+                        third_reps: "",
+                        third_rest: "",
+                        note: ""
+                    });
+                } else if (action.classList.contains("remove-item")) {
+                    const itemIndex = Number(action.closest(".admin-program-item").dataset.itemIndex);
+                    state.days[dayIndex].items.splice(itemIndex, 1);
+                }
+                render();
+            });
+            correctivesRoot.addEventListener("click", function (event) {
+                if (!event.target.closest(".remove-corrective")) return;
+                collect();
+                state.correctives.splice(Number(event.target.closest(".admin-program-corrective").dataset.correctiveIndex), 1);
+                render();
+            });
+            editor.addEventListener("submit", collect);
+            render();
+        })();
+    </script>
+{% endblock %}

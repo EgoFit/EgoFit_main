@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{{ page_title }} | {% trans 'کتابخانه تمرینات' %}{% endblock %}
+{% block content %}
+<main class="workout-library-page"><div class="shell-container page-stack">
+    <header class="workout-library-hero">
+        <a href="{% url 'home:workout_library' %}" class="secondary-action">← {% trans 'کتابخانه تمرینات' %}</a>
+        <div class="workout-library-hero__copy"><span class="eyebrow">{% trans 'انتخاب دسته' %}</span><h1>{{ page_title }}</h1><p>{{ page_description }}</p></div>
+        <form method="get" class="workout-library-search"><label class="sr-only" for="library-category-search">{% trans 'جستجو در دسته‌ها' %}</label><input id="library-category-search" type="search" name="q" value="{{ query }}" placeholder="{% trans 'جستجو در دسته‌ها' %}"><button class="cta-primary" type="submit">{% trans 'جستجو' %}</button></form>
+    </header>
+    <section class="workout-library-section" aria-labelledby="library-category-heading">
+        <div class="workout-library-section__heading"><div><span class="workout-library-kicker">{% trans 'دسته‌بندی‌ها' %}</span><h2 id="library-category-heading">{{ categories|length }} {% trans 'دسته برای انتخاب' %}</h2></div></div>
+        <div class="workout-library-grid">{% for category in categories %}<a class="workout-library-card workout-library-card--category {% if page_kind == 'correctives' %}workout-library-card--corrective{% else %}workout-library-card--strength{% endif %}" href="{% url category_url_name category.pk %}"><span class="workout-library-card__icon">{% if page_kind == 'correctives' %}🧘{% else %}🏋️{% endif %}</span><strong>{{ category.name }}</strong><span class="workout-library-card__meta">{% if page_kind == 'correctives' %}{{ category.corrective_exercises.count }}{% else %}{{ category.exercises.count }}{% endif %} {% trans 'حرکت' %}<b aria-hidden="true">←</b></span></a>{% empty %}<p class="workout-library-empty">{% trans 'دسته‌ای پیدا نشد.' %}</p>{% endfor %}</div>
+    </section>
+</div></main>
+{% endblock %}

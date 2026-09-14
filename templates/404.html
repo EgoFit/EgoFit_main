@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'صفحه پیدا نشد' %} | {% trans 'ایگوفیت' %}{% endblock %}
+{% block page_wrapper_class %}bg-secondary{% endblock %}
+
+{% block content %}
+<main class="page-section error-page">
+    <div class="shell-container">
+        <section class="error-shell modern-surface" data-reveal>
+            <div class="error-shell__content">
+                <span class="eyebrow">{% trans 'خطای ۴۰۴' %}</span>
+                <h1>{% trans 'این صفحه در مسیر فعلی پیدا نشد' %}</h1>
+                <p>{% trans 'ممکن است آدرس اشتباه وارد شده باشد، صفحه جابه‌جا شده باشد یا دسترسی آن دیگر از این مسیر ممکن نباشد. از مسیرهای اصلی سایت ادامه دهید.' %}</p>
+
+                <div class="error-shell__actions">
+                    <a href="{% url 'home:home' %}" class="cta-primary cta-primary--strong">{% trans 'بازگشت به صفحه اصلی' %}</a>
+                    <a href="{% url 'home:series' %}" class="cta-secondary cta-secondary--soft">{% trans 'مشاهده دوره‌ها' %}</a>
+                </div>
+
+                <div class="error-shell__chips">
+                    <span>{% trans 'مسیر یادگیری' %}</span>
+                    <span>{% trans 'آرشیو دوره‌ها' %}</span>
+                    <span>{% trans 'بلاگ آموزشی' %}</span>
+                </div>
+            </div>
+
+            <div class="error-shell__visual" aria-hidden="true">
+                <div class="error-orb error-orb--lg"></div>
+                <div class="error-orb error-orb--sm"></div>
+                <div class="error-code">404</div>
+            </div>
+        </section>
+    </div>
+</main>
+{% endblock %}

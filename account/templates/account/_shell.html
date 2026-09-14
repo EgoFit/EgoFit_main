@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block skip_link %}{% endblock %}
+
+{% block public_ui_css %}{% endblock %}
+{% block public_ui_js %}{% endblock %}
+
+{% block body_class %}account-dashboard{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/account.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard-polish.css' %}">
+    <link rel="stylesheet" href="{% static 'css/account-mobile.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="account-app {% if hide_account_chrome %}account-app--compact{% endif %}">
+    {% if not hide_account_chrome %}
+        <header class="dashboard-glass-header dashboard-glass-header--account" aria-label="{% trans 'سربرگ پنل کاربری' %}">
+            <div class="dashboard-glass-header__inner">
+                <a href="{% url 'home:home' %}" class="dashboard-glass-header__brand" aria-label="{% trans 'بازگشت به صفحه اصلی' %}">
+                    <span class="dashboard-glass-header__logo" aria-hidden="true">
+                        <img src="{% static 'images/logoimageego.webp' %}" alt="">
+                    </span>
+                    <span class="dashboard-glass-header__brand-copy">
+                        <span>{% trans 'ایگوفیت' %}</span>
+                        <strong>{% trans 'پنل کاربری' %}</strong>
+                    </span>
+                </a>
+
+                <div class="dashboard-glass-header__title">
+                    <span>{% trans 'حساب کاربری' %}</span>
+                    {% trans 'پروفایل' as default_account_title %}
+                    <h1>{{ account_title|default:default_account_title }}</h1>
+                </div>
+
+                <div class="dashboard-glass-header__actions">
+                    <a href="{% url 'home:series' %}" class="dashboard-glass-header__action">{% trans 'دوره‌ها' %}</a>
+                    {% include 'includes/theme_toggle.html' %}
+                    <a href="{% url 'register:logout' %}" class="dashboard-glass-header__icon-action" aria-label="{% trans 'خروج از حساب' %}">
+                        <span aria-hidden="true">↵</span>
+                    </a>
+                </div>
+            </div>
+        </header>
+    {% endif %}
+
+    <div class="account-app__layout {% if hide_account_chrome %}account-app__layout--compact{% endif %}">
+        {% if not hide_account_chrome %}
+            <aside class="account-app__sidebar">
+                {% include 'includes/account_sidebar.html' with active_section=active_section|default:'dashboard' %}
+            </aside>
+        {% endif %}
+
+        <section class="account-app__content {% if hide_account_chrome %}account-app__content--compact{% endif %}">
+            {% if messages %}
+                <div class="account-toast-stack" role="status" aria-live="polite">
+                    {% for message in messages %}
+                        <div class="account-toast {% if message.tags %}account-toast--{{ message.tags }}{% endif %}" data-account-toast>
+                            <span>{{ message }}</span>
+                            <button type="button" class="account-toast__close" data-account-toast-close aria-label="{% trans 'بستن' %}">×</button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            {% block account_content %}{% endblock %}
+        </section>
+    </div>
+
+    {% if not hide_account_chrome %}
+        {% include 'includes/account_bottom_nav.html' with active_section=active_section|default:'dashboard' %}
+    {% endif %}
+</main>
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script src="{% static 'js/account-user.js' %}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll("[data-account-toast]").forEach(function (toast) {
+                var timer = window.setTimeout(function () {
+                    toast.classList.add("is-dismissed");
+                }, 5000);
+                var closeBtn = toast.querySelector("[data-account-toast-close]");
+                if (closeBtn) {
+                    closeBtn.addEventListener("click", function () {
+                        window.clearTimeout(timer);
+                        toast.classList.add("is-dismissed");
+                    });
+                }
+            });
+        });
+    </script>
+{% endblock %}

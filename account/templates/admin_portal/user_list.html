@@ -1,0 +1,71 @@
+{% extends 'admin_portal/_shell.html' %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}لیست کاربران | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block admin_content %}
+<section class="admin-screen admin-search-screen">
+    <header class="admin-screen__header admin-screen__header--split">
+        <h1 class="admin-screen__title">{% trans 'لیست کاربران' %}</h1>
+    </header>
+
+    <a href="{% url 'register:admin_user_add' %}" class="admin-primary-btn">+ {% trans 'افزودن کاربر جدید' %}</a>
+    <a href="{% url 'register:admin_coach_management' %}" class="admin-secondary-btn">{% trans 'مدیریت مربیان' %}</a>
+
+    <form method="get" class="admin-search-form">
+        {{ form.query }}
+        {% if current_sort %}<input type="hidden" name="sort" value="{{ current_sort }}">{% endif %}
+        <button type="submit" class="admin-primary-btn">{% trans 'جست و جو' %}</button>
+    </form>
+
+    <nav class="admin-sort-bar" aria-label="{% trans 'مرتب‌سازی' %}">
+        <a href="?query={{ search_query|urlencode }}&sort=fullname" class="admin-sort-bar__item {% if current_sort == 'fullname' %}is-active{% endif %}">{% trans 'نام' %}</a>
+        <a href="?query={{ search_query|urlencode }}&sort=-id" class="admin-sort-bar__item {% if current_sort == '-id' %}is-active{% endif %}">{% trans 'تاریخ ثبت‌نام' %}</a>
+        <a href="?query={{ search_query|urlencode }}&sort=coach" class="admin-sort-bar__item {% if current_sort == 'coach' %}is-active{% endif %}">{% trans 'مربی' %}</a>
+    </nav>
+
+    <section class="admin-result-list admin-result-list--grid">
+        {% for client in clients %}
+            <article class="admin-result-card">
+                <div class="admin-result-card__meta">
+                    <span class="admin-result-card__avatar" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="8.5" r="3.5" stroke="currentColor" stroke-width="1.8"/>
+                            <path d="M6 19V17.5C6 15.6 7.6 14 9.5 14H14.5C16.4 14 18 15.6 18 17.5V19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                    <div>
+                        <strong>{{ client.fullname }}{% if client.is_admin %} · {% trans 'ادمین' %}{% endif %}</strong>
+                        <span>{{ client.phone }} — {% if client.coach %}{{ client.coach.fullname }}{% else %}{% trans 'بدون مربی' %}{% endif %}</span>
+                    </div>
+                </div>
+                <div class="admin-result-card__actions">
+                    <a href="{% url 'register:admin_user_hub' client.id %}" class="admin-primary-btn admin-primary-btn--small">{% trans 'مشاهده اطلاعات' %}</a>
+                    {% if not client.is_admin %}
+                    <form method="post" action="{% url 'register:admin_user_delete' client.id %}" onsubmit="return confirm('{% trans "آیا از حذف این کاربر اطمینان دارید؟ این عمل غیرقابل بازگشت است." %}');">
+                        {% csrf_token %}
+                        <button type="submit" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'حذف' %}</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </article>
+        {% empty %}
+            <article class="admin-empty admin-empty--center">
+                <strong>{% trans 'کاربری یافت نشد.' %}</strong>
+            </article>
+        {% endfor %}
+    </section>
+
+    {% if is_paginated %}
+        <nav class="admin-pagination" aria-label="{% trans 'صفحه‌بندی' %}">
+            {% if page_obj.has_previous %}
+                <a href="?query={{ search_query|urlencode }}&sort={{ current_sort }}&page={{ page_obj.previous_page_number }}" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'قبلی' %}</a>
+            {% endif %}
+            <span class="admin-pagination__status">{% blocktrans with current=page_obj.number total=paginator.num_pages %}صفحه {{ current }} از {{ total }}{% endblocktrans %}</span>
+            {% if page_obj.has_next %}
+                <a href="?query={{ search_query|urlencode }}&sort={{ current_sort }}&page={{ page_obj.next_page_number }}" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'بعدی' %}</a>
+            {% endif %}
+        </nav>
+    {% endif %}
+</section>
+{% endblock %}

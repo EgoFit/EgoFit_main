@@ -1,0 +1,56 @@
+{% load static %}
+{% load my_tags %}
+{% load i18n %}
+
+<div class="modern-blog-grid modern-blog-grid--compact">
+    {% for blog in blog %}
+        <article class="modern-blog-card modern-blog-card--compact">
+            <div class="modern-blog-card__media">
+                <a href="{% url 'home:article_detail' blog.slug %}" class="block">
+                    <img src="{{ blog.image|public_media_url }}" alt="{{ blog.title }}" loading="lazy">
+                </a>
+            </div>
+
+            <div class="modern-blog-card__body">
+                <div class="space-y-3">
+                    <a href="{% url 'home:blog' %}" class="pill-link pill-link--compact">
+                        <span class="font-bold text-xs">{{ blog.language_kinds }}</span>
+                    </a>
+
+                    <h2 class="modern-blog-card__title">
+                        <a href="{% url 'home:article_detail' blog.slug %}" class="transition-colors hover:text-primary">
+                            {{ blog.title }}
+                        </a>
+                    </h2>
+                    {% if blog.article_excerpt %}
+                        <div class="modern-blog-card__excerpt modern-blog-card__excerpt--block line-clamp-2">{{ blog.article_excerpt|linebreaksbr }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="flex items-center justify-between gap-4 flex-wrap">
+                    <div class="modern-blog-card__author">
+                        <img src="{{ blog.author_image|public_media_url }}" alt="{{ blog.author }}" loading="lazy">
+                        <span class="font-bold text-sm text-foreground">{{ blog.author }}</span>
+                    </div>
+
+                    <div class="modern-blog-card__meta modern-blog-card__meta--dense">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                             class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                        </svg>
+                        <span class="font-semibold text-xs">{% blocktrans with reading_time=blog.reading_time %}زمان مطالعه {{ reading_time }} دقیقه{% endblocktrans %}</span>
+                    </div>
+                </div>
+            </div>
+        </article>
+    {% empty %}
+        <div class="modern-blog-card modern-blog-card--compact">
+            <div class="empty-state modern-surface">
+                <h3>{% trans 'هنوز مقاله‌ای برای نمایش وجود ندارد' %}</h3>
+                <p>{% trans 'پس از انتشار مقالات جدید، این بخش به‌روزرسانی می‌شود.' %}</p>
+            </div>
+        </div>
+    {% endfor %}
+</div>

@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load my_tags %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}سبد خرید | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block content %}
+<main class="page-section cart-page">
+    <div class="shell-container">
+        <section class="cart-hero modern-surface" data-reveal>
+            <div class="cart-hero__copy">
+                <span class="eyebrow">{% trans 'سبد خرید' %}</span>
+                <h1>{% trans 'آماده نهایی‌سازی مسیر آموزشی شما' %}</h1>
+                <p>{% blocktrans with counter=cart_item_count %}{{ counter }} دوره در سبد خرید قرار دارد. قبل از پرداخت، جزئیات دوره‌ها و مبلغ نهایی را بررسی کنید.{% endblocktrans %}</p>
+            </div>
+            <div class="cart-hero__meta">
+                <span>{% trans 'پرداخت امن' %}</span>
+                <strong>{% blocktrans with price=cart.total_price %}{{ price }} تومان{% endblocktrans %}</strong>
+                <small>{% trans 'مبلغ قابل پرداخت' %}</small>
+            </div>
+        </section>
+
+        <section class="cart-layout">
+            <div class="cart-items-stack">
+                {% for item in cart %}
+                    <article class="cart-item-card modern-surface" data-reveal>
+                        <a href="{% url 'home:course_detail' item.product.id %}" class="cart-item-card__media">
+                            <img src="{{ item.product.image|public_media_url }}" alt="{{ item.product.title }}" loading="lazy">
+                        </a>
+
+                        <div class="cart-item-card__body">
+                            <div class="cart-item-card__top">
+                                <div class="status-row">
+                                    <span class="status-dot {% if item.product.is_compeleted %}is-success{% else %}is-warning{% endif %}"></span>
+                                    <span>{% if item.product.is_compeleted %}{% trans 'تکمیل شده' %}{% else %}{% trans 'در حال تکمیل' %}{% endif %}</span>
+                                </div>
+                                {% if item.product.language_kinds %}
+                                    <span class="cart-chip">{{ item.product.language_kinds }}</span>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                <h2>
+                                    <a href="{% url 'home:course_detail' item.product.id %}">{{ item.product.title }}</a>
+                                </h2>
+                                <p>{% blocktrans with author=item.product.author %}مدرس: {{ author }}{% endblocktrans %}</p>
+                            </div>
+
+                            <div class="cart-item-card__footer">
+                                <div class="cart-price-block">
+                                    <span>{% trans 'قیمت دوره' %}</span>
+                                    <strong>{% blocktrans with price=item.price %}{{ price }} تومان{% endblocktrans %}</strong>
+                                </div>
+                                <form method="post" action="{% url 'cart:cart_delete' item.unique_id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="secondary-action is-danger">{% trans 'حذف از سبد' %}</button>
+                                </form>
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+
+            <aside class="cart-summary-card modern-surface" data-reveal>
+                <div class="cart-summary-card__header">
+                    <span class="eyebrow">{% trans 'خلاصه سفارش' %}</span>
+                    <h2>{% trans 'پرداخت نهایی' %}</h2>
+                    <p>{% trans 'سفارش بعد از تایید شما ساخته می‌شود و سپس وارد مرحله پرداخت خواهید شد.' %}</p>
+                </div>
+
+                <div class="cart-summary-list">
+                    <div class="summary-row">
+                        <span>{% trans 'تعداد دوره' %}</span>
+                        <strong>{{ cart_item_count }}</strong>
+                    </div>
+                    <div class="summary-row">
+                        <span>{% trans 'مبلغ کل' %}</span>
+                        <strong>{% blocktrans with price=cart.total_price %}{{ price }} تومان{% endblocktrans %}</strong>
+                    </div>
+                    <div class="cart-security-note">
+                        <span class="status-dot is-success"></span>
+                        <span>{% trans 'پرداخت از مسیر امن و قابل پیگیری انجام می‌شود.' %}</span>
+                    </div>
+                </div>
+
+                <form method="post" action="{% url 'cart:order_create' %}" data-submit-loading>
+                    {% csrf_token %}
+                    <button type="submit" class="cta-primary cta-primary--strong w-full">{% trans 'ادامه فرایند خرید' %}</button>
+                </form>
+                <a href="{% url 'home:series' %}" class="secondary-action w-full">{% trans 'افزودن دوره‌های بیشتر' %}</a>
+            </aside>
+        </section>
+    </div>
+</main>
+{% endblock %}

@@ -1,0 +1,121 @@
+
+{% include 'includes/header_reference.html' %}
+{% include 'includes/header.html' %}
+    <!-- start mega menu -->
+
+    <!-- end breadcroumb -->
+
+    <!-- start content -->
+
+    <div class="content">
+        <div class="container-fluid">
+            <div class="container-fluid">
+                <style>
+                    .line-step-box.complete:nth-child(1):before {
+                        width: 100%;
+                    }
+                    .line-step-box.complete:nth-child(2):before {
+                        width: 100%;
+                    }
+                </style>
+
+                <div class="line-step-container d-sm-block d-none">
+                    <div class="line-step">
+                        <div class="line-step-boxs">
+                            <div class="line-step-box complete">
+                                <a href="cart.html">
+                                    <p>سبد خرید</p>
+                                    <div class="icon">
+                                        1
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="line-step-box complete">
+                                <a href="checkout.html">
+                                    <p>جزییات پرداخت</p>
+                                    <div class="icon">
+                                        2
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="line-step-box">
+                                <a href="cart.html">
+                                    <p>تکمیل سفارش</p>
+                                    <div class="icon">
+                                        3
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container-fluid">
+                    <div class="payment-status fail-pay">
+                    <div class="icon" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
+                            <path d="M12 2.25A9.75 9.75 0 1 0 21.75 12 9.76 9.76 0 0 0 12 2.25Zm0 18A8.25 8.25 0 1 1 20.25 12 8.26 8.26 0 0 1 12 20.25Zm-3.75-9A1.125 1.125 0 1 0 7.125 10.125 1.126 1.126 0 0 0 8.25 11.25Zm7.5 0a1.125 1.125 0 1 0-1.125-1.125A1.126 1.126 0 0 0 15.75 11.25Zm-7.934 5.298a.75.75 0 0 0 1.048-.138 3.75 3.75 0 0 1 6.022 0 .75.75 0 1 0 1.186-.91 5.25 5.25 0 0 0-8.394 0 .75.75 0 0 0 .138 1.048Z"/>
+                        </svg>
+                    </div>
+                    <div class="title">
+                        <h3>پرداخت شما ناموفق بود</h3>
+                        <p>دوباره تلاش کنید</p>
+                    </div>
+                    <div class="pay-table">
+                        <div class="pay-table-title">
+                            <h5 class="font-18">مشخصات پرداختی</h5>
+                        </div>
+                        <div class="pay-table-item">
+                            <h6 class="font-16">درگاه پرداختی</h6>
+                            <p class="mb-0">بانک ملت</p>
+                        </div>
+                        <div class="pay-table-item">
+                            <h6 class="font-16">تاریخ</h6>
+                            <p class="mb-0">1402/04/01</p>
+                        </div>
+                        <div class="pay-table-item">
+                            <h6 class="font-16">کد تراکنش</h6>
+                            <p class="mb-0">abG856f23</p>
+                        </div>
+                        <div class="pay-table-item">
+                            <h6 class="font-16 text-danger">مقدار تخفیف</h6>
+                            <p class="mb-0 text-danger">500,000 تومان</p>
+                        </div>
+                        <div class="pay-table-item">
+                            <h6 class="font-16">مقدار پرداختی</h6>
+                            <p class="mb-0">500,000 تومان</p>
+                        </div>
+                    </div>
+                    <div class="pay-table">
+                        <div class="pay-table-title">
+                            <h5 class="font-18">وضعیت سفارش</h5>
+                        </div>
+                        <div class="pay-table-item">
+                            <h6 class="font-16">شماره سفارش</h6>
+                            <p class="mb-0">45320235</p>
+                        </div>
+                        <div class="pay-table-item">
+                            <h6 class="font-16">قیمت کل</h6>
+                            <p class="mb-0">75,000,000 تومان</p>
+                        </div>
+                        <div class="pay-table-item">
+                            <h6 class="font-16">وضعیت پرداخت</h6>
+                            <p class="mb-0 text-danger">پرداخت نشده</p>
+                        </div>
+                        <div class="pay-table-item">
+                            <h6 class="font-16 text-danger">وضعیت سفارش</h6>
+                            <p class="mb-0 text-danger">ناموفق</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center my-4">
+                    <a href="" class="btn d-inline-block main-color-three-bg mx-auto">پرداخت مجدد</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% include 'includes/footer.html' %}
+    <!-- end content -->
+
+
+

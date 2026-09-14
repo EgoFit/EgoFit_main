@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{{ error_title }} | {% trans 'ایگوفیت' %}{% endblock %}
+{% block page_wrapper_class %}bg-secondary{% endblock %}
+
+{% block content %}
+<main class="page-section error-page">
+    <div class="shell-container">
+        <section class="error-shell modern-surface" data-reveal>
+            <div class="error-shell__content">
+                <span class="eyebrow">{{ error_label }}</span>
+                <h1>{{ error_title }}</h1>
+                <p>{{ error_message }}</p>
+
+                <div class="error-shell__actions">
+                    <a href="{% url 'home:home' %}" class="cta-primary cta-primary--strong">{% trans 'بازگشت به صفحه اصلی' %}</a>
+                    <a href="{% url 'home:series' %}" class="cta-secondary cta-secondary--soft">{% trans 'مشاهده دوره‌ها' %}</a>
+                </div>
+
+                <div class="error-shell__chips">
+                    <span>{% trans 'مسیر یادگیری' %}</span>
+                    <span>{% trans 'آرشیو دوره‌ها' %}</span>
+                    <span>{% trans 'بلاگ آموزشی' %}</span>
+                </div>
+            </div>
+
+            <div class="error-shell__visual" aria-hidden="true">
+                <div class="error-orb error-orb--lg"></div>
+                <div class="error-orb error-orb--sm"></div>
+                <div class="error-code">{{ error_code }}</div>
+            </div>
+        </section>
+    </div>
+</main>
+{% endblock %}

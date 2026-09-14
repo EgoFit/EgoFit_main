@@ -1,0 +1,82 @@
+{% extends 'account/_auth_mobile_shell.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}تایید کد ورود | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block auth_content %}
+<section class="auth-mobile-screen">
+    <div class="auth-mobile-toolbar">
+        <a href="{% url 'register:register' %}" class="auth-mobile-back" aria-label="{% trans 'بازگشت به ورود' %}">→</a>
+    </div>
+
+    <div class="auth-mobile-logo-wrap">
+        <img src="{% static 'images/logoimageego.webp' %}" alt="{% trans 'ایگوفیت' %}" class="auth-mobile-logo">
+    </div>
+
+    <section class="auth-mobile-copy">
+        <p class="auth-mobile-eyebrow">{% trans 'تایید هویت' %}</p>
+        <h1 class="auth-mobile-title">{% trans 'کد تایید را وارد کنید' %}</h1>
+        {% if verification_phone %}
+            <div class="auth-mobile-phone-row">
+                <p class="auth-mobile-description auth-mobile-description--phone">
+                    {% blocktrans %}کد ۵ رقمی به شماره{% endblocktrans %}
+                    <strong class="auth-mobile-phone" dir="ltr">{{ verification_phone }}</strong>
+                    {% trans 'ارسال شد.' %}
+                </p>
+                <a href="{% url 'register:register' %}" class="auth-mobile-edit-phone">{% trans 'ویرایش شماره' %}</a>
+            </div>
+        {% else %}
+            <p class="auth-mobile-description">{% trans 'کد ارسال‌شده به شماره موبایل خود را وارد کنید.' %}</p>
+        {% endif %}
+    </section>
+
+    <section class="auth-mobile-form">
+        {% if messages %}
+            <div class="form-messages" role="status" aria-live="polite">
+                {% for message in messages %}
+                    <div class="form-message {% if message.tags %}is-{{ message.tags }}{% endif %}" role="alert">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div
+            class="auth-otp-timers"
+            data-otp-timers
+            data-expires-in="{{ otp_expires_in_seconds|default:300 }}"
+            data-cooldown-remaining="{{ otp_cooldown_remaining_seconds|default:0 }}"
+            data-cooldown-total="{{ otp_resend_cooldown_seconds|default:120 }}"
+        >
+            <p class="auth-otp-timer" data-otp-expiry>
+                {% trans 'اعتبار کد:' %} <span data-otp-expiry-value>05:00</span>
+            </p>
+            <p class="auth-otp-timer auth-otp-timer--resend" data-otp-resend {% if otp_can_resend %}hidden{% endif %}>
+                {% trans 'ارسال مجدد تا' %} <span data-otp-resend-value>02:00</span>
+            </p>
+        </div>
+
+        <form method="post" class="stack-form auth-mobile-form__stack" novalidate>
+            {% csrf_token %}
+            <div class="field-group">
+                {% trans 'کد تایید' as default_code_label %}
+                <label for="id_code">{{ form.code.label|default:default_code_label }}</label>
+                {{ form.code }}
+                {% if form.code.errors %}
+                    <div class="form-message is-error" role="alert">{{ form.code.errors|striptags }}</div>
+                {% endif %}
+            </div>
+
+            <a
+                href="{% if token %}{% url 'register:resend_otp' %}?token={{ token }}{% else %}{% url 'register:register' %}{% endif %}"
+                class="auth-mobile-secondary{% if not otp_can_resend %} is-disabled{% endif %}"
+                data-otp-resend-link
+                {% if not otp_can_resend %}aria-disabled="true" tabindex="-1"{% endif %}
+            >
+                {% trans 'دریافت مجدد کد' %}
+            </a>
+
+            <button type="submit" class="auth-mobile-primary">{% trans 'تایید و ادامه' %}</button>
+        </form>
+    </section>
+</section>
+{% endblock %}

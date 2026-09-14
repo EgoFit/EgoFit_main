@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block skip_link %}{% endblock %}
+
+{% block public_ui_css %}{% endblock %}
+{% block public_ui_js %}{% endblock %}
+{% block public_media_css %}{% endblock %}
+{% block public_media_js %}{% endblock %}
+
+{% block body_class %}admin-dashboard{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/account.css' %}">
+    <link rel="stylesheet" href="{% static 'css/admin-portal.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard-polish.css' %}">
+    <link rel="stylesheet" href="{% static 'css/account-mobile.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="admin-app {% if hide_admin_chrome %}admin-app--compact{% endif %}">
+    {% if not hide_admin_chrome %}
+        <header class="dashboard-glass-header dashboard-glass-header--admin" aria-label="{% trans 'سربرگ پنل ادمین' %}">
+            <div class="dashboard-glass-header__inner">
+                <a href="{% url 'home:home' %}" class="dashboard-glass-header__brand" aria-label="{% trans 'بازگشت به صفحه اصلی' %}">
+                    <span class="dashboard-glass-header__logo" aria-hidden="true">
+                        <img src="{% static 'images/logoimageego.webp' %}" alt="">
+                    </span>
+                    <span class="dashboard-glass-header__brand-copy">
+                        <span>{% trans 'ایگوفیت' %}</span>
+                        <strong>{% trans 'پنل ادمین' %}</strong>
+                    </span>
+                </a>
+
+                <div class="dashboard-glass-header__title">
+                    <span>{% trans 'مدیریت کاربران' %}</span>
+                    {% trans 'کاربر انتخاب‌شده' as default_target_user_name %}
+                    <h1>{% if target_user %}{{ target_user.fullname|default:default_target_user_name }}{% else %}{% trans 'جستجو و مدیریت' %}{% endif %}</h1>
+                </div>
+
+                <div class="dashboard-glass-header__actions">
+                    <a href="{% url 'register:admin_search' %}" class="dashboard-glass-header__action">{% trans 'جستجو' %}</a>
+                    <a href="{% url 'register:admin_password_change' %}" class="dashboard-glass-header__action">{% trans 'رمز عبور' %}</a>
+                    {% include 'includes/theme_toggle.html' %}
+                    <a href="{% url 'register:logout' %}" class="dashboard-glass-header__icon-action" aria-label="{% trans 'خروج از پنل' %}">
+                        <span aria-hidden="true">↵</span>
+                    </a>
+                </div>
+            </div>
+        </header>
+        {% include 'admin_portal/includes/bottom_nav.html' with active_section=active_section|default:'search' target_user=target_user %}
+    {% endif %}
+
+    <div class="admin-app__layout {% if hide_admin_chrome %}admin-app__layout--compact{% endif %}">
+        {% if not hide_admin_chrome %}
+            <aside class="admin-app__sidebar">
+                {% include 'admin_portal/includes/sidebar_nav.html' with active_section=active_section|default:'search' target_user=target_user %}
+            </aside>
+        {% endif %}
+
+        <section class="admin-app__content">
+            {% include 'admin_portal/includes/toast_stack.html' %}
+            {% block admin_content %}{% endblock %}
+        </section>
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script src="{% static 'js/account-user.js' %}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll("[data-admin-toast]").forEach(function (toast) {
+                var timer = window.setTimeout(function () {
+                    toast.classList.add("is-dismissed");
+                }, 5000);
+                var closeBtn = toast.querySelector("[data-admin-toast-close]");
+                if (closeBtn) {
+                    closeBtn.addEventListener("click", function () {
+                        window.clearTimeout(timer);
+                        toast.classList.add("is-dismissed");
+                    });
+                }
+            });
+        });
+    </script>
+{% endblock %}

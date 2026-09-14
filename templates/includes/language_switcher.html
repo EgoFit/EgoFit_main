@@ -1,0 +1,22 @@
+{% load i18n %}
+{% if LANGUAGE_CODE == 'en' %}
+    {% trans 'تغییر زبان به فارسی' as switch_label %}
+    <form action="{% url 'set_language' %}" method="post" class="modern-lang-toggle">
+        {% csrf_token %}
+        <input type="hidden" name="language" value="fa">
+        <input type="hidden" name="next" value="{{ request.path }}">
+        <button type="submit" class="modern-icon-btn modern-icon-btn--wide" aria-label="{{ switch_label }}">
+            <span class="font-semibold text-xs">FA</span>
+        </button>
+    </form>
+{% else %}
+    {% trans 'تغییر زبان به انگلیسی' as switch_label %}
+    <form action="{% url 'set_language' %}" method="post" class="modern-lang-toggle">
+        {% csrf_token %}
+        <input type="hidden" name="language" value="en">
+        <input type="hidden" name="next" value="{{ request.path }}">
+        <button type="submit" class="modern-icon-btn modern-icon-btn--wide" aria-label="{{ switch_label }}">
+            <span class="font-semibold text-xs">EN</span>
+        </button>
+    </form>
+{% endif %}

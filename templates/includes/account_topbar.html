@@ -1,0 +1,21 @@
+<header class="account-topbar" aria-label="Account navigation">
+    <div class="account-topbar__inner">
+        <button
+            type="button"
+            class="account-topbar__back"
+            onclick="if (window.history.length > 1) { window.history.back(); } else { window.location.href = '{% url 'home:home' %}'; }"
+            aria-label="بازگشت"
+        >
+            <span aria-hidden="true">←</span>
+        </button>
+
+        <div class="account-topbar__title-wrap">
+            <p class="account-topbar__eyebrow">حساب کاربری</p>
+            <h1 class="account-topbar__title">{{ account_title|default:"پروفایل" }}</h1>
+        </div>
+
+        <a href="{% url 'home:home' %}" class="account-topbar__home" aria-label="رفتن به صفحه اصلی">
+            <span aria-hidden="true">⌂</span>
+        </a>
+    </div>
+</header>

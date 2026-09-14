@@ -1,0 +1,148 @@
+{% extends 'account/_shell.html' %}
+{% load static %}
+{% load my_tags %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}مربی شما | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block account_content %}
+<section class="profile-screen">
+    <header class="profile-screen__header">
+        <h2 class="profile-screen__title">{% trans 'مربی شما' %}</h2>
+    </header>
+
+    {% if messages %}
+        <div class="form-messages mb-4">
+            {% for message in messages %}
+                <div class="form-message {% if message.tags %}is-{{ message.tags }}{% endif %}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if coach %}
+        <article class="profile-identity-card">
+            <div class="profile-identity-card__meta">
+                <span class="profile-identity-card__label">{% trans 'مربی اختصاصی شما' %}</span>
+                <strong>{{ coach.display_name|default:coach.fullname }}</strong>
+                <span class="profile-identity-card__phone">{{ coach.phone }}</span>
+            </div>
+            <div class="profile-identity-card__avatar" aria-hidden="true">
+                {% if coach.profile_picture %}
+                    <img src="{{ coach.profile_picture|public_media_url }}" alt="{{ coach.fullname }}" loading="lazy">
+                {% else %}
+                    <img src="{% static 'images/avatars/download.png' %}" alt="{{ coach.fullname }}" loading="lazy">
+                {% endif %}
+            </div>
+        </article>
+    {% else %}
+        <article class="analysis-empty">
+            <strong>{% trans 'هنوز مربی اختصاصی ثبت نشده است.' %}</strong>
+            <p>{% trans 'وقتی مربی برای حساب شما تعریف شود، اطلاعات و دسترسی‌های او در این بخش نمایش داده می‌شود.' %}</p>
+        </article>
+    {% endif %}
+
+    <section class="profile-panel-card">
+        <h2 class="profile-screen__title">{% trans 'درخواست برنامه از مربی' %}</h2>
+        <p class="profile-screen__lead">{% trans 'با ثبت این فرم، درخواست شما برای مربی ارسال می‌شود.' %}</p>
+
+        {% if pending_request %}
+            <div class="coach-edit-banner" role="status">
+                <span aria-hidden="true">✎</span>
+                <p>{% blocktrans with created_at=pending_request.created_at|date:"Y/m/d" %}یک درخواست در انتظار بررسی دارید (ثبت‌شده در {{ created_at }}). تا پیش از بررسی مربی می‌توانید آن را ویرایش کنید.{% endblocktrans %}</p>
+            </div>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data" class="coach-request-form" data-coach-form>
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            <fieldset class="coach-fieldset">
+                <legend>{% trans 'نوع برنامه' %}</legend>
+                <div class="field-group">
+                    <label for="{{ form.sessions_per_week.id_for_label }}">{{ form.sessions_per_week.label }}</label>
+                    {{ form.sessions_per_week }}
+                    {{ form.sessions_per_week.errors }}
+                </div>
+                <div class="coach-check-row">
+                    <label class="coach-check"><input type="checkbox" name="wants_diet" {% if form.wants_diet.value %}checked{% endif %}> <span>{{ form.fields.wants_diet.label }}</span></label>
+                    <label class="coach-check"><input type="checkbox" name="wants_workout" {% if form.wants_workout.value %}checked{% endif %}> <span>{{ form.fields.wants_workout.label }}</span></label>
+                </div>
+            </fieldset>
+
+            <fieldset class="coach-fieldset">
+                <legend>{% trans 'قد و وزن' %}</legend>
+                <div class="coach-measure-grid coach-measure-grid--pair">
+                    {% include 'account/_coach_field.html' with field=form.height_cm %}
+                    {% include 'account/_coach_field.html' with field=form.weight_kg %}
+                </div>
+            </fieldset>
+
+            <fieldset class="coach-fieldset">
+                <legend>{% trans 'دورسنجی (سانتی‌متر)' %}</legend>
+                <p class="coach-fieldset__hint">{% trans 'فیلدهای ستاره‌دار اجباری هستند.' %}</p>
+                <div class="coach-measure-grid">
+                    {% include 'account/_coach_field.html' with field=form.wrist_cm %}
+                    {% include 'account/_coach_field.html' with field=form.forearm_cm %}
+                    {% include 'account/_coach_field.html' with field=form.arm_rest_cm %}
+                    {% include 'account/_coach_field.html' with field=form.arm_flexed_cm %}
+                    {% include 'account/_coach_field.html' with field=form.chest_cm %}
+                    {% include 'account/_coach_field.html' with field=form.shoulders_cm %}
+                    {% include 'account/_coach_field.html' with field=form.waist_cm %}
+                    {% include 'account/_coach_field.html' with field=form.abdomen_cm %}
+                    {% include 'account/_coach_field.html' with field=form.hips_cm %}
+                    {% include 'account/_coach_field.html' with field=form.thigh_cm %}
+                    {% include 'account/_coach_field.html' with field=form.calf_cm %}
+                    {% include 'account/_coach_field.html' with field=form.thigh_left_cm %}
+                    {% include 'account/_coach_field.html' with field=form.calf_left_cm %}
+                </div>
+            </fieldset>
+
+            <fieldset class="coach-fieldset">
+                <legend>{% trans 'سلامتی و محدودیت‌ها' %}</legend>
+                <div class="field-group">
+                    <label for="{{ form.pain_notes.id_for_label }}">{{ form.pain_notes.label }}</label>
+                    {{ form.pain_notes }}
+                </div>
+                <div class="field-group">
+                    <label for="{{ form.illness_notes.id_for_label }}">{{ form.illness_notes.label }}</label>
+                    {{ form.illness_notes }}
+                </div>
+                <div class="field-group">
+                    <label for="{{ form.diet_restrictions.id_for_label }}">{{ form.diet_restrictions.label }}</label>
+                    {{ form.diet_restrictions }}
+                </div>
+            </fieldset>
+
+            <fieldset class="coach-fieldset">
+                <legend>{% trans 'فایل‌های پیوست' %}</legend>
+                <label class="coach-dropzone" for="coach-attachments">
+                    <span class="coach-dropzone__icon" aria-hidden="true">⬆</span>
+                    <span class="coach-dropzone__title">{% trans 'افزودن عکس، ویدیو، صدا یا PDF' %}</span>
+                    <span class="coach-dropzone__hint">{% trans 'می‌توانید چند فایل را هم‌زمان انتخاب کنید — حداکثر ۱۵ مگابایت برای هر فایل.' %}</span>
+                    <input id="coach-attachments" type="file" name="attachments" multiple
+                           accept="image/*,video/*,audio/*,application/pdf" data-coach-file-input>
+                </label>
+                <ul class="coach-file-chips" data-coach-file-chips></ul>
+
+                {% if attachments %}
+                    <div class="coach-attachments">
+                        <span class="coach-attachments__title">{% trans 'فایل‌های ثبت‌شده' %}</span>
+                        <ul class="coach-attachments__list">
+                            {% for attachment in attachments %}
+                                <li><a href="{{ attachment.file|public_media_url }}" target="_blank" rel="noopener">{{ attachment.file.name|cut:'coach_requests/' }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            </fieldset>
+
+            <div class="form-actions coach-actions">
+                <button type="submit" class="cta-primary coach-submit-btn">
+                    <span aria-hidden="true">➜</span>
+                    <span>{% if pending_request %}{% trans 'به‌روزرسانی درخواست' %}{% else %}{% trans 'ارسال درخواست' %}{% endif %}</span>
+                </button>
+            </div>
+        </form>
+    </section>
+</section>
+{% endblock %}

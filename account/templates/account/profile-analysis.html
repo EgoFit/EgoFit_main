@@ -1,0 +1,205 @@
+{% extends 'account/_shell.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% blocktrans %}آنالیز | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block account_content %}
+<section class="analysis-screen analysis-dashboard" data-analysis-root data-jalali-year="{{ analysis_end_date|slice:':4'|default:'1404' }}">
+    <header class="analysis-screen__header">
+        <h2 class="analysis-screen__title">{% trans 'آنالیز بدنی' %}</h2>
+        {% if analysis_formula_used %}
+            <span class="analysis-formula-badge">{% blocktrans with formula=analysis_formula_used %}فرمول: {{ formula }}{% endblocktrans %}</span>
+        {% endif %}
+    </header>
+
+    {% if not analysis_has_data %}
+        <article class="analysis-empty" data-analysis-empty>
+            <strong>{% trans 'نتیجه‌ای یافت نشد.' %}</strong>
+            <p>{% trans 'برای نمایش گزارش، حداقل وزن و قد را در پروفایل ثبت کنید.' %}</p>
+        </article>
+    {% else %}
+
+        {% if analysis_stat_cards %}
+        <p class="analysis-sec-title">{% trans 'اندازه‌گیری‌های بدنی' %}</p>
+        <div class="analysis-stats-grid">
+            {% for card in analysis_stat_cards %}
+                <article class="analysis-stat-card">
+                    <span class="analysis-stat-card__icon" aria-hidden="true">{% include 'includes/profile_metric_icon.html' with icon=card.icon %}</span>
+                    <span class="analysis-stat-card__label">{{ card.label }}</span>
+                    <span class="analysis-stat-card__value">{{ card.value }}<span class="analysis-stat-card__unit"> {{ card.unit }}</span></span>
+                </article>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="analysis-gauge-grid">
+            <article class="analysis-gauge-card">
+                <span class="analysis-gauge-card__title">{% trans 'شاخص توده بدنی (BMI)' %}</span>
+                <strong class="analysis-gauge-card__num">{{ analysis_gauges.bmi.value|default:'—' }}</strong>
+                <span class="analysis-gauge-card__cat">{{ analysis_gauges.bmi.category|default:'' }}</span>
+                <div class="analysis-gauge-bar analysis-gauge-bar--bmi">
+                    <i class="analysis-gauge-bar__ptr" style="inset-inline-start: {{ analysis_gauges.bmi.pct }}%;"></i>
+                </div>
+                <div class="analysis-gauge-bar__labs">
+                    <span>{% trans 'کمبود وزن' %}</span><span>{% trans 'نرمال' %}</span><span>{% trans 'اضافه وزن' %}</span><span>{% trans 'چاق' %}</span>
+                </div>
+            </article>
+            <article class="analysis-gauge-card">
+                <span class="analysis-gauge-card__title">{% trans 'نسبت کمر به باسن (WHR)' %}</span>
+                <strong class="analysis-gauge-card__num">{{ analysis_gauges.whr.value|default:'—' }}</strong>
+                <span class="analysis-gauge-card__cat">{{ analysis_gauges.whr.status|default:'' }}</span>
+                <div class="analysis-gauge-bar analysis-gauge-bar--whr">
+                    <i class="analysis-gauge-bar__ptr" style="inset-inline-start: {{ analysis_gauges.whr.pct }}%;"></i>
+                </div>
+                <div class="analysis-gauge-bar__labs">
+                    <span>{% trans 'مطلوب' %}</span><span>{% trans 'متوسط' %}</span><span>{% trans 'پرخطر' %}</span>
+                </div>
+            </article>
+        </div>
+
+        {% if analysis_dates %}
+        <form class="analysis-datepicker" method="get" data-analysis-date-form>
+            <label class="analysis-datepicker__label" for="analysis-date-select">{% trans 'تاریخ آنالیز' %}</label>
+            <select class="analysis-trend-select" id="analysis-date-select" name="date" data-analysis-date-select onchange="this.form.submit()" dir="ltr">
+                {% for d in analysis_dates %}
+                    <option value="{{ d.value }}" {% if d.value == analysis_selected_date %}selected{% endif %}>{{ d.label }}</option>
+                {% endfor %}
+            </select>
+            <noscript><button type="submit" class="analysis-datepicker__go">{% trans 'نمایش' %}</button></noscript>
+        </form>
+        {% endif %}
+
+        {% if analysis_result_tiles %}
+        <p class="analysis-sec-title">{% trans 'نتایج محاسبات' %}</p>
+        <section class="analysis-result-grid">
+            {% for tile in analysis_result_tiles %}
+                <article class="analysis-result-tile analysis-result-tile--{{ tile.tone }}">
+                    <span class="analysis-result-tile__label">{{ tile.label }}</span>
+                    <strong class="analysis-result-tile__value">{{ tile.value }}{% if tile.unit %}<small>{{ tile.unit }}</small>{% endif %}</strong>
+                    {% if tile.status %}<span class="analysis-result-tile__status">{{ tile.status }}</span>{% endif %}
+                </article>
+            {% endfor %}
+        </section>
+        {% endif %}
+
+        {% if analysis_body_composition.calories_for_loss or analysis_body_composition.calories_for_gain or analysis_body_composition.protein_min_g or analysis_body_composition.protein_max_g %}
+        <section class="analysis-nutrition-panel" aria-labelledby="analysis-nutrition-title">
+            <div class="analysis-nutrition-panel__intro">
+                <span class="analysis-nutrition-panel__icon" aria-hidden="true">✦</span>
+                <div><span class="analysis-kicker">{% trans 'راهنمای تغذیه' %}</span><h3 id="analysis-nutrition-title">{% trans 'هدف‌های روزانه پیشنهادی' %}</h3><p>{% trans 'این اعداد بر اساس آنالیز فعلی شما تخمین زده شده‌اند و برای شروع برنامه‌ریزی غذایی کاربرد دارند.' %}</p></div>
+            </div>
+            <div class="analysis-nutrition-grid">
+                <article class="analysis-nutrition-card analysis-nutrition-card--loss"><span class="analysis-nutrition-card__label">{% trans 'کالری مورد نیاز برای کاهش وزن' %}</span><strong>{{ analysis_body_composition.calories_for_loss|default:'—' }}</strong><small>{% trans 'کیلوکالری در روز' %}</small><span class="analysis-nutrition-card__hint">{% trans 'کسری کالری پیشنهادی' %}</span></article>
+                <article class="analysis-nutrition-card analysis-nutrition-card--gain"><span class="analysis-nutrition-card__label">{% trans 'کالری مورد نیاز برای افزایش وزن' %}</span><strong>{{ analysis_body_composition.calories_for_gain|default:'—' }}</strong><small>{% trans 'کیلوکالری در روز' %}</small><span class="analysis-nutrition-card__hint">{% trans 'مازاد کالری پیشنهادی' %}</span></article>
+                <article class="analysis-nutrition-card analysis-nutrition-card--protein"><span class="analysis-nutrition-card__label">{% trans 'حداقل پروتئین روزانه' %}</span><strong>{{ analysis_body_composition.protein_min_g|default:'—' }}</strong><small>{% trans 'گرم در روز' %}</small><span class="analysis-nutrition-card__hint">{% trans 'برای حفظ و ساخت عضله' %}</span></article>
+                <article class="analysis-nutrition-card analysis-nutrition-card--protein"><span class="analysis-nutrition-card__label">{% trans 'حداکثر پروتئین روزانه' %}</span><strong>{{ analysis_body_composition.protein_max_g|default:'—' }}</strong><small>{% trans 'گرم در روز' %}</small><span class="analysis-nutrition-card__hint">{% trans 'سقف بازه پیشنهادی' %}</span></article>
+            </div>
+            <p class="analysis-nutrition-note">{% trans 'این مقادیر تخمینی هستند؛ در صورت بیماری، دارو یا شرایط ویژه با متخصص تغذیه مشورت کنید.' %}</p>
+        </section>
+        {% endif %}
+
+        {% if analysis_metric_series %}
+        <section class="analysis-panel analysis-metric-explorer">
+            <div class="analysis-explorer-head">
+                <strong>{% trans 'بررسی شاخص دلخواه' %}</strong>
+            </div>
+            <select class="analysis-trend-select" data-metric-select aria-label="{% trans 'بررسی شاخص دلخواه' %}">
+                {% for option in analysis_metric_options %}
+                    <option value="{{ option.key }}">{{ option.label }}</option>
+                {% endfor %}
+            </select>
+            <div class="analysis-canvas analysis-canvas--lg"><canvas data-metric-canvas></canvas></div>
+            <p class="analysis-metric-explorer__empty" data-metric-empty hidden>{% trans 'برای این شاخص داده کافی ثبت نشده است.' %}</p>
+        </section>
+        {% endif %}
+
+        {% if analysis_has_chart_data %}
+        <p class="analysis-sec-title">{% trans 'روند تغییرات' %}</p>
+        <div class="analysis-chart-grid">
+            <article class="analysis-chart-box"><span>{% trans 'وزن (kg)' %}</span><div class="analysis-canvas"><canvas data-chart="weight"></canvas></div></article>
+            <article class="analysis-chart-box"><span>BMI</span><div class="analysis-canvas"><canvas data-chart="bmi"></canvas></div></article>
+            <article class="analysis-chart-box"><span>{% trans 'نسبت کمر به باسن (WHR)' %}</span><div class="analysis-canvas"><canvas data-chart="whr"></canvas></div></article>
+            <article class="analysis-chart-box"><span>{% trans 'درصد چربی (%)' %}</span><div class="analysis-canvas"><canvas data-chart="body_fat"></canvas></div></article>
+            <article class="analysis-chart-box"><span>{% trans 'کالری روزانه (kcal)' %}</span><div class="analysis-canvas"><canvas data-chart="calories"></canvas></div></article>
+        </div>
+
+        <p class="analysis-sec-title">{% trans 'روند اندازه‌گیری‌های بدنی' %}</p>
+        <div class="analysis-measure-trend" data-measure-trend>
+            <select class="analysis-trend-select" data-measure-select>
+                <option value="chest-shoulder">{% trans 'سینه و سرشانه' %}</option>
+                <option value="mid-body">{% trans 'شکم، کمر و باسن' %}</option>
+                <option value="arms">{% trans 'بازو' %}</option>
+                <option value="wrist-forearm">{% trans 'مچ و ساعد' %}</option>
+                <option value="thigh">{% trans 'ران' %}</option>
+                <option value="calf">{% trans 'ساق' %}</option>
+            </select>
+            <article class="analysis-chart-box analysis-chart-box--lg"><div class="analysis-canvas analysis-canvas--lg"><canvas data-measure-canvas></canvas></div></article>
+        </div>
+        {% endif %}
+
+        {% if analysis_measurements.has_measurements %}
+        <p class="analysis-sec-title">{% trans 'جدول اندازه‌گیری‌های مربی' %}</p>
+        <div class="analysis-tables">
+            {% if analysis_measurements.circumference_rows %}
+            <div class="analysis-table-card">
+                <h3>{% trans 'محیط بدن' %}</h3>
+                <table class="analysis-table">
+                    <thead><tr><th>{% trans 'شاخص' %}</th><th>{% trans 'مقدار' %}</th></tr></thead>
+                    <tbody>
+                        {% for row in analysis_measurements.circumference_rows %}
+                            <tr><td>{{ row.label }}</td><td>{{ row.value }}</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+            {% if analysis_measurements.caliper_rows %}
+            <div class="analysis-table-card">
+                <h3>{% trans 'کالیپر' %}</h3>
+                <table class="analysis-table">
+                    <thead><tr><th>{% trans 'شاخص' %}</th><th>{% trans 'مقدار' %}</th></tr></thead>
+                    <tbody>
+                        {% for row in analysis_measurements.caliper_rows %}
+                            <tr><td>{{ row.label }}</td><td>{{ row.value }}</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% if analysis_history_rows %}
+        <p class="analysis-sec-title">{% trans 'تاریخچه' %}</p>
+        <div class="analysis-table-card">
+            <table class="analysis-table analysis-table--history">
+                <thead><tr><th>{% trans 'تاریخ' %}</th><th>BMI</th><th>{% trans 'درصد چربی' %}</th><th>{% trans 'توده بدون چربی' %}</th></tr></thead>
+                <tbody>
+                    {% for row in analysis_history_rows %}
+                        <tr>
+                            <td dir="ltr">{{ row.date }}</td>
+                            <td>{{ row.bmi }}</td>
+                            <td>{{ row.fat_percent }}</td>
+                            <td>{{ row.lean_mass }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        {{ analysis_trend_charts|json_script:"analysis-trend-data" }}
+        {{ analysis_measurement_groups|json_script:"analysis-measure-data" }}
+        {{ analysis_metric_series|json_script:"analysis-metric-series" }}
+    {% endif %}
+</section>
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    {% if analysis_has_chart_data or analysis_metric_series %}
+        <script src="{% static 'js/vendor/chart.umd.min.js' %}"></script>
+        <script src="{% static 'js/account-analysis.js' %}"></script>
+    {% endif %}
+{% endblock %}

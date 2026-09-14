@@ -1,0 +1,118 @@
+{% extends 'admin_portal/_shell.html' %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}{{ page_title }} | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block admin_content %}
+<section class="admin-screen admin-screen--modal">
+    <a href="{% url 'register:admin_search' %}" class="metric-overlay" aria-label="{% trans 'بستن' %}"></a>
+
+    <article class="metric-sheet admin-upload-sheet">
+        <header class="metric-sheet__header">
+            <h1>{% trans 'آپلود فایل' %}</h1>
+            <a href="{% url 'register:admin_search' %}" class="metric-sheet__close" aria-label="{% trans 'بستن' %}">×</a>
+        </header>
+
+        <p class="metric-sheet__description">{% blocktrans with fullname=target_user.fullname %}برای {{ fullname }} تصویر یا ویدیو ثبت کنید.{% endblocktrans %}</p>
+
+        <form method="post" enctype="multipart/form-data" class="admin-upload-form">
+            {% csrf_token %}
+            <input type="hidden" name="upload_kind" value="media">
+            <label class="admin-upload-field">
+                <span>
+                    <strong>{% trans 'آپلود تصویر' %}</strong>
+                    <small>JPG, PNG, WEBP</small>
+                </span>
+                {{ form.image }}
+            </label>
+            <label class="admin-upload-field">
+                <span>
+                    <strong>{% trans 'آپلود ویدیو' %}</strong>
+                    <small>{% trans 'MP4 یا فایل ویدیویی تمرین' %}</small>
+                </span>
+                {{ form.video }}
+            </label>
+            {% if form.non_field_errors %}
+                <div class="admin-form-errors">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <button type="submit" class="admin-primary-btn">{% trans 'تایید' %}</button>
+        </form>
+
+        <hr>
+
+        <p class="metric-sheet__description">{% blocktrans with fullname=target_user.fullname %}برنامه تمرینی/غذایی (PDF یا فایل دیگر) برای {{ fullname }} ارسال کنید.{% endblocktrans %}</p>
+
+        <form method="post" enctype="multipart/form-data" class="admin-upload-form">
+            {% csrf_token %}
+            <input type="hidden" name="upload_kind" value="document">
+            <label class="admin-upload-field">
+                <span>
+                    <strong>{{ document_form.title.label }}</strong>
+                </span>
+                {{ document_form.title }}
+            </label>
+            <label class="admin-upload-field">
+                <span>
+                    <strong>{% trans 'فایل برنامه' %}</strong>
+                    <small>{% trans 'PDF یا هر فایل دیگر' %}</small>
+                </span>
+                {{ document_form.file }}
+            </label>
+            <label class="admin-upload-field">
+                <span>
+                    <strong>{{ document_form.access_type.label }}</strong>
+                    <small>{% trans 'یکی از دو گزینه را انتخاب کنید؛ پرداخت شده یعنی دانلود رایگان.' %}</small>
+                </span>
+                {{ document_form.access_type }}
+                {% for error in document_form.access_type.errors %}<small class="admin-field-error">{{ error }}</small>{% endfor %}
+            </label>
+            <label class="admin-upload-field">
+                <span><strong>{{ document_form.price.label }}</strong><small>{% trans 'فقط برای فایل پرداخت نشده؛ مبلغ پرداختی کاربر به تومان' %}</small></span>
+                {{ document_form.price }}
+                {% for error in document_form.price.errors %}<small class="admin-field-error">{{ error }}</small>{% endfor %}
+            </label>
+            {% for field in document_form %}{% if field.name != 'access_type' and field.name != 'price' and field.errors %}<div class="admin-form-errors">{% for error in field.errors %}<p>{{ error }}</p>{% endfor %}</div>{% endif %}{% endfor %}
+            {% if document_form.non_field_errors %}
+                <div class="admin-form-errors">
+                    {% for error in document_form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <button type="submit" class="admin-primary-btn">{% trans 'ارسال برنامه' %}</button>
+        </form>
+    </article>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var accessOptions = document.querySelectorAll(".admin-access-checkboxes input[type='checkbox']");
+            var priceInput = document.querySelector(".admin-upload-form input[name='price']");
+            if (!accessOptions.length) return;
+            function syncAccessOptions(changed) {
+                accessOptions.forEach(function (option) {
+                    if (option !== changed && changed.checked) option.checked = false;
+                });
+                var paid = Array.prototype.some.call(accessOptions, function (option) {
+                    return option.checked && option.value === "unpaid";
+                });
+                if (priceInput) {
+                    priceInput.disabled = !paid;
+                    priceInput.required = paid;
+                    if (!paid) priceInput.value = "0";
+                }
+            }
+            accessOptions.forEach(function (option) {
+                option.addEventListener("change", function () { syncAccessOptions(option); });
+                if (option.checked) syncAccessOptions(option);
+            });
+        });
+    </script>
+{% endblock %}

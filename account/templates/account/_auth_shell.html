@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block extra_css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/account.css' %}">
+    <link rel="stylesheet" href="{% static 'css/account-mobile.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="auth-main">
+    <div class="auth-brand">
+        <a href="{% url 'home:home' %}" class="auth-brand__link">
+            <img src="{% static 'images/logoimageego.webp' %}" alt="{% trans 'ایگوفیت' %}" class="auth-brand__logo">
+            <span class="auth-brand__text">{% trans 'ایگوفیت' %}</span>
+        </a>
+    </div>
+    {% block auth_content %}{% endblock %}
+</main>
+{% endblock %}

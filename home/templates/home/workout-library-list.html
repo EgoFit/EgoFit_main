@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{{ page_title }} | {% trans 'کتابخانه تمرینات' %}{% endblock %}
+{% block content %}
+<main class="workout-library-page">
+    <div class="shell-container page-stack">
+        <header class="workout-library-hero">
+            <a href="{% url 'home:workout_library' %}" class="secondary-action">← {% trans 'کتابخانه تمرینات' %}</a>
+            <div class="workout-library-hero__copy">
+                <span class="eyebrow">{% trans 'جزئیات برنامه' %}</span>
+                <h1>{{ page_title }}</h1>
+                <p>{{ page_description }}</p>
+            </div>
+            <form method="get" class="workout-library-search">
+                <label class="sr-only" for="library-items-search">{% trans 'جستجو' %}</label>
+                <input id="library-items-search" type="search" name="q" value="{{ query }}" placeholder="{% trans 'جستجو در حرکات' %}">
+                <button class="cta-primary" type="submit">{% trans 'جستجو' %}</button>
+            </form>
+        </header>
+
+        <section class="workout-library-section" aria-labelledby="library-items-heading">
+            <div class="workout-library-section__heading">
+                <div>
+                    <span class="workout-library-kicker">{% trans 'فهرست حرکات' %}</span>
+                    <h2 id="library-items-heading">{{ items|length }} {% trans 'مورد' %}</h2>
+                </div>
+            </div>
+            <div class="workout-library-grid workout-library-grid--items">
+                {% for item in items %}
+                    {% if page_kind == 'muscles' %}
+                        <article class="workout-library-detail-card" data-library-modal-trigger role="button" tabindex="0" aria-haspopup="dialog" aria-label="{% trans 'مشاهده جزئیات' %}: {{ item.name }}">
+                            {% if item.image %}<img src="{{ item.image.url }}" alt="{{ item.name }}" loading="lazy">{% else %}<div class="workout-library-media-placeholder" aria-hidden="true">🫀</div>{% endif %}
+                            <div class="workout-library-card__eyebrow">{% trans 'عضله' %}</div>
+                            <h2>{{ item.name }}</h2>
+                            <p>{{ item.function_note|default:'اطلاعات عملکرد این عضله در دست تکمیل است.' }}</p>
+                            <dl>
+                                <dt>{% trans 'مبدا' %}</dt><dd>{{ item.origin|default:'—' }}</dd>
+                                <dt>{% trans 'انتها' %}</dt><dd>{{ item.insertion|default:'—' }}</dd>
+                                <dt>{% trans 'عصب' %}</dt><dd>{{ item.nerve|default:'—' }}</dd>
+                            </dl>
+                            <template class="workout-library-modal-template">
+                                <div class="workout-library-modal__eyebrow">{% trans 'اطلس عضلات' %}</div>
+                                <h2>{{ item.name }}</h2>
+                                {% if item.image %}<img class="workout-library-modal__image" src="{{ item.image.url }}" alt="{{ item.name }}">{% endif %}
+                                <p class="workout-library-modal__description">{{ item.function_note|default:'اطلاعات عملکرد این عضله در دست تکمیل است.' }}</p>
+                                <dl class="workout-library-modal__details">
+                                    <dt>{% trans 'مبدا' %}</dt><dd>{{ item.origin|default:'—' }}</dd>
+                                    <dt>{% trans 'انتها' %}</dt><dd>{{ item.insertion|default:'—' }}</dd>
+                                    <dt>{% trans 'عصب' %}</dt><dd>{{ item.nerve|default:'—' }}</dd>
+                                </dl>
+                                <div class="workout-library-modal__actions">
+                                    <a href="{% url 'home:workout_musculology' %}" class="secondary-action">← {% trans 'بازگشت به کتابخانه عضلات' %}</a>
+                                </div>
+                            </template>
+                        </article>
+                    {% else %}
+                        <article class="workout-library-detail-card" data-library-modal-trigger role="button" tabindex="0" aria-haspopup="dialog" aria-label="{% trans 'مشاهده جزئیات' %}: {{ item.name }}">
+                            <div class="workout-library-detail-card__media">
+                                {% if item.image_media %}<img src="{{ item.image_media.url }}" alt="{{ item.name }}" loading="lazy">
+                                {% elif item.video_files %}{% with preview=item.video_files|first %}<video class="workout-library-media" controls preload="metadata"><source src="{{ preview.url }}">{% trans 'مرورگر شما از پخش ویدیو پشتیبانی نمی‌کند.' %}</video>{% endwith %}
+                                {% else %}<div class="workout-library-media-placeholder" aria-hidden="true">{% if page_kind == 'correctives' %}🧘{% else %}🏋️{% endif %}</div>{% endif %}
+                            </div>
+                            <div class="workout-library-tags">
+                                {% if item.primary_muscle %}<span>{{ item.primary_muscle.name }}</span>{% endif %}
+                                {% if item.secondary_muscle %}<span>{{ item.secondary_muscle.name }}</span>{% endif %}
+                                {% if item.abnormality_type %}<span>{{ item.abnormality_type.name }}</span>{% endif %}
+                                {% if item.equipment_type %}<span>{{ item.equipment_type.name }}</span>{% elif item.equipment %}<span>{{ item.equipment.name }}</span>{% endif %}
+                            </div>
+                            <h2>{{ item.name }}</h2>
+                            <p>{{ item.description|default:'توضیحات این حرکت در دست تکمیل است.' }}</p>
+                            {% if item.movement_type or item.difficulty_level or item.joint_type %}
+                                <dl>
+                                    <dt>{% trans 'نوع حرکت' %}</dt><dd>{{ item.movement_type.name|default:'—' }}</dd>
+                                    <dt>{% trans 'سطح دشواری' %}</dt><dd>{{ item.difficulty_level.name|default:'—' }}</dd>
+                                    <dt>{% trans 'مفصل هدف' %}</dt><dd>{{ item.joint_type.name|default:'—' }}</dd>
+                                </dl>
+                            {% endif %}
+                            <template class="workout-library-modal-template">
+                                <div class="workout-library-modal__eyebrow">{% if page_kind == 'correctives' %}{% trans 'حرکت اصلاحی' %}{% else %}{% trans 'تمرین بدنسازی' %}{% endif %}</div>
+                                <h2>{{ item.name }}</h2>
+                                <div class="workout-library-modal__media">
+                                    {% if item.image_media %}<img class="workout-library-modal__image" src="{{ item.image_media.url }}" alt="{{ item.name }}">
+                                    {% elif item.video_files %}{% with preview=item.video_files|first %}<video class="workout-library-modal__video" controls preload="metadata"><source src="{{ preview.url }}">{% trans 'مرورگر شما از پخش ویدیو پشتیبانی نمی‌کند.' %}</video>{% endwith %}
+                                    {% else %}<div class="workout-library-media-placeholder" aria-hidden="true">{% if page_kind == 'correctives' %}🧘{% else %}🏋️{% endif %}</div>{% endif %}
+                                </div>
+                                <div class="workout-library-tags">
+                                    {% if item.primary_muscle %}<span>{{ item.primary_muscle.name }}</span>{% endif %}
+                                    {% if item.secondary_muscle %}<span>{{ item.secondary_muscle.name }}</span>{% endif %}
+                                    {% if item.abnormality_type %}<span>{{ item.abnormality_type.name }}</span>{% endif %}
+                                    {% if item.equipment_type %}<span>{{ item.equipment_type.name }}</span>{% elif item.equipment %}<span>{{ item.equipment.name }}</span>{% endif %}
+                                </div>
+                                <p class="workout-library-modal__description">{{ item.description|default:'توضیحات این حرکت در دست تکمیل است.' }}</p>
+                                {% if item.movement_type or item.difficulty_level or item.joint_type %}
+                                    <dl class="workout-library-modal__details">
+                                        <dt>{% trans 'نوع حرکت' %}</dt><dd>{{ item.movement_type.name|default:'—' }}</dd>
+                                        <dt>{% trans 'سطح دشواری' %}</dt><dd>{{ item.difficulty_level.name|default:'—' }}</dd>
+                                        <dt>{% trans 'مفصل هدف' %}</dt><dd>{{ item.joint_type.name|default:'—' }}</dd>
+                                    </dl>
+                                {% endif %}
+                                <div class="workout-library-modal__actions">
+                                    <a href="{% url 'home:workout_musculology' %}" class="secondary-action">← {% trans 'بازگشت به کتابخانه عضلات' %}</a>
+                                </div>
+                            </template>
+                        </article>
+                    {% endif %}
+                {% empty %}
+                    <p class="workout-library-empty">{% trans 'نتیجه‌ای پیدا نشد.' %}</p>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+</main>
+{% endblock %}

@@ -100,3 +100,4 @@ The local `.env` file should never be committed.
 - `staticfiles/` is generated output and should be recreated with `collectstatic` in deployment pipelines.
 - `db.sqlite3`, `media/`, and temporary folders are local artifacts and are ignored by default.
 # EgoFit_main
+# EgoFit_main

@@ -1,0 +1,30 @@
+{% extends 'account/_shell.html' %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}اعلان‌ها | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block account_content %}
+<section class="profile-screen">
+    <header class="profile-screen__header">
+        <h2 class="profile-screen__title">{{ account_title }}</h2>
+    </header>
+    <p class="profile-screen__lead">{{ account_description }}</p>
+
+    <section class="profile-panel-card">
+        <div class="timeline-list">
+            {% for notification in notifications %}
+                <article class="timeline-item">
+                    <strong>{{ notification.title }}</strong>
+                    <p class="mt-2">{{ notification.message }}</p>
+                    <span>{% blocktrans with time=notification.created_at|timesince %}{{ time }} پیش{% endblocktrans %}</span>
+                </article>
+            {% empty %}
+                <div class="empty-state">
+                    <h3>{% trans 'اعلان جدیدی ندارید' %}</h3>
+                    <p>{% trans 'هر زمان پیام جدیدی برای حساب شما ثبت شود، اینجا نمایش داده می‌شود.' %}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+</section>
+{% endblock %}

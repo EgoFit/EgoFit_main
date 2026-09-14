@@ -1,0 +1,62 @@
+{% extends 'admin_portal/_shell.html' %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}{{ page_title }} | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block admin_content %}
+<section class="admin-screen">
+    <header class="admin-screen__header admin-screen__header--split">
+        <h1 class="admin-screen__title">{{ page_title }}</h1>
+    </header>
+
+    <p class="admin-screen__lead">{% trans 'مربی هر کاربر را مشخص کنید یا یک مربی را برای همه کاربران تنظیم نمایید.' %}</p>
+
+    <section class="admin-panel-card">
+        <h2 class="admin-panel-card__title">{% trans 'تعیین مربی برای همه کاربران' %}</h2>
+        <form method="post" class="admin-form-grid admin-form-grid--stacked">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="bulk_assign">
+            <div class="field-group admin-form-grid__full">
+                <label for="{{ bulk_form.coach.id_for_label }}">{{ bulk_form.coach.label }}</label>
+                {{ bulk_form.coach }}
+                {{ bulk_form.coach.errors }}
+            </div>
+            <button type="submit" class="admin-primary-btn" onclick="return confirm('{% trans "آیا مطمئن هستید که می‌خواهید این مربی برای همه کاربران تنظیم شود؟" %}');">
+                {% trans 'تعیین مربی همه کاربران' %}
+            </button>
+        </form>
+    </section>
+
+    <section class="admin-result-list admin-result-list--grid">
+        {% for client in clients %}
+            <article class="admin-result-card">
+                <div class="admin-result-card__meta">
+                    <div>
+                        <strong>{{ client.fullname }}</strong>
+                        <span>{{ client.phone }}</span>
+                    </div>
+                </div>
+                <form method="post" class="admin-coach-inline-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="update_user">
+                    <input type="hidden" name="user_id" value="{{ client.id }}">
+                    <div class="field-group">
+                        <label>{% trans 'مربی' %}</label>
+                        <select name="coach" class="form-input enterprise-input w-full h-11 !ring-0 !ring-offset-0 bg-secondary border-border focus:border-border rounded-xl text-sm text-foreground px-5">
+                            <option value="">{% trans 'بدون مربی' %}</option>
+                            {% for coach in coaches %}
+                                <option value="{{ coach.id }}" {% if client.coach_id == coach.id %}selected{% endif %}>{{ coach.fullname }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'ذخیره' %}</button>
+                </form>
+            </article>
+        {% empty %}
+            <article class="admin-empty admin-empty--center">
+                <strong>{% trans 'کاربری یافت نشد.' %}</strong>
+            </article>
+        {% endfor %}
+    </section>
+</section>
+{% endblock %}

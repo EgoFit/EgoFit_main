@@ -1,0 +1,75 @@
+{% extends 'admin_portal/_shell.html' %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}{{ page_title }} | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block admin_content %}
+<section class="admin-screen">
+    <header class="admin-screen__header">
+        <a href="{% url 'register:admin_user_hub' target_user.id %}" class="admin-back-link" aria-label="{% trans 'بازگشت' %}">→</a>
+        <h1 class="admin-screen__title">{{ page_title }}</h1>
+    </header>
+
+    <p class="admin-screen__lead">{{ target_user.fullname }}</p>
+
+    <form method="post" class="admin-form-grid admin-form-grid--stacked admin-form-grid--cols2">
+        {% csrf_token %}
+        <div class="field-group">
+            <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
+            {{ form.first_name }}
+            {{ form.first_name.errors }}
+        </div>
+        <div class="field-group">
+            <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
+            {{ form.last_name }}
+            {{ form.last_name.errors }}
+        </div>
+        <div class="field-group">
+            <label for="{{ form.display_name.id_for_label }}">{{ form.display_name.label }}</label>
+            {{ form.display_name }}
+            {{ form.display_name.errors }}
+        </div>
+        <div class="field-group">
+            <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+            {{ form.phone }}
+            {{ form.phone.errors }}
+        </div>
+        <div class="field-group admin-form-grid__full">
+            <span class="field-group__label">{{ form.blood_group.label }}</span>
+            <div class="blood-group-grid">
+                {% for value, label in form.fields.blood_group.choices %}
+                    {% if value %}
+                        <label class="blood-group-chip {% if form.blood_group.value == value %}is-active{% endif %}">
+                            <input type="radio" name="blood_group" value="{{ value }}" {% if form.blood_group.value == value %}checked{% endif %}>
+                            <span>{{ label }}</span>
+                        </label>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {{ form.blood_group.errors }}
+        </div>
+        <div class="field-group">
+            <label for="{{ form.gender.id_for_label }}">{{ form.gender.label }}</label>
+            {{ form.gender }}
+            {{ form.gender.errors }}
+        </div>
+        <div class="field-group">
+            <label for="{{ form.birth_date_jalali.id_for_label }}">{{ form.birth_date_jalali.label }}</label>
+            {{ form.birth_date_jalali }}
+            {{ form.birth_date_jalali.errors }}
+            <small>{% trans 'سن' %}: {{ target_user.age|default:"—" }}</small>
+        </div>
+        <div class="field-group">
+            <label for="{{ form.activity_level.id_for_label }}">{{ form.activity_level.label }}</label>
+            {{ form.activity_level }}
+            {{ form.activity_level.errors }}
+        </div>
+        <div class="field-group admin-form-grid__full">
+            <label for="{{ form.coach.id_for_label }}">{{ form.coach.label }}</label>
+            {{ form.coach }}
+            {{ form.coach.errors }}
+        </div>
+        <button type="submit" class="admin-primary-btn">{% trans 'ثبت' %}</button>
+    </form>
+</section>
+{% endblock %}

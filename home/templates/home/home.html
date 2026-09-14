@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load my_tags %}
+{% load i18n %}
+
+{% block page_wrapper_class %}bg-secondary{% endblock %}
+
+{% block content %}
+    {% trans 'آموزش حرفه‌ای و ساختارمند' as default_hero_eyebrow %}
+    {% trans 'مسیر یادگیری حرفه‌ای، سریع و ساختارمند' as default_hero_title %}
+    {% trans 'دوره‌ها، مقالات و مسیرهای آموزشی با تجربه کاربری مدرن و دسترسی سریع‌تر آماده شده‌اند.' as default_hero_description %}
+    {% trans 'مشاهده دوره‌ها' as default_hero_primary_label %}
+    {% trans 'درخواست مشاوره' as default_hero_secondary_label %}
+    <main class="flex-auto py-5">
+        <div class="shell-container content-stack">
+            <section class="section-card modern-surface home-hero-section" data-reveal>
+                <div class="hero-grid">
+                    <div class="hero-copy">
+                        <div class="space-y-4">
+                            <span class="eyebrow">{{ home_page.hero_eyebrow|default_cms:default_hero_eyebrow }}</span>
+                            <h1 class="hero-title">{{ home_page.hero_title|default_cms:default_hero_title }}</h1>
+                            <div class="hero-lead content-justify">{{ home_page.hero_description|default_cms:default_hero_description|linebreaksbr }}</div>
+                        </div>
+
+                        <div class="hero-actions">
+                            <a href="{% if home_page.hero_primary_url %}{{ home_page.hero_primary_url }}{% else %}{% url 'home:series' %}{% endif %}" class="cta-primary cta-primary--strong">
+                                <span class="font-semibold text-sm">{{ home_page.hero_primary_label|default_if_none:default_hero_primary_label }}</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                                    <path fill-rule="evenodd"
+                                          d="M14.78 14.78a.75.75 0 0 1-1.06 0L6.5 7.56v5.69a.75.75 0 0 1-1.5 0v-7.5A.75.75 0 0 1 5.75 5h7.5a.75.75 0 0 1 0 1.5H7.56l7.22 7.22a.75.75 0 0 1 0 1.06Z"
+                                          clip-rule="evenodd"/>
+                                </svg>
+                            </a>
+                            <a href="{% if home_page.hero_secondary_url %}{{ home_page.hero_secondary_url }}{% else %}{% url 'home:series' %}{% endif %}" class="cta-secondary cta-secondary--soft">
+                                <span class="font-semibold text-sm">{{ home_page.hero_secondary_label|default_if_none:default_hero_secondary_label }}</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+                                    <path fill-rule="evenodd"
+                                          d="M2 3.5A1.5 1.5 0 0 1 3.5 2h1.148a1.5 1.5 0 0 1 1.465 1.175l.716 3.223a1.5 1.5 0 0 1-1.052 1.767l-.933.267c-.41.117-.643.555-.48.95a11.542 11.542 0 0 0 6.254 6.254c.395.163.833-.07.95-.48l.267-.933a1.5 1.5 0 0 1 1.767-1.052l3.223.716A1.5 1.5 0 0 1 18 15.352V16.5a1.5 1.5 0 0 1-1.5 1.5H15c-1.149 0-2.263-.15-3.326-.43A13.022 13.022 0 0 1 2.43 8.326 13.019 13.019 0 0 1 2 5V3.5Z"
+                                          clip-rule="evenodd"/>
+                                </svg>
+                            </a>
+                        </div>
+
+                        <div class="hero-metrics">
+                            {% for metric in home_page.metrics.all %}
+                                <div class="hero-metric">
+                                    <span class="block font-black text-2xl text-primary">{{ metric.value }}</span>
+                                    <span class="block pt-2 font-semibold text-sm text-foreground">{{ metric.title }}</span>
+                                    {% if metric.description %}
+                                        <span class="block pt-1 text-xs text-muted">{{ metric.description }}</span>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        {% if home_page.trust_items.all %}
+                            <div class="home-hero-trust-row" aria-label="{% trans 'مزیت‌های مسیر آموزشی' %}">
+                                {% for trust_item in home_page.trust_items.all %}
+                                    <span>{{ trust_item.title }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        {% if home_page.feature_points.all %}
+                            <div class="feature-points">
+                                {% for point in home_page.feature_points.all %}
+                                    <div class="feature-point">
+                                        <span class="feature-point__icon text-primary">
+                                            {% if point.icon == 'book' %}
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-6 h-6">
+                                                    <path d="M9.25 4.065A8.963 8.963 0 0 0 5 3c-.85 0-1.673.118-2.454.339A.75.75 0 0 0 2 4.06v11a.75.75 0 0 0 .954.721A7.506 7.506 0 0 1 5 15.5c1.579 0 3.042.487 4.25 1.32V4.065ZM10.75 16.82A7.462 7.462 0 0 1 15 15.5c.71 0 1.396.098 2.046.282A.75.75 0 0 0 18 15.06v-11a.75.75 0 0 0-.546-.721A9.006 9.006 0 0 0 15 3a8.963 8.963 0 0 0-4.25 1.065v12.755Z"/>
+                                                </svg>
+                                            {% elif point.icon == 'shield' %}
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-6 h-6">
+                                                    <path fill-rule="evenodd" d="M9.664 1.319a.75.75 0 0 1 .672 0 41.059 41.059 0 0 1 8.198 5.424.75.75 0 0 1-.254 1.285 31.372 31.372 0 0 0-7.86 3.83.75.75 0 0 1-.84 0 31.508 31.508 0 0 0-2.08-1.287V9.394c0-.244.116-.463.302-.592a35.504 35.504 0 0 1 3.305-2.033.75.75 0 0 0-.714-1.319 37 37 0 0 0-3.446 2.12A2.216 2.216 0 0 0 6 9.393v.38a31.293 31.293 0 0 0-4.28-1.746.75.75 0 0 1-.254-1.285 41.059 41.059 0 0 1 8.198-5.424ZM6 11.459a29.848 29.848 0 0 0-2.455-1.158 41.029 41.029 0 0 0-.39 3.114.75.75 0 0 0 .419.74c.528.256 1.046.53 1.554.82-.21.324-.455.63-.739.914a.75.75 0 1 0 1.06 1.06c.37-.369.69-.77.96-1.193a26.61 26.61 0 0 1 3.095 2.348.75.75 0 0 0 .992 0 26.547 26.547 0 0 1 5.93-3.95.75.75 0 0 0 .42-.739 41.053 41.053 0 0 0-.39-3.114 29.925 29.925 0 0 0-5.199 2.801 2.25 2.25 0 0 1-2.514 0c-.41-.275-.826-.541-1.25-.797a6.985 6.985 0 0 1-1.084 3.45 26.503 26.503 0 0 0-1.281-.78A5.487 5.487 0 0 0 6 12v-.54Z" clip-rule="evenodd"/>
+                                                </svg>
+                                            {% elif point.icon == 'lightning' %}
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-6 h-6">
+                                                    <path d="m13.202 2.991-4.853 7.28h3.204l-.789 6.738 4.925-7.406h-3.222l.735-6.612Z"/>
+                                                </svg>
+                                            {% else %}
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-6 h-6">
+                                                    <path fill-rule="evenodd" d="M2 3.5A1.5 1.5 0 0 1 3.5 2h1.148a1.5 1.5 0 0 1 1.465 1.175l.716 3.223a1.5 1.5 0 0 1-1.052 1.767l-.933.267c-.41.117-.643.555-.48.95a11.542 11.542 0 0 0 6.254 6.254c.395.163.833-.07.95-.48l.267-.933a1.5 1.5 0 0 1 1.767-1.052l3.223.716A1.5 1.5 0 0 1 18 15.352V16.5a1.5 1.5 0 0 1-1.5 1.5H15c-1.149 0-2.263-.15-3.326-.43A13.022 13.022 0 0 1 2.43 8.326 13.019 13.019 0 0 1 2 5V3.5Z" clip-rule="evenodd"/>
+                                                </svg>
+                                            {% endif %}
+                                        </span>
+                                        <span class="font-semibold text-sm text-foreground">{{ point.title }}</span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="hero-media">
+                        {% for highlight in home_page.highlight_cards.all %}
+                            {% if highlight.title|default_cms:"" %}
+                                <div class="hero-float-card {% if highlight.position == 'top' %}is-top{% else %}is-bottom{% endif %}">
+                                    <span class="block font-black text-lg text-primary">{{ highlight.title|default_cms:"" }}</span>
+                                    {% if highlight.description|default_cms:"" %}
+                                        <span class="block pt-2 text-sm text-muted">{{ highlight.description|default_cms:"" }}</span>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if home_page.hero_image %}
+                            <img src="{{ home_page.hero_image|public_media_url }}" alt="{{ home_page.hero_image_alt }}" fetchpriority="high">
+                        {% elif featured_advantage and featured_advantage.image %}
+                            <img src="{{ featured_advantage.image|public_media_url }}" alt="{{ featured_advantage.title }}" fetchpriority="high">
+                        {% else %}
+                            <div class="home-hero-placeholder" aria-hidden="true"></div>
+                        {% endif %}
+
+                        <div class="home-hero-media__shade"></div>
+                    </div>
+                </div>
+            </section>
+
+            {% trans 'سیستم یادگیری' as default_stats_eyebrow %}
+            {% trans 'تجربه یکپارچه آموزش' as default_stats_title %}
+            {% trans 'دسترسی سریع به دوره‌ها، مقالات و مسیرهای پیشنهادی با ساختار شفاف‌تر.' as default_stats_description %}
+            {% trans 'دوره فعال' as default_stat_total_courses_label %}
+            {% trans 'دوره تکمیل‌شده' as default_stat_completed_courses_label %}
+            {% trans 'محتوای آموزشی' as default_stat_articles_label %}
+            <section class="home-insight-rail" data-reveal>
+                <div class="home-insight-card is-primary">
+                    <span class="home-insight-card__label">{{ home_page.stats_eyebrow|default_cms:default_stats_eyebrow }}</span>
+                    <strong>{{ home_page.stats_title|default_cms:default_stats_title }}</strong>
+                    <div>{{ home_page.stats_description|default_cms:default_stats_description }}</div>
+                </div>
+                <div class="home-insight-card">
+                    <span>{{ home_stats.total_courses }}+</span>
+                    <div>{{ home_page.stat_total_courses_label|default_cms:default_stat_total_courses_label }}</div>
+                </div>
+                <div class="home-insight-card">
+                    <span>{{ home_stats.completed_courses }}+</span>
+                    <div>{{ home_page.stat_completed_courses_label|default_cms:default_stat_completed_courses_label }}</div>
+                </div>
+                <div class="home-insight-card">
+                    <span>{{ home_stats.latest_articles }}+</span>
+                    <div>{{ home_page.stat_articles_label|default_cms:default_stat_articles_label }}</div>
+                </div>
+            </section>
+
+            {% trans 'دوره‌های منتخب' as default_featured_courses_eyebrow %}
+            {% trans 'آخرین دوره‌های منتشر شده' as default_featured_courses_title %}
+            {% trans 'منتخب دوره‌ها با ارائه‌ای شفاف‌تر، کارت‌های مدرن‌تر و دسترسی سریع‌تر به جزئیات.' as default_featured_courses_description %}
+            {% trans 'مشاهده همه دوره‌ها' as default_featured_courses_button_label %}
+            <section class="section-card modern-surface home-library-section" data-reveal>
+                <div class="section-heading">
+                    <div class="section-heading__copy">
+                        <span class="eyebrow">{{ home_page.featured_courses_eyebrow|default_cms:default_featured_courses_eyebrow }}</span>
+                        <h2 class="section-heading__title">{{ home_page.featured_courses_title|default_cms:default_featured_courses_title }}</h2>
+                        <div class="section-heading__text content-justify">{{ home_page.featured_courses_description|default_cms:default_featured_courses_description|linebreaksbr }}</div>
+                    </div>
+                    <a href="{% if home_page.featured_courses_button_url %}{{ home_page.featured_courses_button_url }}{% else %}{% url 'home:series' %}{% endif %}" class="pill-link">
+                        <span class="font-semibold text-sm">{{ home_page.featured_courses_button_label|default_if_none:default_featured_courses_button_label }}</span>
+                    </a>
+                </div>
+                {% include 'includes/series.html' %}
+            </section>
+
+            {% if counseling_content %}
+                <section class="section-card modern-surface home-article-section" data-reveal>
+                    <div class="consulting-grid">
+                        <div class="space-y-5">
+                            <span class="eyebrow">{% trans 'مسیر مشاوره' %}</span>
+                            <h2 class="section-heading__title">{{ counseling_content.title }}</h2>
+                            <h3 class="font-black text-2xl text-primary">{{ counseling_content.subtitle }}</h3>
+                            <div class="section-heading__text content-justify">{{ counseling_content.description|linebreaksbr }}</div>
+                            <a href="{% url 'home:series' %}" class="cta-primary cta-primary--strong">
+                                {% trans 'شروع مسیر مشاوره' as default_counseling_button %}
+                                <span class="font-semibold text-sm">{{ counseling_content.button_content|default_if_none:default_counseling_button }}</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                                    <path fill-rule="evenodd"
+                                          d="M14.78 14.78a.75.75 0 0 1-1.06 0L6.5 7.56v5.69a.75.75 0 0 1-1.5 0v-7.5A.75.75 0 0 1 5.75 5h7.5a.75.75 0 0 1 0 1.5H7.56l7.22 7.22a.75.75 0 0 1 0 1.06Z"
+                                          clip-rule="evenodd"/>
+                                </svg>
+                            </a>
+                        </div>
+
+                        {% if counseling_content.image %}
+                            <div class="consulting-visual">
+                                <img src="{{ counseling_content.image|public_media_url }}" alt="{{ counseling_content.title }}" loading="lazy">
+                            </div>
+                        {% endif %}
+                    </div>
+                </section>
+            {% endif %}
+
+            {% trans 'محتوای آموزشی' as default_article_eyebrow %}
+            {% trans 'آخرین نوشته‌های آموزشی' as default_article_title %}
+            {% trans 'مطالب آموزشی با چیدمان خواناتر و تجربه مطالعه بهتر.' as default_article_description %}
+            {% trans 'مشاهده مقالات' as default_article_button_label %}
+            <section class="section-card modern-surface" data-reveal>
+                <div class="section-heading">
+                    <div class="section-heading__copy">
+                        <span class="eyebrow">{{ home_page.article_eyebrow|default_cms:default_article_eyebrow }}</span>
+                        <h2 class="section-heading__title">{{ home_page.article_title|default_cms:default_article_title }}</h2>
+                        <div class="section-heading__text content-justify">{{ home_page.article_description|default_cms:default_article_description|linebreaksbr }}</div>
+                    </div>
+                    <a href="{% if home_page.article_button_url %}{{ home_page.article_button_url }}{% else %}{% url 'home:blog' %}{% endif %}" class="pill-link">
+                        <span class="font-semibold text-sm">{{ home_page.article_button_label|default_if_none:default_article_button_label }}</span>
+                    </a>
+                </div>
+
+                {% if down_content %}
+                    <div class="home-down-grid">
+                        {% for down in down_content %}
+                            <article class="home-down-card modern-surface">
+                                <div class="space-y-3">
+                                    <span class="eyebrow">{{ home_page.article_eyebrow|default_cms:default_article_eyebrow }}</span>
+                                    <h3 class="modern-blog-card__title">{{ down.title }}</h3>
+                                    <div class="section-heading__text content-justify">{{ down.description|linebreaksbr }}</div>
+                                </div>
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% include 'includes/blog.html' %}
+            </section>
+        </div>
+
+        {% if messages %}
+            <div class="notification-container" data-notification-toast role="status" aria-live="polite">
+                <ul class="messages space-y-2">
+                    {% for message in messages %}
+                        <li class="notification{% if message.tags %} {{ message.tags }}{% endif %}" role="alert">
+                            {{ message }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </main>
+{% endblock %}

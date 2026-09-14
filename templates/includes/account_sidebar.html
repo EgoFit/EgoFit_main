@@ -1,0 +1,50 @@
+{% load static %}
+{% load my_tags %}
+{% load i18n %}
+<aside class="account-sidebar section-card modern-surface" data-reveal>
+    <div class="account-user">
+        <div class="account-user__avatar">
+            {% if request.user.profile_picture %}
+                <img src="{{ request.user.profile_picture|public_media_url }}" alt="{{ request.user.fullname }}" loading="lazy">
+            {% else %}
+                <img src="{% static 'images/avatars/download.png' %}" alt="{{ request.user.fullname }}" loading="lazy">
+            {% endif %}
+        </div>
+        <div class="account-user__meta">
+            <p class="eyebrow">{% trans 'پنل کاربری' %}</p>
+            <h2>{{ request.user.fullname }}</h2>
+            <p class="account-user__phone">{{ request.user.phone }}</p>
+            <div class="account-user__badges">
+                <span>{% trans 'حساب فعال' %}</span>
+                <span>{% trans 'دسترسی امن' %}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="account-sidebar__status">
+        <div>
+            <span>{% trans 'آخرین ورود' %}</span>
+            <strong>{% if request.user.last_login %}{{ request.user.last_login|date:"Y/m/d" }}{% else %}{% trans 'امروز' %}{% endif %}</strong>
+        </div>
+        <div>
+            <span>{% trans 'وضعیت' %}</span>
+            <strong>{% trans 'آماده' %}</strong>
+        </div>
+    </div>
+
+    <nav class="account-nav">
+        <a href="{% url 'register:profile' %}" class="account-nav__item {% if active_section == 'dashboard' %}is-active{% endif %}">{% trans 'پیشخوان' %}</a>
+        <a href="{% url 'register:profile_analysis' %}" class="account-nav__item {% if active_section == 'analysis' %}is-active{% endif %}">{% trans 'آنالیز' %}</a>
+        <a href="{% url 'register:profile_workout_programs' %}" class="account-nav__item {% if active_section == 'workout' %}is-active{% endif %}">{% trans 'برنامه بدنسازی' %}</a>
+        <a href="{% url 'register:profile_course' %}" class="account-nav__item {% if active_section == 'courses' %}is-active{% endif %}">{% trans 'دوره‌های من' %}</a>
+        <a href="{% url 'register:profile_coach' %}" class="account-nav__item {% if active_section == 'coach' %}is-active{% endif %}">{% trans 'مربی شما' %}</a>
+        <a href="{% url 'register:profile_plans' %}" class="account-nav__item {% if active_section == 'plans' %}is-active{% endif %}">{% trans 'برنامه‌های من' %}</a>
+        <a href="{% url 'register:profile_financial' %}" class="account-nav__item {% if active_section == 'financial' %}is-active{% endif %}">{% trans 'مالی و سفارش‌ها' %}</a>
+        <a href="{% url 'register:profile_comments' %}" class="account-nav__item {% if active_section == 'comments' %}is-active{% endif %}">{% trans 'دیدگاه‌های من' %}</a>
+        <a href="{% url 'register:profile_notifications' %}" class="account-nav__item {% if active_section == 'notifications' %}is-active{% endif %}">{% trans 'اعلان‌ها' %}</a>
+        <a href="{% url 'register:profile_useredit' %}" class="account-nav__item {% if active_section == 'edit' %}is-active{% endif %}">{% trans 'ویرایش پروفایل' %}</a>
+        <a href="{% url 'register:profile_number_edit' %}" class="account-nav__item {% if active_section == 'number' %}is-active{% endif %}">{% trans 'ویرایش شماره تماس' %}</a>
+        <a href="{% url 'register:change_password' %}" class="account-nav__item {% if active_section == 'password' %}is-active{% endif %}">{% trans 'تغییر رمز عبور' %}</a>
+        <a href="{% url 'register:logout' %}" class="account-nav__item is-danger">{% trans 'خروج از حساب' %}</a>
+    </nav>
+</aside>

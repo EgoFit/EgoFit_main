@@ -1,0 +1,134 @@
+{% load static %}
+{% load my_tags %}
+{% load i18n %}
+<button type="button" class="scroll-to-top" id="scrollToTopBtn" aria-label="{% trans 'بازگشت به بالای صفحه' %}" hidden>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
+         stroke="currentColor" class="w-5 h-5" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5"/>
+    </svg>
+</button>
+<footer class="modern-footer">
+    <div class="shell-container">
+        <div class="section-card modern-surface">
+            <div class="modern-footer__brand-row">
+                {% trans 'ایگوفیت' as default_brand_name %}
+                {% trans 'آکادمی' as default_brand_eyebrow %}
+                <a href="{% url 'home:home' %}" class="modern-logo">
+                    <span class="modern-logo__mark">
+                        {% if site_settings.logo %}
+                            <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.brand_name|default_cms:default_brand_name }}">
+                        {% else %}
+                            <img src="{% static 'images/logoimageego.webp' %}" alt="Logo">
+                        {% endif %}
+                    </span>
+                    <span class="modern-logo__text">
+                        <span class="font-semibold text-sm text-muted">{{ site_settings.brand_eyebrow|default_cms:default_brand_eyebrow }}</span>
+                        <strong class="font-black text-foreground">{{ site_settings.brand_name|default_cms:default_brand_name }}</strong>
+                    </span>
+                </a>
+            </div>
+
+            <div class="soft-divider my-6"></div>
+
+            <div class="modern-footer__grid">
+                <div class="space-y-5">
+                    <div class="space-y-3">
+                        {% trans 'درباره مجموعه' as default_about_eyebrow %}
+                        {% trans 'تجربه‌ای حرفه‌ای برای یادگیری ساختارمند' as default_about_title %}
+                        <span class="eyebrow">{{ footer.about_eyebrow|default_cms:default_about_eyebrow }}</span>
+                        <h2 class="section-heading__title">{{ footer.about_title|default_cms:default_about_title }}</h2>
+                        <p class="section-heading__text">{{ footer.about_us }}</p>
+                    </div>
+
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        <div class="feature-point">
+                            <span class="feature-point__icon text-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                                    <path fill-rule="evenodd"
+                                          d="M2 3.5A1.5 1.5 0 0 1 3.5 2h1.148a1.5 1.5 0 0 1 1.465 1.175l.716 3.223a1.5 1.5 0 0 1-1.052 1.767l-.933.267c-.41.117-.643.555-.48.95a11.542 11.542 0 0 0 6.254 6.254c.395.163.833-.07.95-.48l.267-.933a1.5 1.5 0 0 1 1.767-1.052l3.223.716A1.5 1.5 0 0 1 18 15.352V16.5a1.5 1.5 0 0 1-1.5 1.5H15c-1.149 0-2.263-.15-3.326-.43A13.022 13.022 0 0 1 2.43 8.326 13.019 13.019 0 0 1 2 5V3.5Z"
+                                          clip-rule="evenodd"/>
+                                </svg>
+                            </span>
+                            <span class="flex flex-col gap-1">
+                                <span class="font-bold text-sm text-foreground">{% trans 'شماره تماس' %}</span>
+                                <span class="font-semibold text-sm text-muted">{{ footer.phone_number }}</span>
+                            </span>
+                        </div>
+
+                        <div class="feature-point">
+                            <span class="feature-point__icon text-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                                    <path fill-rule="evenodd"
+                                          d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm.75-13a.75.75 0 0 0-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 0 0 0-1.5h-3.25V5Z"
+                                          clip-rule="evenodd"/>
+                                </svg>
+                            </span>
+                            <span class="flex flex-col gap-1">
+                                <span class="font-bold text-sm text-foreground">{% trans 'ساعات کاری' %}</span>
+                                <span class="font-semibold text-sm text-muted">{{ footer.working_hours }}</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-5">
+                    <div class="modern-footer__links">
+                        <div class="space-y-3">
+                            {% trans 'لینک‌های مفید' as default_links_title %}
+                            <span class="font-black text-foreground">{{ footer.links_section_title|default_cms:default_links_title }}</span>
+                            <ul class="space-y-2">
+                                {% for link in nav_links %}
+                                    <li><a href="{{ link.url }}" class="text-sm text-muted transition-colors hover:text-primary">{{ link.label }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+
+                        <div class="space-y-3">
+                            {% trans 'شبکه‌های اجتماعی' as default_social_title %}
+                            <span class="font-black text-foreground">{{ footer.social_section_title|default_cms:default_social_title }}</span>
+                            <div class="modern-footer__social">
+                                {% for link in social_links %}
+                                    <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ link.title|default:'social-link' }}">
+                                        {% if link.icon %}
+                                            {{ link.icon|safe }}
+                                        {% else %}
+                                            <span class="font-bold text-xs">S</span>
+                                        {% endif %}
+                                    </a>
+                                {% empty %}
+                                    {% if footer.social_media.telegram %}
+                                        <a href="{{ footer.social_media.telegram }}" target="_blank" rel="noopener noreferrer" aria-label="telegram">
+                                            <span class="font-bold text-xs">{% trans 'تلگرام' %}</span>
+                                        </a>
+                                    {% endif %}
+                                    {% if footer.social_media.youtube %}
+                                        <a href="{{ footer.social_media.youtube }}" target="_blank" rel="noopener noreferrer" aria-label="youtube">
+                                            <span class="font-bold text-xs">{% trans 'یوتیوب' %}</span>
+                                        </a>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="footer-cert">
+                        <div class="footer-cert__badge">
+                            <img src="{% static 'images/enamad-badge.svg' %}" alt="{% trans 'نماد اعتماد محلی' %}" loading="lazy">
+                        </div>
+                        <p class="text-sm text-muted leading-7">
+                            {% trans 'این وب‌سایت دارای نماد اعتماد الکترونیکی بوده و فرآیند خرید و ثبت‌نام با ساختاری امن و استاندارد ارائه می‌شود.' as default_trust_text %}
+                            {{ footer.trust_text|default_cms:default_trust_text }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="soft-divider my-6"></div>
+
+            <div class="flex items-center justify-between gap-4 flex-wrap">
+                <p class="text-xs text-muted">© {% if footer.copyright_year %}{{ footer.copyright_year }} - {% endif %}{% trans 'کلیه حقوق محفوظ است' %}</p>
+                <p class="text-xs text-muted">{% trans 'طراحی مجدد رابط کاربری با تمرکز بر وضوح، سرعت و تجربه کاربری بهتر' %}</p>
+            </div>
+        </div>
+    </div>
+</footer>

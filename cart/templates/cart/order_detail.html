@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load my_tags %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}جزئیات سفارش | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block content %}
+<main class="page-section cart-page">
+    <div class="shell-container">
+        <section class="cart-hero checkout-hero modern-surface" data-reveal>
+            <div class="cart-hero__copy">
+                <span class="eyebrow">{% trans 'جزئیات سفارش' %}</span>
+                <h1>{% blocktrans with order_number=order.order_number|default:order.id %}بررسی نهایی سفارش شماره {{ order_number }}{% endblocktrans %}</h1>
+                <p>{% trans 'قبل از اتصال به درگاه، دوره‌ها، مبلغ پرداختی و کد تخفیف را بررسی کنید. بعد از پرداخت موفق، دوره‌ها در حساب شما فعال می‌شوند.' %}</p>
+            </div>
+            <div class="cart-hero__meta">
+                <span>
+                    {% if order.is_paid %}
+                        {% trans 'پرداخت شده' %}
+                    {% elif order.status == 'payment_initiated' %}
+                        {% trans 'در حال پرداخت' %}
+                    {% elif order.status == 'failed' %}
+                        {% trans 'پرداخت ناموفق' %}
+                    {% else %}
+                        {% trans 'آماده پرداخت' %}
+                    {% endif %}
+                </span>
+                <strong>{% blocktrans with price=order.total_price %}{{ price }} تومان{% endblocktrans %}</strong>
+                <small>{% trans 'مبلغ نهایی سفارش' %}</small>
+            </div>
+        </section>
+
+        <section class="cart-layout">
+            <div class="cart-items-stack">
+                {% for item in order.items.all %}
+                    <article class="cart-item-card modern-surface" data-reveal>
+                        <a href="{% url 'home:course_detail' item.product.id %}" class="cart-item-card__media">
+                            <img src="{{ item.product.image|public_media_url }}" alt="{{ item.product.title }}" loading="lazy">
+                        </a>
+
+                        <div class="cart-item-card__body">
+                            <div class="cart-item-card__top">
+                                <div class="status-row">
+                                    <span class="status-dot {% if order.is_paid %}is-success{% elif order.status == 'failed' %}is-danger{% else %}is-warning{% endif %}"></span>
+                                    <span>
+                                        {% if order.is_paid %}
+                                            {% trans 'پرداخت شده' %}
+                                        {% elif order.status == 'payment_initiated' %}
+                                            {% trans 'در حال پرداخت' %}
+                                        {% elif order.status == 'failed' %}
+                                            {% trans 'پرداخت ناموفق' %}
+                                        {% else %}
+                                            {% trans 'در انتظار پرداخت' %}
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                {% if item.product.language_kinds %}
+                                    <span class="cart-chip">{{ item.product.language_kinds }}</span>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                <h2>
+                                    <a href="{% url 'home:course_detail' item.product.id %}">{{ item.product.title }}</a>
+                                </h2>
+                                <p>{% blocktrans with author=item.product.author %}مدرس: {{ author }}{% endblocktrans %}</p>
+                            </div>
+
+                            <div class="cart-item-card__footer">
+                                <div class="cart-price-block">
+                                    <span>{% trans 'قیمت ثبت‌شده در سفارش' %}</span>
+                                    <strong>{% blocktrans with price=item.price %}{{ price }} تومان{% endblocktrans %}</strong>
+                                </div>
+                                <a href="{% url 'home:course_detail' item.product.id %}" class="secondary-action">{% trans 'مشاهده دوره' %}</a>
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+
+            <aside class="cart-summary-card checkout-summary-card modern-surface" data-reveal>
+                <div class="cart-summary-card__header">
+                    <span class="eyebrow">{% trans 'پرداخت' %}</span>
+                    <h2>{% trans 'خلاصه پرداخت' %}</h2>
+                    <p>{% trans 'در صورت داشتن کد تخفیف، قبل از اتصال به درگاه آن را اعمال کنید.' %}</p>
+                </div>
+
+                {% if messages %}
+                    <div class="form-messages">
+                        {% for message in messages %}
+                            <div class="form-message {% if message.tags %}is-{{ message.tags }}{% endif %}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="cart-summary-list">
+                    <div class="summary-row">
+                        <span>{% trans 'مبلغ اولیه' %}</span>
+                        <strong>{% blocktrans with price=order.subtotal_price|default:order.total_price %}{{ price }} تومان{% endblocktrans %}</strong>
+                    </div>
+                    {% if order.discount_amount %}
+                        <div class="summary-row is-discount">
+                            <span>{% trans 'تخفیف' %}</span>
+                            <strong>{% blocktrans with price=order.discount_amount %}{{ price }} تومان{% endblocktrans %}</strong>
+                        </div>
+                    {% elif discount_amount %}
+                        <div class="summary-row is-discount">
+                            <span>{% trans 'تخفیف اعمال‌شده' %}</span>
+                            <strong>{% blocktrans with price=discount_amount %}{{ price }} تومان{% endblocktrans %}</strong>
+                        </div>
+                    {% endif %}
+                    <div class="summary-row summary-row--total">
+                        <span>{% trans 'مبلغ نهایی' %}</span>
+                        <strong>{% blocktrans with price=order.total_price %}{{ price }} تومان{% endblocktrans %}</strong>
+                    </div>
+                    <div class="cart-security-note">
+                        <span class="status-dot is-success"></span>
+                        <span>{% trans 'بعد از پرداخت موفق، دسترسی دوره‌ها به صورت خودکار برای حساب شما فعال می‌شود.' %}</span>
+                    </div>
+                </div>
+
+                {% if not order.is_paid %}
+                    <form method="post" action="{% url 'cart:discount_code' order.id %}" class="checkout-discount-form">
+                        {% csrf_token %}
+                        <div class="field-group">
+                            <label>{% trans 'کد تخفیف' %}</label>
+                            <input type="text" name="discount_code" class="form-input enterprise-input" placeholder="{% trans 'کد تخفیف را وارد کنید' %}">
+                        </div>
+                        <button type="submit" class="secondary-action w-full">{% trans 'اعمال کد تخفیف' %}</button>
+                    </form>
+
+                    <form method="post" action="{% url 'cart:request' order.id %}" data-submit-loading>
+                        {% csrf_token %}
+                        <button type="submit" class="cta-primary cta-primary--strong w-full">{% trans 'اتصال به درگاه پرداخت' %}</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'register:profile_course' %}" class="cta-primary cta-primary--strong w-full">{% trans 'مشاهده دوره‌های من' %}</a>
+                {% endif %}
+
+                <a href="{% url 'cart:cart_detail' %}" class="secondary-action w-full">{% trans 'بازگشت به سبد خرید' %}</a>
+            </aside>
+        </section>
+    </div>
+</main>
+{% endblock %}

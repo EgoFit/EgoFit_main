@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load my_tags %}
+{% load i18n %}
+
+{% block page_wrapper_class %}bg-secondary{% endblock %}
+
+{% block content %}
+    <main class="flex-auto py-5">
+        <div class="shell-container page-stack">
+            <section class="section-card modern-surface" data-reveal>
+                <div class="hero-grid">
+                    <div class="hero-copy">
+                        <span class="eyebrow">{% trans 'درباره ما' %}</span>
+                        <h1 class="hero-title">{% trans 'داستان شکل‌گیری ایگوفیت' %}</h1>
+                        <p class="hero-lead content-justify">{{ about_page.description }}</p>
+                    </div>
+                    <div class="hero-media">
+                        <div class="hero-float-card is-top">
+                            <span class="block font-black text-lg text-primary">Mission</span>
+                            <span class="block pt-2 text-sm text-muted">{% trans 'آموزش ساختارمند و تجربه‌ای حرفه‌ای برای رشد واقعی' %}</span>
+                        </div>
+                        <img src="{{ about_page.image|public_media_url }}" alt="{{ about_page.title|default:'about' }}">
+                    </div>
+                </div>
+            </section>
+
+            <section class="section-card modern-surface" data-reveal>
+                <div class="section-heading">
+                    <div class="section-heading__copy">
+                        <span class="eyebrow">{% trans 'فعالیت‌های ما' %}</span>
+                        <h2 class="section-heading__title">{% trans 'بخشی از فعالیت‌های تیم' %}</h2>
+                        <p class="section-heading__text">{% trans 'نمایی شفاف‌تر از کارهایی که برای ساخت یک اکوسیستم آموزشی حرفه‌ای انجام می‌دهیم.' %}</p>
+                    </div>
+                </div>
+
+                <div class="space-y-8">
+                    {% for activity in activities %}
+                        <div class="detail-layout">
+                            <div class="detail-main">
+                                <div class="content-panel modern-surface">
+                                    <span class="eyebrow">{% trans 'فعالیت' %}</span>
+                                    <h3 class="font-black text-xl text-foreground pt-4">{{ activity.title }}</h3>
+                                    <p class="detail-description content-justify pt-4">{{ activity.description }}</p>
+                                </div>
+                            </div>
+                            <div class="detail-sidebar">
+                                <div class="detail-cover">
+                                    <img src="{{ activity.image|public_media_url }}" alt="{{ activity.title }}">
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="section-card modern-surface" data-reveal>
+                <div class="section-heading">
+                    <div class="section-heading__copy">
+                        <span class="eyebrow">{% trans 'جامعه و مسیر رشد' %}</span>
+                        <h2 class="section-heading__title">{% trans 'نگاه ما به جامعه آموزشی' %}</h2>
+                    </div>
+                </div>
+
+                <div class="space-y-8">
+                    {% for community in communities %}
+                        <div class="detail-layout">
+                            <div class="detail-main">
+                                <div class="content-panel modern-surface">
+                                    <span class="eyebrow">Community</span>
+                                    <h3 class="font-black text-xl text-foreground pt-4">{{ community.title }}</h3>
+                                    <p class="detail-description content-justify pt-4">{{ community.description }}</p>
+                                </div>
+                            </div>
+                            <div class="detail-sidebar">
+                                <div class="detail-cover">
+                                    <img src="{{ community.image|public_media_url }}" alt="{{ community.title }}">
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+    </main>
+{% endblock %}

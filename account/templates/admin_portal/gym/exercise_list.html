@@ -1,0 +1,53 @@
+{% extends 'admin_portal/_shell.html' %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}کتابخانه حرکات تمرینی | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block admin_content %}
+<section class="admin-screen admin-search-screen">
+    <header class="admin-screen__header admin-screen__header--split">
+        <a href="{% url 'register:admin_gym_library' %}" class="admin-back-link" aria-label="{% trans 'بازگشت' %}">→</a>
+        <h1 class="admin-screen__title">{% trans 'کتابخانه حرکات تمرینی' %}</h1>
+    </header>
+
+    <form method="get" class="admin-search-form">
+        {{ form.query }}
+        <button type="submit" class="admin-primary-btn">{% trans 'جست و جو' %}</button>
+    </form>
+
+    <a href="{% url 'register:admin_exercise_add' %}" class="admin-primary-btn">+ {% trans 'افزودن حرکت' %}</a>
+
+    <section class="admin-result-list admin-result-list--grid">
+        {% for exercise in exercises %}
+            <article class="admin-result-card admin-result-card--media">
+                {% include 'admin_portal/gym/_media_thumb.html' with media=exercise.media_preview %}
+                <div class="admin-result-card__body">
+                    <div class="admin-result-card__meta">
+                        <div>
+                            <strong>{{ exercise.name }}</strong>{% if exercise.name_en %} <span dir="ltr">{{ exercise.name_en }}</span>{% endif %}
+                        </div>
+                    </div>
+                    <div class="admin-result-card__tags">
+                        <span>{{ exercise.primary_muscle.name }}</span>
+                        <span>{{ exercise.body_part.name }}</span>
+                        <span>{{ exercise.difficulty_level.name }}</span>
+                    </div>
+                    <div class="admin-result-card__actions">
+                        <a href="{% url 'register:admin_exercise_edit' exercise.pk %}" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'ویرایش' %}</a>
+                        <form method="post" action="{% url 'register:admin_exercise_delete' exercise.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'حذف' %}</button>
+                        </form>
+                    </div>
+                </div>
+            </article>
+        {% empty %}
+            <article class="admin-empty admin-empty--center">
+                <strong>{% trans 'حرکتی ثبت نشده است.' %}</strong>
+            </article>
+        {% endfor %}
+    </section>
+
+    {% include 'admin_portal/gym/_pagination.html' %}
+</section>
+{% endblock %}

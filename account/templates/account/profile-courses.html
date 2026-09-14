@@ -1,0 +1,48 @@
+{% extends 'account/_shell.html' %}
+{% load my_tags %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}دوره های شما | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block account_content %}
+<section class="profile-screen profile-screen--wide">
+    <header class="profile-screen__header">
+        <h2 class="profile-screen__title">{% trans 'دوره های شما' %}</h2>
+    </header>
+
+    <section class="course-library-grid">
+        {% for item in items %}
+            <article class="account-card">
+                <a href="{% url 'home:series_episod' item.id %}" class="block overflow-hidden rounded-3xl">
+                    <img src="{{ item.image|public_media_url }}" alt="{{ item.title }}" class="h-48 w-full object-cover" loading="lazy">
+                </a>
+                <div class="mt-4 grid gap-3">
+                    <div class="flex items-center justify-between gap-3">
+                        <span class="account-chip">{% if item.free %}{% trans 'رایگان' %}{% else %}{% trans 'پولی' %}{% endif %}</span>
+                        <span class="account-chip {% if item.is_compeleted %}is-active{% endif %}">{% if item.is_compeleted %}{% trans 'تکمیل شده' %}{% else %}{% trans 'در حال تکمیل' %}{% endif %}</span>
+                    </div>
+                    <h2 class="text-xl font-black">{{ item.title }}</h2>
+                    <p class="text-sm text-slate-500">{{ item.author }}{% if item.language_kinds %} · {{ item.language_kinds }}{% endif %}</p>
+                    <div class="flex items-center justify-between gap-3">
+                        {% if item.free %}
+                            <strong class="text-emerald-600">{% trans 'رایگان' %}</strong>
+                        {% else %}
+                            <strong class="text-slate-900">{% blocktrans with price=item.discount_price %}{{ price }} تومان{% endblocktrans %}</strong>
+                        {% endif %}
+                        <a href="{% url 'home:series_episod' item.id %}" class="cta-primary">{% trans 'ادامه یادگیری' %}</a>
+                    </div>
+                </div>
+            </article>
+        {% empty %}
+            <section class="account-card col-span-full">
+                <div class="empty-state">
+                    <h3>{% trans 'برنامه شما هنوز خالی است' %}</h3>
+                    <p>{% trans 'پس از تهیه یا افزودن دوره‌های رایگان، این بخش به صورت خودکار تکمیل می‌شود.' %}</p>
+                    <a href="{% url 'home:series' %}" class="cta-primary mt-4">{% trans 'مشاهده دوره‌ها' %}</a>
+                </div>
+            </section>
+        {% endfor %}
+    </section>
+</section>
+{% endblock %}
