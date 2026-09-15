@@ -13,6 +13,8 @@ ENV/
 
 # Django / local data
 .env
+.env.*
+!.env.example
 env
 db.sqlite3
 *.sqlite3

@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from typing import Any, Iterable, Mapping, Sequence
+
+from django.db.models import QuerySet
 
 from account.models import (
     CorrectiveExercise,
@@ -14,9 +17,15 @@ from account.models import (
 
 
 class AutomaticProgramService:
-    """Build a conservative, editable workout payload from the exercise library."""
+    """Build a conservative, editable workout payload from the exercise library.
 
-    DIFFICULTY_ALIASES = {
+    The generator only selects catalogued values and never invents exercise
+    records. Its defaults and selection rules are part of the prescription
+    contract, so changes should preserve the returned payload shape and be
+    validated with ``account.tests_gym_programs``.
+    """
+
+    DIFFICULTY_ALIASES: dict[int, tuple[str, ...]] = {
         0: (
             "beginner",
             "novice",
@@ -43,7 +52,7 @@ class AutomaticProgramService:
         ),
     }
 
-    GOAL_DEFAULTS = {
+    GOAL_DEFAULTS: dict[str, tuple[str, str, str]] = {
         "strength": ("4", "4-6", "120 ثانیه"),
         "volume": ("4", "8-12", "60-90 ثانیه"),
         "endurance": ("3", "15-20", "30-45 ثانیه"),
@@ -51,7 +60,7 @@ class AutomaticProgramService:
         "power": ("4", "3-5", "120-180 ثانیه"),
         "general": ("3", "8-12", "60 ثانیه"),
     }
-    GOAL_ALIASES = {
+    GOAL_ALIASES: dict[str, tuple[str, ...]] = {
         "strength": ("strength", "قدرت"),
         "volume": ("volume", "hypertrophy", "muscle gain", "حجم"),
         "endurance": ("endurance", "استقامت"),
@@ -63,15 +72,22 @@ class AutomaticProgramService:
     def generate(
         self,
         *,
-        difficulty,
-        gender,
-        abnormalities,
-        sessions,
-        movements,
-        goal,
-        secondary_movement_counts=None,
-        session_movement_targets=None,
-    ):
+        difficulty: ExerciseDifficultyLevel | int,
+        gender: str | None,
+        abnormalities: Iterable[Any],
+        sessions: int,
+        movements: int,
+        goal: str,
+        secondary_movement_counts: Mapping[Any, Any] | Sequence[Any] | None = None,
+        session_movement_targets: Sequence[dict[str, Any]] | None = None,
+    ) -> dict[str, list[dict[str, Any]]]:
+        """Generate editable daily exercise and corrective-item payloads.
+
+        ``difficulty`` accepts either the model instance used by admin forms or
+        its primary key. ``secondary_movement_counts`` and
+        ``session_movement_targets`` retain both legacy and row-based input
+        shapes for compatibility with saved editor payloads.
+        """
         selected_ids = self._selected_movement_type_ids(
             secondary_movement_counts,
             session_movement_targets,
@@ -190,12 +206,12 @@ class AutomaticProgramService:
     @staticmethod
     def _pick_varied_exercise(
         *,
-        preferred_pool,
-        pool,
-        used_ids_by_muscle,
-        session_used_ids,
-        cursor,
-    ):
+        preferred_pool: Sequence[Exercise],
+        pool: Sequence[Exercise],
+        used_ids_by_muscle: Mapping[int, set[int]],
+        session_used_ids: set[int],
+        cursor: int,
+    ) -> Exercise | None:
         """Pick an unused movement for its muscle and the current session.
 
         Target sections can point to the same primary muscle, so weekly variety
@@ -222,7 +238,7 @@ class AutomaticProgramService:
         return None
 
     @classmethod
-    def _allowed_difficulty_level_ids(cls, difficulty):
+    def _allowed_difficulty_level_ids(cls, difficulty: ExerciseDifficultyLevel | int) -> list[int]:
         """Return the selected level and all easier levels.
 
         The lookup table is user-editable and historically contains both Persian
@@ -248,7 +264,8 @@ class AutomaticProgramService:
         ] or [difficulty_id]
 
     @classmethod
-    def _difficulty_rank(cls, difficulty_level):
+    def _difficulty_rank(cls, difficulty_level: ExerciseDifficultyLevel | None) -> int | None:
+        """Map a catalog difficulty label to the normalized 0-2 difficulty rank."""
         if not difficulty_level:
             return None
         text = " ".join(
@@ -266,11 +283,19 @@ class AutomaticProgramService:
         return None
 
     @staticmethod
-    def _secondary_movement_types(ids):
+    def _secondary_movement_types(
+        ids: Sequence[int],
+    ) -> QuerySet[ExerciseSecondaryMovementType]:
+        """Load the selected target sections from the exercise library."""
         return ExerciseSecondaryMovementType.objects.filter(pk__in=ids)
 
     @classmethod
-    def _selected_movement_type_ids(cls, secondary_movement_counts, session_movement_targets):
+    def _selected_movement_type_ids(
+        cls,
+        secondary_movement_counts: Mapping[Any, Any] | Sequence[Any] | None,
+        session_movement_targets: Sequence[dict[str, Any]] | None,
+    ) -> list[int]:
+        """Normalize legacy and row-based target-section inputs to primary keys."""
         selected_ids = []
 
         def add(value):
@@ -309,12 +334,13 @@ class AutomaticProgramService:
     def _session_plans(
         cls,
         *,
-        sessions,
-        selected_ids,
-        secondary_movement_counts,
-        session_movement_targets,
-        movement_type_map,
-    ):
+        sessions: int,
+        selected_ids: Sequence[int],
+        secondary_movement_counts: Mapping[Any, Any] | Sequence[Any] | None,
+        session_movement_targets: Sequence[dict[str, Any]] | None,
+        movement_type_map: Mapping[int, Any],
+    ) -> list[list[tuple[int, int]]]:
+        """Build an ordered movement/count plan for each training session."""
         session_count = max(1, int(sessions))
         fallback_counts = (
             secondary_movement_counts
@@ -369,7 +395,9 @@ class AutomaticProgramService:
         return plans
 
     @staticmethod
-    def _session_target_entries(session_target):
+    def _session_target_entries(
+        session_target: dict[str, Any],
+    ) -> list[tuple[Any, Any]] | None:
         """Return row-based session targets as ``(movement_type_id, count)`` pairs.
 
         The editor stores each session as separate target rows. The older
@@ -382,7 +410,7 @@ class AutomaticProgramService:
         entries = session_target.get("targets")
         if not isinstance(entries, list):
             return []
-        normalized = []
+        normalized: list[tuple[Any, Any]] = []
         for entry in entries:
             if not isinstance(entry, dict):
                 continue
@@ -398,7 +426,12 @@ class AutomaticProgramService:
         return normalized
 
     @classmethod
-    def _ordered_movement_type_ids(cls, ids, movement_type_map):
+    def _ordered_movement_type_ids(
+        cls,
+        ids: Sequence[Any] | None,
+        movement_type_map: Mapping[int, Any],
+    ) -> list[int]:
+        """Preserve requested section order while placing abdominal work last."""
         ordered = []
         for value in ids or []:
             try:
@@ -416,7 +449,8 @@ class AutomaticProgramService:
         )
 
     @staticmethod
-    def _is_abdominal_movement_type(movement_type):
+    def _is_abdominal_movement_type(movement_type: Any) -> bool:
+        """Return whether a movement section represents abdominal work."""
         text = " ".join(
             value
             for value in (
@@ -431,7 +465,8 @@ class AutomaticProgramService:
         )
 
     @classmethod
-    def _lookup_value(cls, model, field, goal, fallback):
+    def _lookup_value(cls, model: Any, field: str, goal: str, fallback: str) -> str:
+        """Resolve goal-specific prescription text with a safe fallback value."""
         aliases = cls.GOAL_ALIASES.get(goal, (goal,))
         queryset = model.objects.all()
         for alias in aliases:

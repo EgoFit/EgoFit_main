@@ -5,7 +5,7 @@ from typing import Any
 
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.db.models import Prefetch
+from django.db.models import Prefetch, QuerySet
 from django.utils.translation import gettext_lazy as _
 
 from account.utils import normalize_digits
@@ -21,7 +21,12 @@ from account.models import (
 
 
 class GymProgramService:
-    """Business logic for saving and reading database-backed workout programs."""
+    """Validate, persist, and serialize database-backed workout programs.
+
+    The payload shape and validation rules are intentionally explicit because
+    this service is the boundary for admin-authored training prescriptions.
+    Keep changes here behavioural and covered by the gym-program test module.
+    """
 
     MAX_DAYS = 14
     MAX_ITEMS_PER_DAY = 50
@@ -39,7 +44,8 @@ class GymProgramService:
         except ValueError:
             return 1
 
-    def get_program_queryset(self):
+    def get_program_queryset(self) -> QuerySet[WorkoutProgram]:
+        """Return programs with their nested days, exercises, and correctives prefetched."""
         return (
             WorkoutProgram.objects.select_related("user", "prescribed_by")
             .prefetch_related(
@@ -64,6 +70,7 @@ class GymProgramService:
         )
 
     def serialize_program(self, program: WorkoutProgram | None) -> dict[str, Any]:
+        """Convert a prefetched program into the JSON-compatible editor payload."""
         if program is None:
             return {"days": [], "correctives": []}
 
@@ -118,12 +125,13 @@ class GymProgramService:
     def save_program(
         self,
         *,
-        program_form,
-        target_user,
-        prescribed_by,
+        program_form: Any,
+        target_user: Any,
+        prescribed_by: Any,
         days_payload: list[dict[str, Any]],
         correctives_payload: list[dict[str, Any]] | None = None,
     ) -> WorkoutProgram:
+        """Validate and atomically save an admin-authored workout program."""
         days_payload = days_payload or []
         correctives_payload = correctives_payload or []
         self._validate_payload_shape(days_payload, correctives_payload)
@@ -297,7 +305,12 @@ class GymProgramService:
             NotificationService.schedule_program_registered(program)
         return program
 
-    def _validate_payload_shape(self, days_payload, correctives_payload):
+    def _validate_payload_shape(
+        self,
+        days_payload: list[dict[str, Any]],
+        correctives_payload: list[dict[str, Any]],
+    ) -> None:
+        """Validate collection sizes and nested shapes before touching the database."""
         if not days_payload:
             raise ValidationError(_("حداقل یک روز برای برنامه اضافه کنید."))
         if len(days_payload) > self.MAX_DAYS:
@@ -323,7 +336,8 @@ class GymProgramService:
             raise ValidationError(_("ساختار حرکت‌های اصلاحی معتبر نیست."))
 
     @staticmethod
-    def _parse_id(value, label):
+    def _parse_id(value: Any, label: Any) -> int:
+        """Parse a positive catalog primary key or raise a localized validation error."""
         try:
             parsed = int(value)
         except (TypeError, ValueError):
@@ -333,7 +347,14 @@ class GymProgramService:
         return parsed
 
     @staticmethod
-    def _text(value, label, *, required=False, max_length=None):
+    def _text(
+        value: Any,
+        label: Any,
+        *,
+        required: bool = False,
+        max_length: int | None = None,
+    ) -> str:
+        """Normalize and validate a bounded text field from an editor payload."""
         value = str(value or "").strip()
         if required and not value:
             raise ValidationError(_("%(label)s را وارد کنید.") % {"label": label})
@@ -347,12 +368,13 @@ class GymProgramService:
     @classmethod
     def _optional_movement_text(
         cls,
-        item_data,
-        key,
-        fallback_key,
-        label,
-        max_length,
-    ):
+        item_data: dict[str, Any],
+        key: str,
+        fallback_key: str,
+        label: Any,
+        max_length: int,
+    ) -> str:
+        """Read an optional superset/triset field, falling back to the main value."""
         value = item_data.get(key)
         if value is None:
             value = item_data.get(fallback_key)
