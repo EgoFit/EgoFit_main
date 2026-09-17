@@ -1161,6 +1161,42 @@
     color: #047857;
 }
 
+.admin-program-feedback {
+    display: grid;
+    gap: 8px;
+    padding: 10px 12px;
+    border: 1px solid rgba(245, 158, 11, 0.22);
+    border-radius: 14px;
+    background: rgba(245, 158, 11, 0.06);
+}
+
+.admin-program-feedback__title {
+    color: #92400e;
+    font-size: 0.82rem;
+}
+
+.admin-program-feedback__list {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.admin-program-feedback__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    color: #6b7280;
+    font-size: 0.82rem;
+}
+
+.admin-program-feedback__item strong {
+    color: #92400e;
+    white-space: nowrap;
+}
+
 .admin-program-card__actions {
     display: flex;
     flex-wrap: wrap;

@@ -74,6 +74,9 @@
                                     <dt>{% trans 'سطح دشواری' %}</dt><dd>{{ item.difficulty_level.name|default:'—' }}</dd>
                                     <dt>{% trans 'مفصل هدف' %}</dt><dd>{{ item.joint_type.name|default:'—' }}</dd>
                                 </dl>
+                                <div class="workout-library-modal__actions">
+                                    <a href="{% url 'home:workout_bodybuilding' %}" class="secondary-action">← {% trans 'بازگشت به کتابخانه حرکت' %}</a>
+                                </div>
                             {% endif %}
                             <template class="workout-library-modal-template">
                                 <div class="workout-library-modal__eyebrow">{% if page_kind == 'correctives' %}{% trans 'حرکت اصلاحی' %}{% else %}{% trans 'تمرین بدنسازی' %}{% endif %}</div>
@@ -96,10 +99,10 @@
                                         <dt>{% trans 'سطح دشواری' %}</dt><dd>{{ item.difficulty_level.name|default:'—' }}</dd>
                                         <dt>{% trans 'مفصل هدف' %}</dt><dd>{{ item.joint_type.name|default:'—' }}</dd>
                                     </dl>
+                                    <div class="workout-library-modal__actions">
+                                    <a href="{% url 'home:workout_bodybuilding' %}" class="secondary-action">← {% trans 'بازگشت به کتابخانه حرکات' %}</a>
+                                    </div>
                                 {% endif %}
-                                <div class="workout-library-modal__actions">
-                                    <a href="{% url 'home:workout_musculology' %}" class="secondary-action">← {% trans 'بازگشت به کتابخانه عضلات' %}</a>
-                                </div>
                             </template>
                         </article>
                     {% endif %}

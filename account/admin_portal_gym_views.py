@@ -240,13 +240,23 @@ class AdminProgramListView(AdminProgramMixin, TemplateView):
             gym_program_service.get_program_queryset().filter(user=self.target_user).order_by("-created_at", "-pk"),
         )
         programs = list(programs_page["page_obj"].object_list)
-        feedback_by_program = {}
+        feedback_by_day = {}
+        legacy_feedback_by_program = {}
         for feedback in WorkoutProgramFeedback.objects.filter(
             program_id__in=[program.pk for program in programs]
-        ).order_by("-submitted_at"):
-            feedback_by_program.setdefault(feedback.program_id, feedback)
+        ).select_related("day").order_by("-submitted_at", "-pk"):
+            if feedback.day_id is None:
+                legacy_feedback_by_program.setdefault(feedback.program_id, feedback)
+            else:
+                feedback_by_day.setdefault((feedback.program_id, feedback.day_id), feedback)
+
         for program in programs:
-            program.user_feedback = feedback_by_program.get(program.pk)
+            program.session_feedbacks = [
+                feedback
+                for day in program.days.all()
+                if (feedback := feedback_by_day.get((program.pk, day.pk))) is not None
+            ]
+            program.legacy_feedback = legacy_feedback_by_program.get(program.pk)
         context["programs"] = programs
         context.update(programs_page)
         return context

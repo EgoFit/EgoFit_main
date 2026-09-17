@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.contrib import admin
 from django.test import RequestFactory, SimpleTestCase, TestCase
+from django.urls import reverse
 
 from home.admin import ArticleBlogImageInline, ArticleBlogLinkInline, ArticleBlogModelAdmin, CommentAdmin
-from home.models import ArticleBlogImage, ArticleBlogLink, ArticleBlogModel, Comment
+from home.models import ArticleBlogImage, ArticleBlogLink, ArticleBlogModel, Category, Comment
 from home.rich_text import sanitize_rich_text
 from home.utils import normalize_search_query
 from home.validators import normalize_phone_number, validate_phone_number
@@ -37,6 +39,21 @@ class VideoStreamingTests(SimpleTestCase):
 
     def test_parse_http_range_rejects_invalid_range(self):
         self.assertIsNone(parse_http_range("bytes=200-100", 100))
+
+
+class WorkoutLibraryNavigationTests(TestCase):
+    def test_category_page_keeps_educational_categories_in_site_header(self):
+        from account.models import ExerciseSecondaryMovementType
+
+        Category.objects.create(title="دسته آموزشی", slug="education")
+        ExerciseSecondaryMovementType.objects.get_or_create(name="سینه")
+        cache.clear()
+
+        response = self.client.get(reverse("home:workout_bodybuilding"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "دسته آموزشی")
+        self.assertContains(response, "سینه")
 
 
 class ArticleContentTests(TestCase):

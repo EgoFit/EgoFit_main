@@ -21,6 +21,7 @@ urlpatterns = [
     path('workout-library/bodybuilding/', views.WorkoutBodybuildingView.as_view(), name='workout_bodybuilding'),
     path('workout-library/corrective/', views.WorkoutCorrectiveLibraryView.as_view(), name='workout_corrective_library'),
     path('workout-library/musculology/', views.WorkoutMusculologyView.as_view(), name='workout_musculology'),
+    path('workout-library/category/<int:pk>/', views.WorkoutCategoryView.as_view(), name='workout_category'),
     path('workout-library/body-part/<int:pk>/', views.WorkoutBodyPartView.as_view(), name='workout_body_part'),
     path('workout-library/abnormality/<int:pk>/', views.WorkoutAbnormalityView.as_view(), name='workout_abnormality'),
     path('workout-library/muscle/<int:pk>/', views.WorkoutMuscleView.as_view(), name='workout_muscle'),

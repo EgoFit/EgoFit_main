@@ -2211,6 +2211,10 @@
     color: #1e3a8a;
     box-shadow: 0 12px 22px rgba(15, 23, 42, 0.16);
     white-space: nowrap;
+    -webkit-border-radius: 999px;
+    -moz-border-radius: 999px;
+    -ms-border-radius: 999px;
+    -o-border-radius: 999px;
 }
 
 .workout-plans-shortcut__actions {
@@ -2275,15 +2279,21 @@
 
 .workout-plans-shortcut__cta {
     display: inline-flex;
+    font-size: 0.90rem;
     align-items: center;
     gap: 10px;
     min-height: 40px;
-    padding-inline: 16px;
+    padding-inline: 12px;
     white-space: nowrap;
     background: #fff;
     color: #1e3a8a;
+    border-radius: 12px;
     box-shadow: 0 12px 22px rgba(15, 23, 42, 0.16);
     transition: transform 180ms ease, background-color 180ms ease, color 180ms ease, box-shadow 180ms ease;
+    -webkit-border-radius: 12px;
+    -moz-border-radius: 12px;
+    -ms-border-radius: 12px;
+    -o-border-radius: 12px;
 }
 
 .workout-plans-shortcut__cta:hover,
@@ -2878,6 +2888,7 @@
     min-height: 50px;
     justify-self: start;
     border: 0;
+    border-radius: 12px;
     cursor: pointer;
     background: linear-gradient(135deg, #3454d1 0%, #2f4ecc 55%, #14b8a6 140%);
     color: #fff;
@@ -2885,6 +2896,10 @@
     font-size: 0.9rem;
     font-weight: 900;
     transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+    -webkit-border-radius: 12px;
+    -moz-border-radius: 12px;
+    -ms-border-radius: 12px;
+    -o-border-radius: 12px;
 }
 
 .workout-performance-submit:hover {

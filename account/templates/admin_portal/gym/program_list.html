@@ -38,8 +38,24 @@
                     </span>
                 </div>
                 {% if program.notes %}<p class="admin-screen__note">{{ program.notes|truncatechars:180 }}</p>{% endif %}
-                {% if program.user_feedback %}
-                    <p class="admin-screen__note">{% trans 'بازخورد دشواری کاربر' %}: <strong>{{ program.user_feedback.difficulty }}/10</strong></p>
+                {% if program.session_feedbacks or program.legacy_feedback %}
+                    <section class="admin-program-feedback" aria-label="{% trans 'بازخورد دشواری کاربر' %}">
+                        <strong class="admin-program-feedback__title">{% trans 'بازخورد دشواری کاربر' %}</strong>
+                        <ul class="admin-program-feedback__list">
+                            {% for feedback in program.session_feedbacks %}
+                                <li class="admin-program-feedback__item">
+                                    <span>{% trans 'جلسه' %}: {{ feedback.day.name }}</span>
+                                    <strong>{{ feedback.difficulty }}/10</strong>
+                                </li>
+                            {% endfor %}
+                            {% if program.legacy_feedback %}
+                                <li class="admin-program-feedback__item">
+                                    <span>{% trans 'بازخورد کلی برنامه' %}</span>
+                                    <strong>{{ program.legacy_feedback.difficulty }}/10</strong>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </section>
                 {% endif %}
                 <div class="admin-program-card__actions">
                     <a href="{% url 'register:admin_program_edit' target_user.id program.pk %}" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'ویرایش' %}</a>

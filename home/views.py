@@ -8,11 +8,18 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import DetailView, TemplateView
-from django.db.models import Q
+from django.db.models import Case, IntegerField, Q, When
 
 from home.forms import CommentForm, CommentSectionForm, ReplyForm
 from home.exceptions import SearchValidationException
-from account.models import CorrectiveExercise, Exercise, ExerciseAbnormalityType, ExerciseBodyPart, Muscle
+from account.models import (
+    CorrectiveExercise,
+    Exercise,
+    ExerciseAbnormalityType,
+    ExerciseBodyPart,
+    ExerciseSecondaryMovementType,
+    Muscle,
+)
 from home.models import ArticleBlogModel, Episode, SeriesModel
 from home.selectors.article_selector import ArticleSelector
 from home.selectors.course_selector import CourseSelector
@@ -113,10 +120,22 @@ class WorkoutBodybuildingView(TemplateView):
         context["page_title"] = _("تمرینات بدنسازی")
         context["page_description"] = _("حرکت‌های بدنسازی را بر اساس عضله و بخش بدن پیدا کنید.")
         context["page_kind"] = "exercises"
-        context["categories"] = ExerciseBodyPart.objects.filter(
+        category_names = [
+            "سینه", "بخش بالایی پشت", "بخش پایینی پشت", "شانه", "جلو بازو",
+            "پشت بازو", "پا", "ساق", "سرینی", "ساعد",
+        ]
+        category_order = Case(
+            *[When(name=name, then=index) for index, name in enumerate(category_names)],
+            output_field=IntegerField(),
+        )
+        context["workout_categories"] = ExerciseSecondaryMovementType.objects.filter(
+            name__in=category_names,
+        ).exclude(
+            name__in=["بالاتنه", "بالا تنه", "پایین‌تنه", "پایین تنه"],
+        ).filter(
             Q(name__icontains=query) | Q(name_en__icontains=query) if query else Q()
-        ).order_by("name")
-        context["category_url_name"] = "home:workout_body_part"
+        ).order_by(category_order)
+        context["category_url_name"] = "home:workout_category"
         context["query"] = query
         return context
 
@@ -130,7 +149,7 @@ class WorkoutCorrectiveLibraryView(TemplateView):
         context["page_title"] = _("حرکات اصلاحی")
         context["page_description"] = _("حرکت‌های اصلاحی را بر اساس ناهنجاری انتخاب کنید.")
         context["page_kind"] = "correctives"
-        context["categories"] = ExerciseAbnormalityType.objects.filter(
+        context["workout_categories"] = ExerciseAbnormalityType.objects.filter(
             Q(name__icontains=query) | Q(name_en__icontains=query) if query else Q()
         ).order_by("name")
         context["category_url_name"] = "home:workout_abnormality"
@@ -171,6 +190,32 @@ class WorkoutBodyPartView(TemplateView):
         context.update({
             "page_title": category.name,
             "page_description": _("حرکت‌های مناسب این بخش بدن را با جزئیات کامل ببینید."),
+            "page_kind": "exercises",
+            "query": query,
+            "items": exercises,
+            "category": category,
+        })
+        return context
+
+
+class WorkoutCategoryView(TemplateView):
+    template_name = "home/workout-library-list.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        category = get_object_or_404(ExerciseSecondaryMovementType, pk=kwargs["pk"])
+        query = (self.request.GET.get("q") or "").strip()
+        exercises = Exercise.objects.filter(secondary_movement_type=category).select_related(
+            "primary_muscle", "secondary_muscle", "movement_type", "joint_type",
+            "difficulty_level", "equipment_type"
+        )
+        if query:
+            exercises = exercises.filter(
+                Q(name__icontains=query) | Q(name_en__icontains=query) | Q(description__icontains=query)
+            )
+        context.update({
+            "page_title": category.name,
+            "page_description": _("حرکت‌های این دسته را با جزئیات کامل ببینید."),
             "page_kind": "exercises",
             "query": query,
             "items": exercises,

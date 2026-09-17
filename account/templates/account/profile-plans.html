@@ -49,11 +49,11 @@
                     <h2 class="text-xl font-black">{{ document.title }}</h2>
                     <p class="text-sm text-slate-500">{% blocktrans with uploaded_at=document.uploaded_at|date:"Y/m/d" %}ارسال‌شده در {{ uploaded_at }}{% endblocktrans %}{% if document.uploaded_by %} {% blocktrans with uploader=document.uploaded_by.display_name|default:document.uploaded_by.fullname %}توسط {{ uploader }}{% endblocktrans %}{% endif %}</p>
                     {% if document.pk in paid_document_ids or not document.requires_payment %}
-                        <a href="{% url 'register:profile_document_download' document.pk %}" class="cta-primary">{% trans 'دانلود فایل' %}</a>
+                        <a href="{% url 'register:profile_document_download' document.pk %}" class="cta-primary workout-plans-shortcut__cta">{% trans 'دانلود فایل' %}</a>
                     {% else %}
                         <form method="post" action="{% url 'register:profile_document_pay' document.pk %}">
                             {% csrf_token %}
-                            <button type="submit" class="cta-primary">{% blocktrans with price=document.price %}پرداخت {{ price }} تومان و دانلود{% endblocktrans %}</button>
+                            <button type="submit" class="cta-primary workout-plans-shortcut__cta">{% blocktrans with price=document.price %}پرداخت {{ price }} تومان و دانلود{% endblocktrans %}</button>
                         </form>
                     {% endif %}
                 </div>

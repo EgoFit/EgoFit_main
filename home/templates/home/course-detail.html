@@ -9,7 +9,7 @@
     <div class="shell-container page-stack">
         <section class="section-card modern-surface" data-reveal>
             {% calculate_episodes_and_duration object as episode_data %}
-            <div class="detail-layout">
+            <div class="detail-layout detail-layout--course-detail">
                 <div class="detail-main">
                     <div class="detail-cover relative">
                         <img src="{{ seriesmodel.image|public_media_url }}" alt="{{ seriesmodel.title }}" loading="eager">
@@ -31,7 +31,7 @@
                     </div>
 
                     <div class="detail-body">
-                        <div class="flex flex-wrap items-start justify-between gap-4">
+                        <div class="detail-intro flex flex-wrap items-start justify-between gap-4">
                             <div class="space-y-3 max-w-4xl">
                                 <span class="eyebrow">مسیر یادگیری تخصصی</span>
                                 <h1 class="section-heading__title text-3xl md:text-4xl leading-tight">

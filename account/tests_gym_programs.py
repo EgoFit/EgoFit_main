@@ -91,6 +91,37 @@ class GymProgramPortalTests(TestCase):
             abnormality_type=abnormality,
         )
 
+    def test_admin_program_list_shows_feedback_separately_for_each_day(self):
+        program = WorkoutProgram.objects.create(
+            title="برنامه چهار جلسه‌ای",
+            user=self.client_user,
+            prescribed_by=self.admin,
+            start_date=date(2026, 9, 1),
+        )
+        first_day = WorkoutProgramDay.objects.create(
+            program=program,
+            name="جلسه اول",
+            order=1,
+        )
+        second_day = WorkoutProgramDay.objects.create(
+            program=program,
+            name="جلسه دوم",
+            order=2,
+        )
+        WorkoutProgramFeedback.objects.create(program=program, day=first_day, difficulty=4)
+        WorkoutProgramFeedback.objects.create(program=program, day=second_day, difficulty=8)
+
+        self.client.force_login(self.admin)
+        response = self.client.get(
+            reverse("register:admin_program_list", args=[self.client_user.pk])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "جلسه اول")
+        self.assertContains(response, "4/10")
+        self.assertContains(response, "جلسه دوم")
+        self.assertContains(response, "8/10")
+
     def test_admin_can_create_program_with_superset_and_corrective_movement(self):
         self.client.force_login(self.admin)
         response = self.client.post(
@@ -483,6 +514,91 @@ class GymProgramPortalTests(TestCase):
         )
         self.assertEqual(len(preview["days"][1]["items"]), 1)
         self.assertEqual(preview["days"][1]["items"][0]["exercise"], easier_chest.pk)
+
+    def test_automatic_program_puts_power_first_and_compound_before_isolation(self):
+        movement_type = ExerciseSecondaryMovementType.objects.create(name="ترتیب حرکات")
+        power_type, _ = ExercisePowerType.objects.get_or_create(name="توانی")
+        single_joint, _ = ExerciseJointType.objects.get_or_create(name="تک مفصلی")
+
+        power_isolation = Exercise.objects.create(
+            name="حرکت توان انفجاری",
+            primary_muscle=self.exercise_one.primary_muscle,
+            body_part=self.exercise_one.body_part,
+            movement_type=self.exercise_one.movement_type,
+            joint_type=single_joint,
+            power_type=power_type,
+            difficulty_level=self.exercise_one.difficulty_level,
+            equipment_type=self.exercise_one.equipment_type,
+            secondary_movement_type=movement_type,
+        )
+        compound = Exercise.objects.create(
+            name="حرکت چندمفصلی",
+            primary_muscle=self.exercise_one.primary_muscle,
+            body_part=self.exercise_one.body_part,
+            movement_type=self.exercise_one.movement_type,
+            joint_type=self.exercise_one.joint_type,
+            power_type=self.exercise_one.power_type,
+            difficulty_level=self.exercise_one.difficulty_level,
+            equipment_type=self.exercise_one.equipment_type,
+            secondary_movement_type=movement_type,
+        )
+        isolation = Exercise.objects.create(
+            name="حرکت تک‌مفصلی",
+            primary_muscle=self.exercise_one.primary_muscle,
+            body_part=self.exercise_one.body_part,
+            movement_type=self.exercise_one.movement_type,
+            joint_type=single_joint,
+            power_type=self.exercise_one.power_type,
+            difficulty_level=self.exercise_one.difficulty_level,
+            equipment_type=self.exercise_one.equipment_type,
+            secondary_movement_type=movement_type,
+        )
+
+        preview = AutomaticProgramService().generate(
+            difficulty=self.exercise_one.difficulty_level,
+            gender="",
+            abnormalities=[],
+            sessions=1,
+            movements=3,
+            goal="general",
+            secondary_movement_counts={str(movement_type.pk): 3},
+        )
+
+        selected_ids = [item["exercise"] for item in preview["days"][0]["items"]]
+        self.assertEqual(selected_ids, [power_isolation.pk, compound.pk, isolation.pk])
+
+    def test_automatic_program_varies_goal_prescriptions_from_database(self):
+        movement_type = ExerciseSecondaryMovementType.objects.create(name="تنوع نسخه")
+        for exercise in (self.exercise_one, self.exercise_two, self.exercise_three):
+            exercise.secondary_movement_type = movement_type
+            exercise.save(update_fields=["secondary_movement_type"])
+
+        ExerciseSetType.objects.create(set_count="SET-A", goal="volume")
+        ExerciseSetType.objects.create(set_count="SET-B", goal="volume")
+        ExerciseRepetitionType.objects.create(reps="REP-A", goal="volume")
+        ExerciseRepetitionType.objects.create(reps="REP-B", goal="volume")
+
+        preview = AutomaticProgramService().generate(
+            difficulty=self.exercise_one.difficulty_level,
+            gender="",
+            abnormalities=[],
+            sessions=1,
+            movements=3,
+            goal="volume",
+            secondary_movement_counts={str(movement_type.pk): 3},
+        )
+        items = preview["days"][0]["items"]
+        database_sets = set(
+            ExerciseSetType.objects.filter(goal="volume").values_list("set_count", flat=True)
+        )
+        database_reps = set(
+            ExerciseRepetitionType.objects.filter(goal="volume").values_list("reps", flat=True)
+        )
+
+        self.assertGreater(len({item["sets"] for item in items}), 1)
+        self.assertGreater(len({item["reps"] for item in items}), 1)
+        self.assertTrue({item["sets"] for item in items}.issubset(database_sets))
+        self.assertTrue({item["reps"] for item in items}.issubset(database_reps))
 
     def test_automatic_program_varies_repeated_body_part_sessions_before_repeating(self):
         chest_type = ExerciseSecondaryMovementType.objects.create(name="سینه تنوع هفتگی")

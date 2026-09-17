@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
+import random
 from typing import Any, Iterable, Mapping, Sequence
 
 from django.db.models import QuerySet
@@ -68,6 +69,14 @@ class AutomaticProgramService:
         "power": ("power", "توان"),
         "general": ("general", "عمومی", "تناسب عمومی"),
     }
+    POWER_TYPE_ALIASES = ("power", "توان", "توانی", "explosive")
+    COMPOUND_JOINT_ALIASES = (
+        "compound",
+        "multi-joint",
+        "multijoint",
+        "چند مفصلی",
+        "چندمفصلی",
+    )
 
     def generate(
         self,
@@ -99,14 +108,28 @@ class AutomaticProgramService:
         if not selected_ids:
             return {"days": [], "correctives": []}
 
-        fallback_sets, fallback_reps, fallback_rest = self.GOAL_DEFAULTS.get(goal, self.GOAL_DEFAULTS["general"])
-        sets = self._lookup_value(ExerciseSetType, "set_count", goal, fallback_sets)
-        reps = self._lookup_value(ExerciseRepetitionType, "reps", goal, fallback_reps)
-        rest = self._lookup_value(ExerciseRestType, "rest_time", goal, fallback_rest)
+        fallback_sets, fallback_reps, fallback_rest = self.GOAL_DEFAULTS.get(
+            goal,
+            self.GOAL_DEFAULTS["general"],
+        )
+        prescription_catalogs = {
+            "sets": self._randomized_catalog(
+                self._lookup_values(ExerciseSetType, "set_count", goal) or [fallback_sets]
+            ),
+            "reps": self._randomized_catalog(
+                self._lookup_values(ExerciseRepetitionType, "reps", goal) or [fallback_reps]
+            ),
+            "rest": self._randomized_catalog(
+                self._lookup_values(ExerciseRestType, "rest_time", goal) or [fallback_rest]
+            ),
+        }
         difficulty_id = getattr(difficulty, "pk", difficulty)
         allowed_difficulty_ids = self._allowed_difficulty_level_ids(difficulty)
         queryset = Exercise.objects.select_related(
             "primary_muscle",
+            "body_part",
+            "joint_type",
+            "power_type",
             "difficulty_level",
             "secondary_movement_type",
         ).filter(
@@ -130,8 +153,10 @@ class AutomaticProgramService:
         )
         days = []
         has_explicit_session_targets = bool(session_movement_targets)
-        used_exercise_ids_by_muscle = defaultdict(set)
+        exercise_by_id = {exercise.pk: exercise for exercise in exercises}
+        used_exercise_ids = set()
         rotation_cursors = defaultdict(int)
+        prescription_index = 0
         for day_number, session_plan in enumerate(session_plans, start=1):
             items = []
             session_used_exercise_ids = set()
@@ -148,35 +173,41 @@ class AutomaticProgramService:
                     exercise = self._pick_varied_exercise(
                         preferred_pool=preferred_pool,
                         pool=pool,
-                        used_ids_by_muscle=used_exercise_ids_by_muscle,
+                        used_exercise_ids=used_exercise_ids,
                         session_used_ids=session_used_exercise_ids,
                         cursor=rotation_cursors[movement_type_id],
                     )
                     if exercise is None:
                         break
                     rotation_cursors[movement_type_id] += 1
-                    used_exercise_ids_by_muscle[exercise.primary_muscle_id].add(exercise.pk)
+                    used_exercise_ids.add(exercise.pk)
                     session_used_exercise_ids.add(exercise.pk)
+                    prescription = self._prescription_for_index(
+                        prescription_catalogs,
+                        prescription_index,
+                    )
+                    prescription_index += 1
                     items.append(
                         {
                             "exercise": exercise.pk,
                             "exercise_name": exercise.name,
                             "superset_exercise": "",
                             "third_exercise": "",
-                            "sets": sets,
-                            "reps": reps,
-                            "rest": rest,
-                            "superset_sets": sets,
-                            "superset_reps": reps,
-                            "superset_rest": rest,
-                            "third_sets": sets,
-                            "third_reps": reps,
-                            "third_rest": rest,
+                            "sets": prescription["sets"],
+                            "reps": prescription["reps"],
+                            "rest": prescription["rest"],
+                            "superset_sets": prescription["sets"],
+                            "superset_reps": prescription["reps"],
+                            "superset_rest": prescription["rest"],
+                            "third_sets": prescription["sets"],
+                            "third_reps": prescription["reps"],
+                            "third_rest": prescription["rest"],
                             "note": "",
                         }
                     )
             if not items:
                 continue
+            items = self._order_session_items(items, exercise_by_id)
             days.append(
                 {
                     "name": f"روز {day_number}",
@@ -208,23 +239,23 @@ class AutomaticProgramService:
         *,
         preferred_pool: Sequence[Exercise],
         pool: Sequence[Exercise],
-        used_ids_by_muscle: Mapping[int, set[int]],
+        used_exercise_ids: set[int],
         session_used_ids: set[int],
         cursor: int,
     ) -> Exercise | None:
-        """Pick an unused movement for its muscle and the current session.
+        """Pick an unused movement for the whole program and current session.
 
-        Target sections can point to the same primary muscle, so weekly variety
-        is tracked by muscle rather than by the selected target-section ID.
-        Repeating a movement in one session is never allowed. If the library
-        has no unused candidate, ``None`` is returned instead of prescribing a
-        duplicate.
+        A movement is never prescribed twice in one generated program. This
+        keeps repeated body-part sessions varied and also prevents accidental
+        duplicates when a target section is repeated inside one session. If the
+        library has no unused candidate, ``None`` is returned instead of filling
+        a slot with a duplicate.
         """
 
         def is_available(item):
             return (
                 item.pk not in session_used_ids
-                and item.pk not in used_ids_by_muscle.get(item.primary_muscle_id, set())
+                and item.pk not in used_exercise_ids
             )
 
         preferred_unused = [item for item in preferred_pool if is_available(item)]
@@ -236,6 +267,82 @@ class AutomaticProgramService:
             return unused[cursor % len(unused)]
 
         return None
+
+    @staticmethod
+    def _randomized_catalog(values: Sequence[str]) -> list[str]:
+        """Return unique catalog values in a random order."""
+        randomized = list(dict.fromkeys(value for value in values if value))
+        random.shuffle(randomized)
+        return randomized
+
+    @staticmethod
+    def _prescription_for_index(
+        catalogs: Mapping[str, Sequence[str]],
+        index: int,
+    ) -> dict[str, str]:
+        """Choose varied set/repetition/rest values from randomized catalogs."""
+        return {
+            field: values[index % len(values)]
+            for field, values in catalogs.items()
+            if values
+        }
+
+    @classmethod
+    def _order_session_items(
+        cls,
+        items: Sequence[dict[str, Any]],
+        exercise_by_id: Mapping[int, Exercise],
+    ) -> list[dict[str, Any]]:
+        """Place power work first, then group each body part compound-first."""
+        body_part_order = {}
+        indexed_items = []
+        for item_index, item in enumerate(items):
+            exercise = exercise_by_id[item["exercise"]]
+            body_part_order.setdefault(exercise.body_part_id, item_index)
+            indexed_items.append((item_index, item, exercise))
+
+        indexed_items.sort(
+            key=lambda entry: (
+                0 if cls._is_power_exercise(entry[2]) else 1,
+                body_part_order[entry[2].body_part_id],
+                0 if cls._is_compound_exercise(entry[2]) else 1,
+                entry[0],
+            )
+        )
+        return [item for _item_index, item, _exercise in indexed_items]
+
+    @classmethod
+    def _is_power_exercise(cls, exercise: Exercise) -> bool:
+        """Return whether an exercise has the catalogued explosive-power type."""
+        return cls._label_contains(exercise.power_type, cls.POWER_TYPE_ALIASES)
+
+    @classmethod
+    def _is_compound_exercise(cls, exercise: Exercise) -> bool:
+        """Return whether an exercise targets multiple joints."""
+        return cls._label_contains(exercise.joint_type, cls.COMPOUND_JOINT_ALIASES)
+
+    @classmethod
+    def _label_contains(cls, value: Any, aliases: Sequence[str]) -> bool:
+        text = cls._normalized_label(value)
+        return any(cls._normalized_label(alias) in text for alias in aliases)
+
+    @staticmethod
+    def _normalized_label(value: Any) -> str:
+        if value is None:
+            return ""
+        if hasattr(value, "name") or hasattr(value, "name_en"):
+            parts = (getattr(value, "name", ""), getattr(value, "name_en", ""))
+            value = " ".join(str(part) for part in parts if part)
+        return (
+            str(value)
+            .casefold()
+            .replace("ي", "ی")
+            .replace("ى", "ی")
+            .replace("ك", "ک")
+            .replace("\u200c", "")
+            .replace("-", "")
+            .replace(" ", "")
+        )
 
     @classmethod
     def _allowed_difficulty_level_ids(cls, difficulty: ExerciseDifficultyLevel | int) -> list[int]:
@@ -465,18 +572,26 @@ class AutomaticProgramService:
         )
 
     @classmethod
-    def _lookup_value(cls, model: Any, field: str, goal: str, fallback: str) -> str:
-        """Resolve goal-specific prescription text with a safe fallback value."""
+    def _lookup_values(cls, model: Any, field: str, goal: str) -> list[str]:
+        """Load all catalog values matching the requested goal aliases."""
         aliases = cls.GOAL_ALIASES.get(goal, (goal,))
-        queryset = model.objects.all()
+        values = []
         for alias in aliases:
-            item = queryset.filter(goal__iexact=alias).order_by("pk").first()
-            if item:
-                return getattr(item, field)
+            values.extend(
+                getattr(item, field)
+                for item in model.objects.filter(goal__iexact=alias).order_by("pk")
+            )
 
         # General programs commonly use the intentionally blank catalog goal.
-        if goal == "general":
-            item = queryset.filter(goal="").order_by("pk").first()
-            if item:
-                return getattr(item, field)
-        return fallback
+        if not values and goal == "general":
+            values.extend(
+                getattr(item, field)
+                for item in model.objects.filter(goal="").order_by("pk")
+            )
+        return list(dict.fromkeys(value for value in values if value))
+
+    @classmethod
+    def _lookup_value(cls, model: Any, field: str, goal: str, fallback: str) -> str:
+        """Resolve the first goal-specific prescription text with a fallback."""
+        values = cls._lookup_values(model, field, goal)
+        return values[0] if values else fallback
