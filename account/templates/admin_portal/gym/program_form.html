@@ -205,37 +205,58 @@
             function render() {
                 daysRoot.innerHTML = state.days.map(function (day, dayIndex) {
                     const items = Array.isArray(day.items) ? day.items : [];
+                    const dayBodyId = "program-day-body-" + dayIndex;
                     return '<article class="admin-program-day" data-day-index="' + dayIndex + '">' +
                         '<div class="admin-program-day__head">' +
+                        '<button type="button" class="admin-program-day__toggle" aria-label="نمایش/جمع کردن روز" aria-expanded="true" aria-controls="' + dayBodyId + '">' +
+                        '<span class="admin-program-day__toggle-icon" aria-hidden="true">⌄</span>' +
+                        '</button>' +
                         '<input class="program-day-name admin-program-day__name" value="' + escapeHtml(day.name || ("روز " + (dayIndex + 1))) + '" placeholder="عنوان روز">' +
                         '<button type="button" class="admin-secondary-btn admin-secondary-btn--small remove-day">حذف روز</button>' +
                         '</div>' +
+                        '<div class="admin-program-day__body" id="' + dayBodyId + '">' +
                         '<textarea class="program-day-notes admin-program-day__notes" rows="2" placeholder="توضیحات روز">' + escapeHtml(day.notes) + '</textarea>' +
                         '<div class="admin-program-items">' +
                         items.map(function (item, itemIndex) {
+                            const supersetBodyId = "program-item-" + dayIndex + "-" + itemIndex + "-superset";
+                            const thirdBodyId = "program-item-" + dayIndex + "-" + itemIndex + "-third";
                             return '<div class="admin-program-item" data-item-index="' + itemIndex + '">' +
                                 '<div class="admin-program-item__top"><strong>حرکت ' + (itemIndex + 1) + '</strong><button type="button" class="admin-secondary-btn admin-secondary-btn--small remove-item">حذف</button></div>' +
                                 '<div class="admin-program-item__grid">' +
                                 '<label>حرکت اصلی<select class="program-item-exercise">' + exerciseOptions(item.exercise, false) + '</select></label>' +
-                                '<label>حرکت دوم سوپرست<select class="program-item-superset">' + exerciseOptions(item.superset_exercise, true) + '</select></label>' +
-                                '<label>حرکت سوم<select class="program-item-third">' + exerciseOptions(item.third_exercise, true, "بدون حرکت سوم") + '</select></label>' +
                                 '<div class="admin-program-item__config-label">تنظیمات حرکت اصلی</div>' +
                                 '<label>ست حرکت اصلی<select class="program-item-sets">' + lookupOptions(sets, item.sets, false, "") + '</select></label>' +
                                 '<label>تکرار حرکت اصلی<select class="program-item-reps">' + lookupOptions(repetitions, item.reps, false, "") + '</select></label>' +
                                 '<label>استراحت حرکت اصلی<select class="program-item-rest">' + lookupOptions(rests, item.rest, true, "بدون استراحت") + '</select></label>' +
+                                '<section class="admin-program-movement admin-program-movement--collapsed">' +
+                                '<button type="button" class="admin-program-movement__toggle" aria-expanded="false" aria-controls="' + supersetBodyId + '">' +
+                                '<span><strong>حرکت دوم سوپرست</strong><small>برای افزودن یا ویرایش حرکت دوم باز کنید</small></span>' +
+                                '<span class="admin-program-movement__toggle-icon" aria-hidden="true">⌄</span>' +
+                                '</button>' +
+                                '<div class="admin-program-movement__body" id="' + supersetBodyId + '" hidden>' +
+                                '<label class="admin-program-movement__wide">حرکت دوم سوپرست<select class="program-item-superset">' + exerciseOptions(item.superset_exercise, true) + '</select></label>' +
                                 '<div class="admin-program-item__config-label">تنظیمات حرکت دوم</div>' +
                                 '<label>ست حرکت دوم<select class="program-item-superset-sets">' + lookupOptions(sets, movementValue(item, "superset_sets", "sets"), false, "") + '</select></label>' +
                                 '<label>تکرار حرکت دوم<select class="program-item-superset-reps">' + lookupOptions(repetitions, movementValue(item, "superset_reps", "reps"), false, "") + '</select></label>' +
                                 '<label>استراحت حرکت دوم<select class="program-item-superset-rest">' + lookupOptions(rests, movementValue(item, "superset_rest", "rest"), true, "بدون استراحت") + '</select></label>' +
+                                '</div></section>' +
+                                '<section class="admin-program-movement admin-program-movement--collapsed">' +
+                                '<button type="button" class="admin-program-movement__toggle" aria-expanded="false" aria-controls="' + thirdBodyId + '">' +
+                                '<span><strong>حرکت سوم</strong><small>برای افزودن یا ویرایش حرکت سوم باز کنید</small></span>' +
+                                '<span class="admin-program-movement__toggle-icon" aria-hidden="true">⌄</span>' +
+                                '</button>' +
+                                '<div class="admin-program-movement__body" id="' + thirdBodyId + '" hidden>' +
+                                '<label class="admin-program-movement__wide">حرکت سوم<select class="program-item-third">' + exerciseOptions(item.third_exercise, true, "بدون حرکت سوم") + '</select></label>' +
                                 '<div class="admin-program-item__config-label">تنظیمات حرکت سوم</div>' +
                                 '<label>ست حرکت سوم<select class="program-item-third-sets">' + lookupOptions(sets, movementValue(item, "third_sets", "sets"), false, "") + '</select></label>' +
                                 '<label>تکرار حرکت سوم<select class="program-item-third-reps">' + lookupOptions(repetitions, movementValue(item, "third_reps", "reps"), false, "") + '</select></label>' +
                                 '<label>استراحت حرکت سوم<select class="program-item-third-rest">' + lookupOptions(rests, movementValue(item, "third_rest", "rest"), true, "بدون استراحت") + '</select></label>' +
+                                '</div></section>' +
                                 '<label class="admin-program-item__wide">نکته<input class="program-item-note" value="' + escapeHtml(item.note || "") + '" placeholder="نکته یا توضیح حرکت"></label>' +
                                 '</div></div>';
                         }).join("") +
                         '</div><button type="button" class="admin-secondary-btn admin-secondary-btn--small add-item">+ افزودن حرکت</button>' +
-                        '</article>';
+                        '</div></article>';
                 }).join("");
 
                 correctivesRoot.innerHTML = state.correctives.map(function (item, index) {
@@ -298,6 +319,16 @@
                 render();
             });
             daysRoot.addEventListener("click", function (event) {
+                const disclosureToggle = event.target.closest(".admin-program-day__toggle, .admin-program-movement__toggle");
+                if (disclosureToggle) {
+                    const target = document.getElementById(disclosureToggle.getAttribute("aria-controls"));
+                    if (!target) return;
+                    const isExpanded = disclosureToggle.getAttribute("aria-expanded") === "true";
+                    disclosureToggle.setAttribute("aria-expanded", String(!isExpanded));
+                    target.hidden = isExpanded;
+                    disclosureToggle.closest(".admin-program-day, .admin-program-movement").classList.toggle("is-collapsed", isExpanded);
+                    return;
+                }
                 const day = event.target.closest(".admin-program-day");
                 if (!day) return;
                 const action = event.target.closest(".add-item, .remove-item, .remove-day");

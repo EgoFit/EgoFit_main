@@ -162,10 +162,12 @@ def _positive_float(value: float | int | None) -> float | None:
     return number
 
 
-CALIPER_AGE_RANGES: dict[Gender, tuple[int, int]] = {
-    "male": (18, 61),
-    "female": (18, 55),
-}
+# Jackson–Pollock equations are adult estimates. The original reference
+# samples used narrower age bands, but refusing to calculate above those
+# bands made the analysis page blank for older adults even when all required
+# measurements were present. Keep the adult lower bound and allow the
+# estimate to be shown for older users with the existing clinical caveat.
+CALIPER_MIN_AGE = 18
 
 INCHES_PER_CENTIMETRE = 1 / 2.54
 DEFAULT_WEIGHT_LOSS_DEFICIT_KCAL = 600
@@ -579,10 +581,7 @@ def _jackson_pollock_4_body_fat_percent(sum_mm: float, age: int, gender: Gender)
 
 
 def _valid_caliper_age(age: int | None, gender: Gender) -> bool:
-    if age is None:
-        return False
-    minimum, maximum = CALIPER_AGE_RANGES[gender]
-    return minimum <= int(age) <= maximum
+    return age is not None and int(age) >= CALIPER_MIN_AGE and gender in ("male", "female")
 
 
 def _body_fat_result_from_density(

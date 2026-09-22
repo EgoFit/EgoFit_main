@@ -1266,6 +1266,30 @@ class BodyCompositionCalculatorTests(TestCase):
         self.assertIsNotNone(result)
         self.assertEqual(result.formula_name, "Jackson-Pollock 4-site")
 
+    def test_body_fat_and_lean_mass_are_available_for_older_adults(self):
+        skinfolds = CaliperSkinfolds(
+            abdominal_mm=22.0,
+            triceps_mm=18.0,
+            thigh_mm=24.0,
+            suprailiac_mm=20.0,
+        )
+
+        male_result = calculate_body_fat_from_caliper(skinfolds, age=65, gender="male")
+        female_result = calculate_body_fat_from_caliper(skinfolds, age=66, gender="female")
+
+        self.assertIsNotNone(male_result)
+        self.assertIsNotNone(female_result)
+        male_snapshot = build_body_composition_snapshot(
+            weight_kg=82,
+            height_cm=178,
+            age=65,
+            gender="male",
+            skinfolds=skinfolds,
+            circumference=None,
+        )
+        self.assertIsNotNone(male_snapshot.body_fat_percent)
+        self.assertIsNotNone(male_snapshot.lean_mass_kg)
+
     def test_navy_formula_converts_metric_inputs_to_inches(self):
         result = calculate_body_fat_from_circumference_navy(
             CircumferenceMeasures(abdomen_cm=82.0, neck_cm=38.0),
