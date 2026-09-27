@@ -54,3 +54,27 @@ Use an OS-secure mobile keychain or an equivalent server-side secret store.
 - Admin/content-management writes are intentionally not exposed through this
   public API. Add a separate privileged API only with action-specific
   permissions and audit logging.
+
+## Public exercise library
+
+The read-only library API is available for public catalog and mobile-client
+use:
+
+- `GET /library/` returns resource names, paths, and counts.
+- `GET /library/filters/` returns all lookup values for client-side filters.
+- `GET /library/exercises/` lists exercises with `q`, relationship-id filters,
+  `page`, and `page_size` (maximum 100).
+- `GET /library/exercises/{id}/` returns the complete exercise and media
+  contract.
+- `GET /library/corrective-exercises/` and
+  `/library/corrective-exercises/{id}/` expose corrective exercises.
+- `GET /library/muscles/` and `/library/muscles/{id}/` expose muscle anatomy.
+- Lookup tables are available through `/library/{lookup}/` and
+  `/library/{lookup}/{id}/`, including `body-parts`, `movement-types`,
+  `joint-types`, `power-types`, `difficulty-levels`, `equipment-types`,
+  `execution-equipment-types`, `secondary-movement-types`,
+  `abnormality-types`, `pressure-types`, `sport-types`, `goals`, `set-types`,
+  `repetition-types`, and `rest-types`.
+
+All library endpoints are GET-only. They never expose admin writes or allow
+mass assignment of library records.

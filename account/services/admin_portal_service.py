@@ -12,13 +12,16 @@ from account.models import (
     CaliperMeasurement,
     ClientDocument,
     ClientMedia,
+    UserHealthRecord,
     User,
+    WorkoutBestRecord,
     WorkoutProgram,
 )
 from account.services.coach_request_service import CoachRequestService
 from account.services.notification_service import NotificationService
 from account.services.profile_service import ProfileService
 from account.services.sms_service import SmsService
+from account.services.mood_service import MoodService
 from account.utils import is_birthday_today
 
 
@@ -75,6 +78,7 @@ class AdminPortalService:
             "admin_users_count": len(admin_users),
             "pending_coach_requests": list(self.coach_request_service.get_pending_queryset()[:10]),
             "pending_coach_requests_count": self.coach_request_service.get_pending_count(),
+            "unread_coach_requests_count": self.coach_request_service.get_unread_pending_count(),
             "birthday_users": [
                 user
                 for user in birthday_candidates
@@ -228,15 +232,53 @@ class AdminPortalService:
     def get_analysis_metric_series(self, user: User, *, body_fat_formula: str | None = None) -> dict:
         return self.profile_service.get_analysis_metric_series(user, body_fat_formula=body_fat_formula)
 
-    def get_user_summary_context(self, user: User) -> dict:
+    def get_user_summary_context(self, user: User, *, workout_record_query="") -> dict:
+        workout_record_query = " ".join(str(workout_record_query or "").split())
+        workout_records = WorkoutBestRecord.objects.filter(user=user).select_related(
+            "exercise", "program"
+        )
+        if workout_record_query:
+            workout_records = workout_records.filter(exercise__name__icontains=workout_record_query)
         return {
             "latest_circumference": user.circumference_records.first(),
             "latest_caliper": user.caliper_records.first(),
             "latest_media": list(user.client_media.all()[:4]),
             "latest_documents": list(user.client_documents.all()[:4]),
             "latest_workout_programs": list(WorkoutProgram.objects.filter(user=user)[:4]),
+            "workout_records": list(workout_records),
+            "workout_record_query": workout_record_query,
             "coach_requests": list(user.coach_requests.all()[:10]),
+            "unread_coach_requests_count": self.coach_request_service.get_unread_pending_count(user=user),
         }
+
+    def mark_pending_coach_requests_read(self, *, user=None) -> int:
+        return self.coach_request_service.mark_pending_as_read(user=user)
+
+    def delete_client_media(self, *, media: ClientMedia) -> None:
+        for field_name in ("image", "video"):
+            field = getattr(media, field_name)
+            if field:
+                field.delete(save=False)
+        media.delete()
+
+    def delete_client_document(self, *, document: ClientDocument) -> None:
+        if document.file:
+            document.file.delete(save=False)
+        document.delete()
+
+
+    def get_user_health_context(self, user: User) -> dict:
+        mood_context = MoodService().get_dashboard_context(user)
+        return {
+            "health_records": list(user.health_records.all()),
+            **mood_context,
+        }
+
+    def save_health_record(self, *, user: User, form) -> UserHealthRecord:
+        record = form.save(commit=False)
+        record.user = user
+        record.save()
+        return record
 
     def mark_coach_request_handled(self, coach_request) -> None:
         self.coach_request_service.mark_handled(coach_request)

@@ -39,7 +39,7 @@ class CartAddView(View):
 
         product = get_object_or_404(SeriesModel, id=pk)
         if OrderSelector.user_has_paid_product(user=request.user, product=product):
-            return redirect("home:series_episod", pk=pk)
+            return redirect("home:series_episodes", pk=pk)
 
         cart = Cart(request)
         cart.add(product=product, quantity=1)

@@ -1,0 +1,140 @@
+{% load static %}
+{% load my_tags %}
+{% load i18n %}
+{% trans 'ایگوفیت' as default_brand_name %}
+{% trans 'آکادمی' as default_brand_eyebrow %}
+    <div x-cloak x-show="offcanvasOpen" class="modern-offcanvas">
+        <div id="site-mobile-menu"
+             class="fixed inset-y-0 right-0 xs:w-80 w-72 h-screen modern-offcanvas__panel rounded-l-3xl overflow-y-auto transition-transform z-50"
+             x-bind:class="offcanvasOpen ? '!translate-x-0' : 'translate-x-full'"
+             x-bind:aria-hidden="!offcanvasOpen">
+            <div class="flex items-center justify-between gap-4 sticky top-0 bg-background/90 backdrop-blur-xl p-4 z-10">
+                <a href="{% url 'home:home' %}" class="modern-logo">
+                    <span class="modern-logo__mark">
+                        {% if site_settings.logo %}
+                            <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.brand_name|default_cms:default_brand_name }}">
+                        {% else %}
+                            <img src="{% static 'images/logoimageego.webp' %}" alt="Logo">
+                        {% endif %}
+                    </span>
+                    <span class="modern-logo__text">
+                        <span class="font-semibold text-sm text-muted">{{ site_settings.brand_eyebrow|default_cms:default_brand_eyebrow }}</span>
+                        <strong class="font-black text-foreground">{{ site_settings.brand_name|default_cms:default_brand_name }}</strong>
+                    </span>
+                </a>
+                <button x-on:click="offcanvasOpen = false" class="modern-icon-btn" type="button" aria-label="{% trans 'بستن منو' %}">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                         stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="space-y-5 p-4">
+                <form action="{% url 'home:search' %}" method="post" class="modern-search modern-search--wide" role="search">
+                    {% csrf_token %}
+                    <label class="sr-only" for="mobile-header-search">{% trans 'جستجو در سایت' %}</label>
+                    <input id="mobile-header-search" type="search" name="search" placeholder="{% trans 'جستجو در سایت' %}" autocomplete="off">
+                    <button type="submit" aria-label="{% trans 'جستجو' %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                            <path fill-rule="evenodd"
+                                  d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z"
+                                  clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                </form>
+                <a href="{% url 'home:workout_library' %}" class="pill-link">{% trans 'کتابخانه تمرینات' %}</a>
+
+                <div class="section-card modern-surface">
+                    <div class="flex items-center justify-between gap-3">
+                        <span class="font-bold text-sm text-foreground">{% trans 'زبان سایت' %}</span>
+                        {% include 'includes/language_switcher.html' %}
+                    </div>
+                </div>
+
+                <div class="section-card modern-surface">
+                    <div class="flex items-center justify-between gap-3">
+                        <span class="font-bold text-sm text-foreground">{% trans 'تم تاریک' %}</span>
+                        <button type="button" class="modern-icon-btn modern-icon-btn--wide" x-on:click="darkMode = !darkMode">
+                            <span class="font-semibold text-xs text-primary" x-text="darkMode ? '{% trans 'روشن' %}' : '{% trans 'تاریک' %}'"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="section-card modern-surface">
+                    <ul class="space-y-2">
+                        {% for link in nav_links %}
+                            <li><a href="{{ link.url }}" class="modern-nav-link modern-nav-link--plain">{{ link.label }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="section-card modern-surface">
+                    <div class="space-y-4">
+                        <div>
+                            <span class="font-bold text-sm text-foreground">{% trans 'دسته بندی آموزش‌ها' %}</span>
+                            <ul class="space-y-2 pt-3">
+                                {% for category in categories %}
+                                    <li>
+                                        <div class="font-semibold text-xs text-primary pb-1">{{ category.title }}</div>
+                                        <ul class="space-y-1 pr-3">
+                                            {% for subcategory in category.categories.all %}
+                                                <li>
+                                                    <a href="{% url 'home:course_detail' subcategory.id %}"
+                                                       class="text-sm text-muted transition-colors hover:text-primary">{{ subcategory.title }}</a>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+
+                        <div class="soft-divider"></div>
+
+                        <div>
+                            <span class="font-bold text-sm text-foreground">{% trans 'دسته بندی بلاگ‌ها' %}</span>
+                            <ul class="space-y-2 pt-3">
+                                {% for category in article %}
+                                    <li>
+                                        <div class="font-semibold text-xs text-primary pb-1">{{ category.title }}</div>
+                                        <ul class="space-y-1 pr-3">
+                                            {% for subcategory in category.article_categories.all %}
+                                                <li>
+                                                    <a href="{% url 'home:article_detail' subcategory.slug %}"
+                                                       class="text-sm text-muted transition-colors hover:text-primary">{{ subcategory.title }}</a>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                {% if request.user.is_authenticated %}
+                    <div class="section-card modern-surface">
+                        <div class="space-y-2">
+                            <span class="font-semibold text-sm text-foreground">{{ request.user.fullname }}</span>
+                            <span class="block text-xs text-muted">{% if request.user.is_admin %}{% trans 'به پنل ادمین دسترسی سریع دارید' %}{% else %}{% trans 'به پنل کاربری خود دسترسی سریع دارید' %}{% endif %}</span>
+                        </div>
+                        <div class="grid gap-2 pt-4">
+                            <a href="{% if request.user.is_admin %}{% url 'register:admin_search' %}{% else %}{% url 'register:profile' %}{% endif %}" class="pill-link">{% if request.user.is_admin %}{% trans 'پنل ادمین' %}{% else %}{% trans 'پروفایل' %}{% endif %}</a>
+                            {% if not request.user.is_admin %}
+                                <a href="{% url 'register:profile_course' %}" class="pill-link">{% trans 'دوره‌ها' %}</a>
+                            {% endif %}
+                            <a href="{% url 'register:logout' %}" class="pill-link">{% trans 'خروج' %}</a>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{% url 'register:pass_register' %}" class="cta-primary w-full">{% trans 'ثبت نام یا ورود' %}</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="modern-offcanvas__backdrop fixed inset-0 h-screen bg-secondary/80 cursor-pointer transition-all duration-300 z-40"
+             x-bind:class="offcanvasOpen ? 'opacity-100 visible' : 'opacity-0 invisible'"
+             x-on:click="offcanvasOpen = false"
+             aria-hidden="true"></div>
+    </div>

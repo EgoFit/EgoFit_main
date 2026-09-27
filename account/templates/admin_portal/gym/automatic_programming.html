@@ -1,913 +1,12 @@
 {% extends 'admin_portal/_shell.html' %}
 {% load i18n %}
+{% load static %}
 
 {% block title %}{% trans 'برنامه‌ریزی خودکار | ایگوفیت' %}{% endblock %}
 
 {% block extra_css %}
 {{ block.super }}
-<style>
-    /*
-     * The automatic designer is intentionally scoped to this page. The
-     * shared admin stylesheet keeps common controls consistent, while this
-     * layer gives the workflow enough width and hierarchy on larger screens.
-     */
-    .admin-screen.admin-program-screen {
-        width: 100% !important;
-        max-width: 1120px;
-        min-width: 0;
-    }
-
-    .automatic-program-header {
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 18px;
-        padding: 4px 2px 2px;
-    }
-
-    .automatic-program-header__copy {
-        display: grid;
-        gap: 6px;
-        min-width: 0;
-    }
-
-    .automatic-program-header__eyebrow,
-    .automatic-section-eyebrow {
-        margin: 0;
-        color: #3454d1;
-        font-size: .72rem;
-        font-weight: 900;
-        letter-spacing: .04em;
-    }
-
-    .automatic-program-header .admin-screen__title {
-        font-size: clamp(1.15rem, 1.2vw + .8rem, 1.65rem);
-        line-height: 1.35;
-    }
-
-    .automatic-program-header .admin-screen__note {
-        max-width: 760px;
-        line-height: 1.9;
-    }
-
-    .automatic-program-header__badge,
-    .automatic-session-target__badge,
-    .automatic-day__count {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-        min-height: 30px;
-        padding: 0 10px;
-        border: 1px solid rgba(52, 84, 209, .16);
-        border-radius: 999px;
-        background: rgba(52, 84, 209, .07);
-        color: #3454d1;
-        font-size: .72rem;
-        font-weight: 850;
-        white-space: nowrap;
-    }
-
-    .automatic-program-header__badge {
-        flex-wrap: wrap;
-    }
-
-    .automatic-program-steps {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 8px;
-    }
-
-    .automatic-program-step {
-        display: flex;
-        align-items: center;
-        gap: 9px;
-        min-width: 0;
-        min-height: 52px;
-        padding: 9px 12px;
-        border: 1px solid rgba(229, 231, 235, .95);
-        border-radius: 15px;
-        background: rgba(255, 255, 255, .75);
-    }
-
-    .automatic-program-step__number {
-        display: inline-grid;
-        flex: 0 0 auto;
-        place-items: center;
-        width: 28px;
-        height: 28px;
-        border-radius: 10px;
-        background: #eef2ff;
-        color: #3454d1;
-        font-size: .78rem;
-        font-weight: 900;
-    }
-
-    .automatic-program-step__copy {
-        display: grid;
-        gap: 2px;
-        min-width: 0;
-    }
-
-    .automatic-program-step strong,
-    .automatic-program-step small {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .automatic-program-step strong {
-        color: #111827;
-        font-size: .78rem;
-    }
-
-    .automatic-program-step small {
-        color: #64748b;
-        font-size: .69rem;
-    }
-
-    .automatic-design-panel {
-        gap: 18px;
-    }
-
-    .automatic-design-panel .field-group {
-        min-width: 0;
-    }
-
-    .automatic-design-panel .field-group > label,
-    .automatic-target-library > label,
-    .automatic-date-field > label {
-        color: #334155;
-        font-size: .78rem;
-        font-weight: 800;
-    }
-
-    .automatic-design-panel .field-group > small,
-    .automatic-target-library > small,
-    .automatic-date-field > small {
-        color: #64748b;
-        font-size: .72rem;
-        line-height: 1.7;
-    }
-
-    .automatic-design-panel select[multiple] {
-        min-height: 132px;
-        padding: 8px;
-        line-height: 1.65;
-    }
-
-    .automatic-design-panel textarea,
-    .automatic-program-meta textarea {
-        min-height: 82px;
-        padding-block: 11px;
-        line-height: 1.7;
-        resize: vertical;
-    }
-
-    .automatic-athlete-picker__search .admin-input {
-        padding-inline-start: 42px;
-    }
-
-    .automatic-athlete-picker > select {
-        height: 116px;
-        min-height: 116px;
-        padding: 8px;
-    }
-
-    .automatic-athlete-picker > select option {
-        padding: 10px;
-    }
-
-    .automatic-session-targets {
-        gap: 14px;
-        padding: clamp(12px, 1.5vw, 18px);
-        border-radius: 18px;
-    }
-
-    .automatic-session-targets__header {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
-        align-items: end;
-        gap: 12px;
-    }
-
-    .automatic-session-targets__header-copy {
-        display: grid;
-        gap: 4px;
-        min-width: 0;
-    }
-
-    .automatic-session-targets__header h2 {
-        margin: 0;
-        color: #111827;
-        font-size: 1rem;
-        font-weight: 900;
-    }
-
-    .automatic-session-targets__header p {
-        max-width: 780px;
-        line-height: 1.8;
-    }
-
-    .automatic-target-library {
-        display: grid;
-        gap: 7px;
-        padding: 12px;
-        border: 1px dashed rgba(52, 84, 209, .28);
-        border-radius: 14px;
-        background: rgba(255, 255, 255, .62);
-    }
-
-    .automatic-target-library select {
-        width: 100%;
-        min-height: 104px;
-        padding: 7px;
-    }
-
-    .automatic-target-library option {
-        padding: 8px;
-    }
-
-    .automatic-session-target-list {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        align-items: start;
-        gap: 10px;
-    }
-
-    .automatic-session-target {
-        min-width: 0;
-        padding: 14px;
-        border-color: #dbe2ea;
-        box-shadow: 0 7px 18px rgba(15, 23, 42, .035);
-    }
-
-    .automatic-session-target__head {
-        align-items: center;
-    }
-
-    .automatic-session-target__head-copy {
-        display: grid;
-        gap: 3px;
-        min-width: 0;
-    }
-
-    .automatic-session-target__head-copy strong {
-        color: #111827;
-        font-size: .9rem;
-    }
-
-    .automatic-session-target__head-copy small {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .automatic-session-target__counts {
-        gap: 9px;
-    }
-
-    .automatic-session-target__row {
-        grid-template-columns: minmax(0, 1fr) minmax(104px, .34fr) auto;
-        padding: 9px;
-    }
-
-    .automatic-session-target__row select,
-    .automatic-session-target__row input {
-        min-height: 42px;
-    }
-
-    .automatic-session-target__row select:focus-visible,
-    .automatic-session-target__row input:focus-visible,
-    .automatic-target-library select:focus-visible {
-        outline: 2px solid rgba(52, 84, 209, .45);
-        outline-offset: 2px;
-    }
-
-    .automatic-session-target__add {
-        width: 100%;
-        min-height: 42px;
-    }
-
-    .automatic-program-meta {
-        gap: 12px;
-    }
-
-    .automatic-program-meta .field-group {
-        min-width: 0;
-    }
-
-    .automatic-date-field input {
-        direction: ltr;
-        text-align: left;
-    }
-
-    .automatic-preview-panel {
-        gap: 18px;
-    }
-
-    .automatic-preview-summary {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 9px;
-    }
-
-    .automatic-preview-stat {
-        display: grid;
-        gap: 4px;
-        min-width: 0;
-        padding: 12px;
-        border: 1px solid #e2e8f0;
-        border-radius: 14px;
-        background: #f8fafc;
-    }
-
-    .automatic-preview-stat span {
-        color: #64748b;
-        font-size: .72rem;
-        font-weight: 750;
-    }
-
-    .automatic-preview-stat strong {
-        overflow: hidden;
-        color: #111827;
-        font-size: 1.05rem;
-        font-weight: 900;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .automatic-preview-toolbar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-        padding: 10px 12px;
-        border: 1px solid rgba(52, 84, 209, .13);
-        border-radius: 13px;
-        background: rgba(52, 84, 209, .045);
-    }
-
-    .automatic-preview-toolbar p {
-        margin: 0;
-        color: #475569;
-        font-size: .76rem;
-        line-height: 1.7;
-    }
-
-    .automatic-preview-toolbar button,
-    .automatic-day__toggle,
-    .automatic-day__remove,
-    .automatic-program-item__remove,
-    .automatic-corrective__remove {
-        min-height: 40px;
-        white-space: nowrap;
-    }
-
-    .automatic-days {
-        gap: 14px;
-    }
-
-    .automatic-day {
-        gap: 14px;
-        padding: clamp(12px, 1.5vw, 18px);
-        background: linear-gradient(180deg, #f8fafc 0%, #f5f8fc 100%);
-        border-color: #dbe2ea;
-        overflow: hidden;
-    }
-
-    .automatic-day__head {
-        align-items: flex-start;
-        gap: 12px;
-    }
-
-    .automatic-day__heading {
-        display: flex;
-        align-items: center;
-        gap: 9px;
-        min-width: 0;
-    }
-
-    .automatic-day__number {
-        display: inline-grid;
-        flex: 0 0 auto;
-        place-items: center;
-        width: 31px;
-        height: 31px;
-        border-radius: 11px;
-        background: #3454d1;
-        color: #fff;
-        font-size: .78rem;
-        font-weight: 900;
-    }
-
-    .automatic-day__title-field {
-        display: grid;
-        gap: 3px;
-        min-width: 0;
-    }
-
-    .automatic-day__title-field span {
-        color: #64748b;
-        font-size: .69rem;
-        font-weight: 750;
-    }
-
-    .automatic-day__title-field input {
-        min-width: 0;
-        min-height: 42px;
-        font-weight: 850;
-    }
-
-    .automatic-day__actions {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-        gap: 7px;
-    }
-
-    .automatic-day__body {
-        display: grid;
-        gap: 12px;
-    }
-
-    .automatic-day.is-collapsed .automatic-day__body {
-        display: none;
-    }
-
-    .automatic-day__notes {
-        width: 100%;
-        min-height: 66px;
-        padding: 10px 12px;
-        border: 1px solid #dbe2ea;
-        border-radius: 12px;
-        background: #fff;
-        resize: vertical;
-    }
-
-    .automatic-program-item {
-        gap: 12px;
-        padding: 13px;
-        border-color: #e2e8f0;
-        box-shadow: 0 5px 14px rgba(15, 23, 42, .025);
-    }
-
-    .automatic-program-item__top {
-        align-items: center;
-    }
-
-    .automatic-program-item__identity {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        min-width: 0;
-    }
-
-    .automatic-program-item__identity strong {
-        color: #334155;
-        font-size: .83rem;
-    }
-
-    .automatic-program-item__grid {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 10px;
-    }
-
-    .automatic-program-item__grid label {
-        display: grid;
-        gap: 5px;
-        min-width: 0;
-        color: #475569;
-        font-size: .72rem;
-        font-weight: 800;
-    }
-
-    .automatic-program-item__grid .automatic-program-item__main {
-        grid-column: 1 / -1;
-    }
-
-    .automatic-program-item__grid select,
-    .automatic-program-item__grid input {
-        min-width: 0;
-        min-height: 42px;
-        padding-inline: 10px;
-    }
-
-    .automatic-program-item__config-label {
-        grid-column: 1 / -1;
-        margin-top: 3px;
-        padding: 9px 10px 4px;
-        border-top: 1px solid #e2e8f0;
-        color: #3454d1;
-        font-size: .75rem;
-        font-weight: 900;
-    }
-
-    .automatic-program-item__config-label:first-of-type {
-        padding-top: 0;
-        border-top: 0;
-    }
-
-    .automatic-correctives-editor {
-        display: grid;
-        gap: 12px;
-    }
-
-    .automatic-correctives-editor__head {
-        display: flex;
-        align-items: flex-end;
-        justify-content: space-between;
-        gap: 12px;
-    }
-
-    .automatic-correctives-editor__head-copy {
-        display: grid;
-        gap: 4px;
-    }
-
-    .automatic-correctives-editor__head h2 {
-        margin: 0;
-        color: #111827;
-        font-size: 1rem;
-        font-weight: 900;
-    }
-
-    .automatic-correctives-editor__head p,
-    .automatic-correctives-editor__empty {
-        margin: 0;
-        color: #64748b;
-        font-size: .76rem;
-        line-height: 1.7;
-    }
-
-    .automatic-corrective {
-        display: grid;
-        grid-template-columns: minmax(0, 1.55fr) minmax(120px, .9fr) minmax(100px, .7fr) minmax(120px, .9fr) minmax(0, 1.25fr) auto;
-        gap: 9px;
-        align-items: end;
-        padding: 12px;
-        border: 1px solid #e2e8f0;
-        border-radius: 14px;
-        background: #f8fafc;
-    }
-
-    .automatic-corrective label {
-        display: grid;
-        gap: 5px;
-        min-width: 0;
-        color: #475569;
-        font-size: .72rem;
-        font-weight: 800;
-    }
-
-    .automatic-corrective select,
-    .automatic-corrective input {
-        width: 100%;
-        min-width: 0;
-        min-height: 42px;
-        padding-inline: 10px;
-        border: 1px solid #dbe2ea;
-        border-radius: 10px;
-        background: #fff;
-        color: #111827;
-    }
-
-    .automatic-form-tip {
-        display: flex;
-        align-items: flex-start;
-        gap: 9px;
-        padding: 10px 12px;
-        border: 1px solid rgba(52, 84, 209, .13);
-        border-radius: 13px;
-        background: rgba(52, 84, 209, .045);
-    }
-
-    .automatic-form-tip > span {
-        display: inline-grid;
-        flex: 0 0 auto;
-        place-items: center;
-        width: 22px;
-        height: 22px;
-        border-radius: 50%;
-        background: #eef2ff;
-        color: #3454d1;
-        font-size: .75rem;
-        font-weight: 900;
-    }
-
-    .automatic-form-tip p {
-        margin: 0;
-        color: #475569;
-        font-size: .76rem;
-        line-height: 1.7;
-    }
-
-    .automatic-form-status {
-        display: none;
-        padding: 10px 12px;
-        border: 1px solid rgba(239, 68, 68, .25);
-        border-radius: 12px;
-        background: #fff5f5;
-        color: #b42318;
-        font-size: .78rem;
-        font-weight: 750;
-        line-height: 1.7;
-    }
-
-    .automatic-form-status.is-visible {
-        display: block;
-    }
-
-    .automatic-form-status.is-success {
-        border-color: rgba(16, 185, 129, .22);
-        background: #f0fdf4;
-        color: #166534;
-    }
-
-    .automatic-program-actions {
-        position: sticky;
-        bottom: 10px;
-        z-index: 4;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-        gap: 9px;
-        padding: 10px;
-        border: 1px solid rgba(209, 213, 219, .9);
-        border-radius: 16px;
-        background: rgba(255, 255, 255, .9);
-        box-shadow: 0 14px 28px rgba(15, 23, 42, .13);
-        backdrop-filter: blur(12px);
-    }
-
-    .automatic-program-actions > button {
-        min-width: 170px;
-    }
-
-    .automatic-empty-state {
-        display: grid;
-        gap: 8px;
-        padding: 18px;
-        border: 1px dashed rgba(52, 84, 209, .28);
-        border-radius: 16px;
-        background: rgba(52, 84, 209, .045);
-        color: #475569;
-        line-height: 1.8;
-    }
-
-    .automatic-empty-state strong {
-        color: #263f9d;
-    }
-
-    .automatic-empty-state p {
-        margin: 0;
-        font-size: .8rem;
-    }
-
-    .automatic-program-screen button:disabled {
-        cursor: not-allowed;
-        opacity: .58;
-    }
-
-    .automatic-program-screen .is-invalid {
-        border-color: #dc2626 !important;
-        box-shadow: 0 0 0 3px rgba(220, 38, 38, .1);
-    }
-
-    .dark .admin-dashboard .automatic-program-step,
-    .dark .admin-dashboard .automatic-target-library,
-    .dark .admin-dashboard .automatic-preview-stat,
-    .dark .admin-dashboard .automatic-preview-toolbar,
-    .dark .admin-dashboard .automatic-form-tip,
-    .dark .admin-dashboard .automatic-form-status,
-    .dark .admin-dashboard .automatic-empty-state {
-        background: rgba(2, 6, 23, .46);
-        border-color: rgba(148, 163, 184, .28);
-        color: #e2e8f0;
-    }
-
-    .dark .admin-dashboard .automatic-session-targets,
-    .dark .admin-dashboard .automatic-program-meta,
-    .dark .admin-dashboard .automatic-design-panel,
-    .dark .admin-dashboard .automatic-preview-panel {
-        background:
-            linear-gradient(145deg, rgba(125, 211, 252, .08), transparent 38%),
-            rgba(15, 23, 42, .72);
-        border-color: rgba(148, 163, 184, .28);
-    }
-
-    .dark .admin-dashboard .automatic-session-target,
-    .dark .admin-dashboard .automatic-day,
-    .dark .admin-dashboard .automatic-program-item,
-    .dark .admin-dashboard .automatic-corrective {
-        background: rgba(15, 23, 42, .7);
-        border-color: rgba(148, 163, 184, .28);
-    }
-
-    .dark .admin-dashboard .automatic-program-step strong,
-    .dark .admin-dashboard .automatic-preview-stat strong,
-    .dark .admin-dashboard .automatic-session-target__head-copy strong,
-    .dark .admin-dashboard .automatic-correctives-editor__head h2,
-    .dark .admin-dashboard .automatic-target-library > label,
-    .dark .admin-dashboard .automatic-design-panel .field-group > label,
-    .dark .admin-dashboard .automatic-date-field > label {
-        color: #f8fafc;
-    }
-
-    .dark .admin-dashboard .automatic-program-item__grid select,
-    .dark .admin-dashboard .automatic-program-item__grid input,
-    .dark .admin-dashboard .automatic-program-item__grid textarea,
-    .dark .admin-dashboard .automatic-day__notes,
-    .dark .admin-dashboard .automatic-corrective select,
-    .dark .admin-dashboard .automatic-corrective input,
-    .dark .admin-dashboard .automatic-session-target__row select,
-    .dark .admin-dashboard .automatic-session-target__row input,
-    .dark .admin-dashboard .automatic-target-library select {
-        background: rgba(2, 6, 23, .58);
-        border-color: rgba(148, 163, 184, .32);
-        color: #f8fafc;
-    }
-
-    .dark .admin-dashboard .automatic-program-actions {
-        background: rgba(15, 23, 42, .88);
-        border-color: rgba(148, 163, 184, .3);
-    }
-
-    /* Controls and nested cards that do not use the shared form selectors. */
-    .dark .admin-dashboard .automatic-athlete-picker__search .admin-input,
-    .dark .admin-dashboard .admin-program-screen input:not([type="checkbox"]),
-    .dark .admin-dashboard .admin-program-screen select,
-    .dark .admin-dashboard .admin-program-screen textarea,
-    .dark .admin-dashboard .automatic-day__title-field input,
-    .dark .admin-dashboard .automatic-day__notes,
-    .dark .admin-dashboard .automatic-corrective select,
-    .dark .admin-dashboard .automatic-corrective input {
-        background: rgba(2, 6, 23, .58);
-        border-color: rgba(148, 163, 184, .32);
-        color: #f8fafc;
-    }
-
-    .dark .admin-dashboard .automatic-session-targets__header h2,
-    .dark .admin-dashboard .automatic-session-target__head-copy strong,
-    .dark .admin-dashboard .automatic-program-item__identity strong,
-    .dark .admin-dashboard .automatic-correctives-editor__head h2 {
-        color: #f8fafc;
-    }
-
-    .dark .admin-dashboard .automatic-program-item__grid label,
-    .dark .admin-dashboard .automatic-corrective label,
-    .dark .admin-dashboard .automatic-correctives-editor__head p,
-    .dark .admin-dashboard .automatic-corrective__empty,
-    .dark .admin-dashboard .automatic-preview-toolbar p,
-    .dark .admin-dashboard .automatic-form-tip p {
-        color: #cbd5e1;
-    }
-
-    .dark .admin-dashboard .automatic-day,
-    .dark .admin-dashboard .automatic-corrective {
-        background: rgba(15, 23, 42, .7);
-        border-color: rgba(148, 163, 184, .28);
-    }
-
-    @media (min-width: 901px) {
-        .automatic-design-panel {
-            padding: 22px;
-        }
-
-        .automatic-design-panel .admin-form-grid--cols2 {
-            grid-template-columns: repeat(6, minmax(0, 1fr));
-        }
-
-        .automatic-design-panel .admin-form-grid--cols2 > .field-group {
-            grid-column: span 3;
-        }
-
-        .automatic-design-panel .admin-form-grid--cols2 > .automatic-field--abnormalities,
-        .automatic-design-panel .admin-form-grid--cols2 > .admin-form-grid__full {
-            grid-column: 1 / -1;
-        }
-
-        .automatic-design-panel .admin-form-grid--cols2 > .automatic-field--sessions,
-        .automatic-design-panel .admin-form-grid--cols2 > .automatic-field--goal,
-        .automatic-design-panel .admin-form-grid--cols2 > .automatic-field--title {
-            grid-column: span 2;
-        }
-    }
-
-    @media (max-width: 900px) {
-        .automatic-session-target-list {
-            grid-template-columns: 1fr;
-        }
-
-        .automatic-corrective {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-
-        .automatic-corrective label:first-child,
-        .automatic-corrective label:last-of-type {
-            grid-column: 1 / -1;
-        }
-
-        .automatic-corrective__remove {
-            width: 100%;
-        }
-    }
-
-    @media (max-width: 700px) {
-        .automatic-program-header,
-        .automatic-correctives-editor__head {
-            align-items: stretch;
-            flex-direction: column;
-        }
-
-        .automatic-program-header {
-            display: grid;
-        }
-
-        .automatic-program-header__badge {
-            justify-self: start;
-        }
-
-        .automatic-program-steps {
-            grid-template-columns: 1fr;
-        }
-
-        .automatic-program-step {
-            min-height: 46px;
-        }
-
-        .automatic-session-targets__header {
-            grid-template-columns: 1fr;
-            align-items: stretch;
-        }
-
-        .automatic-preview-summary {
-            grid-template-columns: 1fr;
-        }
-
-        .automatic-preview-toolbar,
-        .automatic-day__head,
-        .automatic-program-item__top {
-            align-items: stretch;
-            flex-direction: column;
-        }
-
-        .automatic-preview-toolbar button,
-        .automatic-day__actions,
-        .automatic-day__actions > button,
-        .automatic-program-item__remove,
-        .automatic-correctives-editor__head > button {
-            width: 100%;
-        }
-
-        .automatic-day__heading {
-            align-items: flex-start;
-        }
-
-        .automatic-program-item__grid,
-        .automatic-corrective {
-            grid-template-columns: 1fr;
-        }
-
-        .automatic-program-item__grid .automatic-program-item__main,
-        .automatic-program-item__config-label {
-            grid-column: auto;
-        }
-
-        .automatic-corrective label:first-child,
-        .automatic-corrective label:last-of-type {
-            grid-column: auto;
-        }
-
-        .automatic-session-target__row {
-            grid-template-columns: 1fr;
-        }
-
-        .automatic-session-target__row .automatic-session-target__remove {
-            width: 100%;
-        }
-
-        .automatic-program-actions {
-            bottom: calc(78px + env(safe-area-inset-bottom, 0px));
-            flex-direction: column;
-        }
-
-        .automatic-program-actions > button {
-            width: 100%;
-            min-width: 0;
-        }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        .automatic-program-screen *,
-        .automatic-program-screen *::before,
-        .automatic-program-screen *::after {
-            scroll-behavior: auto !important;
-            transition-duration: .01ms !important;
-            animation-duration: .01ms !important;
-        }
-    }
-</style>
+<link rel="stylesheet" href="{% static 'css/automatic-programming.css' %}">
 {% endblock %}
 
 {% block admin_content %}
@@ -961,7 +60,7 @@
                     {% if field.name == 'movements_per_session' %}
                         {{ field.as_hidden }}
                     {% elif field.name != 'secondary_movement_counts_json' and field.name != 'session_movement_targets_json' and field.name != 'target_secondary_movement_types' %}
-                        <div class="field-group {% if field.name == 'abnormalities' %}admin-form-grid__full automatic-field--abnormalities{% endif %} {% if field.name == 'sessions_per_week' %}automatic-field--sessions{% endif %} {% if field.name == 'goal' %}automatic-field--goal{% endif %} {% if field.name == 'title' %}automatic-field--title{% endif %} {% if field.name == 'is_published' or field.name == 'requires_payment' %}admin-checkbox-field{% endif %}">
+                        <div class="field-group {% if field.name == 'abnormalities' %}admin-form-grid__full automatic-field--abnormalities{% endif %} {% if field.name == 'gender' %}automatic-field--gender{% endif %} {% if field.name == 'sessions_per_week' %}automatic-field--sessions{% endif %} {% if field.name == 'goal' %}automatic-field--goal{% endif %} {% if field.name == 'title' %}automatic-field--title{% endif %} {% if field.name == 'is_published' or field.name == 'requires_payment' %}admin-checkbox-field{% endif %}">
                             {% if field.name == 'user' %}
                                 <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                                 <div class="automatic-athlete-picker" data-athlete-picker>
@@ -1115,6 +214,7 @@
 
 {{ preview|json_script:"automatic-preview" }}
 {{ exercise_catalog|json_script:"automatic-exercises" }}
+{{ body_part_catalog|json_script:"automatic-body-parts" }}
 {{ corrective_catalog|json_script:"automatic-corrective-catalog" }}
 {% endblock %}
 
@@ -1126,9 +226,11 @@
 
     const previewNode = document.getElementById("automatic-preview");
     const exerciseNode = document.getElementById("automatic-exercises");
+    const bodyPartNode = document.getElementById("automatic-body-parts");
     const correctiveNode = document.getElementById("automatic-corrective-catalog");
     const preview = parseJson(previewNode ? previewNode.textContent : "", {days: [], correctives: []});
     const exercises = parseJson(exerciseNode ? exerciseNode.textContent : "", []);
+    const bodyParts = parseJson(bodyPartNode ? bodyPartNode.textContent : "", []);
     const correctiveCatalog = parseJson(correctiveNode ? correctiveNode.textContent : "", []);
     const editor = document.getElementById("automatic-program-editor");
     const movementTypeCatalog = document.getElementById("id_target_secondary_movement_types");
@@ -1184,6 +286,10 @@
         mainSettings: "{% trans 'تنظیمات حرکت اصلی' %}",
         secondSettings: "{% trans 'تنظیمات حرکت دوم' %}",
         thirdSettings: "{% trans 'تنظیمات حرکت سوم' %}",
+        bodyPartFilter: "{% trans 'فیلتر بخش بدن' %}",
+        allBodyParts: "{% trans 'همه بخش‌های بدن' %}",
+        collapseItem: "{% trans 'جمع کردن تنظیمات حرکت' %}",
+        expandItem: "{% trans 'باز کردن تنظیمات حرکت' %}",
         corrective: "{% trans 'حرکت اصلاحی' %}",
         phase: "{% trans 'مرحله اجرا' %}",
         repsOrTime: "{% trans 'تکرار / مدت' %}",
@@ -1441,19 +547,31 @@
 
     function exerciseLabel(item) {
         if (!item) return "";
-        return [item.name, item.secondary_movement_type, item.difficulty_level].filter(Boolean).join(" — ");
+        return [item.name, item.body_part, item.secondary_movement_type, item.difficulty_level].filter(Boolean).join(" — ");
     }
 
-    function exerciseOptionMarkup(selected, allowEmpty, emptyLabel) {
+    function bodyPartOptionMarkup(selected) {
+        const selectedId = stringId(selected);
+        return '<option value="">' + esc(text.allBodyParts) + '</option>' + bodyParts.map(function (item) {
+            const itemId = stringId(item.id);
+            return '<option value="' + esc(itemId) + '"' + (itemId === selectedId ? ' selected' : '') + '>' + esc(item.name) + '</option>';
+        }).join("");
+    }
+
+    function exerciseOptionMarkup(selected, allowEmpty, emptyLabel, bodyPartFilter) {
         const selectedId = stringId(selected);
         let html = allowEmpty
             ? '<option value="">' + esc(emptyLabel || "") + '</option>'
             : '<option value="">' + esc(text.selectExercise) + '</option>';
         const selectedItem = exerciseById(selectedId);
+        exercises.filter(function (item) {
+            return !bodyPartFilter || stringId(item.body_part_id) === stringId(bodyPartFilter);
+        }).forEach(function (item) {
+            const itemId = stringId(item.id);
+            html += '<option value="' + esc(itemId) + '"' + (itemId === selectedId ? ' selected' : '') + '>' + esc(exerciseLabel(item)) + '</option>';
+        });
         if (selectedId && !selectedItem) {
             html += '<option value="' + esc(selectedId) + '" selected>' + esc(selectedId) + '</option>';
-        } else if (selectedItem) {
-            html += '<option value="' + esc(selectedId) + '" selected>' + esc(exerciseLabel(selectedItem)) + '</option>';
         }
         return html;
     }
@@ -1463,10 +581,15 @@
         const selected = stringId(select.value);
         const allowEmpty = select.dataset.allowEmpty === "true";
         const emptyLabel = select.dataset.emptyLabel || "";
+        const picker = select.closest("[data-exercise-picker]");
+        const filter = picker ? picker.querySelector("[data-exercise-body-part-filter]") : null;
+        const bodyPartFilter = filter ? filter.value : "";
         let html = allowEmpty
             ? '<option value="">' + esc(emptyLabel) + '</option>'
             : '<option value="">' + esc(text.selectExercise) + '</option>';
-        exercises.forEach(function (item) {
+        exercises.filter(function (item) {
+            return !bodyPartFilter || stringId(item.body_part_id) === stringId(bodyPartFilter);
+        }).forEach(function (item) {
             html += '<option value="' + esc(item.id) + '">' + esc(exerciseLabel(item)) + '</option>';
         });
         select.innerHTML = html;
@@ -1474,10 +597,14 @@
         select.dataset.loaded = "true";
     }
 
-    function exerciseSelectMarkup(selected, allowEmpty, emptyLabel, role) {
-        return '<select class="admin-input" data-exercise-select data-key="' + esc(role || "exercise") + '" data-loaded="false" data-allow-empty="' + (allowEmpty ? "true" : "false") + '" data-empty-label="' + esc(emptyLabel || "") + '"' + (!allowEmpty ? " required" : "") + '>' +
-            exerciseOptionMarkup(selected, allowEmpty, emptyLabel) +
-        '</select>';
+    function exerciseSelectMarkup(selected, allowEmpty, emptyLabel, role, bodyPartFilter) {
+        const filterKey = role + "_body_part_filter";
+        return '<div class="automatic-exercise-picker" data-exercise-picker>' +
+            '<label><span>' + esc(text.bodyPartFilter) + '</span><select class="admin-input" data-exercise-body-part-filter data-key="' + esc(filterKey) + '">' + bodyPartOptionMarkup(bodyPartFilter) + '</select></label>' +
+            '<select class="admin-input" data-exercise-select data-key="' + esc(role || "exercise") + '" data-loaded="false" data-allow-empty="' + (allowEmpty ? "true" : "false") + '" data-empty-label="' + esc(emptyLabel || "") + '"' + (!allowEmpty ? " required" : "") + '>' +
+                exerciseOptionMarkup(selected, allowEmpty, emptyLabel, bodyPartFilter) +
+            '</select>' +
+        '</div>';
     }
 
     function correctiveOptions(selected) {
@@ -1528,29 +655,24 @@
                     '<label><span>' + esc(text.dayNotes) + '</span><textarea class="automatic-day__notes" data-day-notes rows="2" placeholder="' + esc(text.dayNotes) + '">' + esc(day.notes || "") + '</textarea></label>' +
                     '<div class="admin-program-items">' +
                         items.map(function (item, itemIndex) {
+                            const itemBodyId = "automatic-item-body-" + dayIndex + "-" + itemIndex;
+                            const secondBodyId = "automatic-item-second-" + dayIndex + "-" + itemIndex;
+                            const thirdBodyId = "automatic-item-third-" + dayIndex + "-" + itemIndex;
                             return '<div class="admin-program-item automatic-program-item" data-item="' + itemIndex + '">' +
                                 '<div class="admin-program-item__top">' +
-                                    '<div class="automatic-program-item__identity"><strong>' + esc(text.movement) + ' ' + (itemIndex + 1) + '</strong></div>' +
+                                    '<button type="button" class="automatic-program-item__toggle" data-item-toggle aria-expanded="true" aria-controls="' + itemBodyId + '"><span class="automatic-program-item__identity"><strong>' + esc(text.movement) + ' ' + (itemIndex + 1) + '</strong><small>' + esc(text.collapseItem) + '</small></span><span class="automatic-program-item__toggle-icon" aria-hidden="true">⌄</span></button>' +
                                     '<button type="button" class="admin-secondary-btn admin-secondary-btn--small automatic-program-item__remove" data-item-remove>' + esc(text.remove) + '</button>' +
                                 '</div>' +
-                                '<div class="automatic-program-item__grid">' +
-                                    '<label class="automatic-program-item__main"><span>' + esc(text.movementMain) + '</span>' + exerciseSelectMarkup(item.exercise, false, "", "exercise") + '</label>' +
-                                    '<label><span>' + esc(text.movementSecond) + '</span>' + exerciseSelectMarkup(item.superset_exercise, true, text.noSuperset, "superset_exercise") + '</label>' +
-                                    '<label><span>' + esc(text.movementThird) + '</span>' + exerciseSelectMarkup(item.third_exercise, true, text.noThird, "third_exercise") + '</label>' +
+                                '<div class="automatic-program-item__body" id="' + itemBodyId + '"><div class="automatic-program-item__grid">' +
+                                    '<div class="automatic-program-item__main"><span>' + esc(text.movementMain) + '</span>' + exerciseSelectMarkup(item.exercise, false, "", "exercise", item.body_part_filter) + '</div>' +
                                     '<div class="automatic-program-item__config-label">' + esc(text.mainSettings) + '</div>' +
                                     inputMarkup(text.setsMain, "sets", itemValue(item, "sets"), "{% trans 'مثلاً ۳' %}") +
                                     inputMarkup(text.repsMain, "reps", itemValue(item, "reps"), "{% trans 'مثلاً ۸ تا ۱۲' %}") +
                                     inputMarkup(text.restMain, "rest", itemValue(item, "rest"), "{% trans 'مثلاً ۶۰ ثانیه' %}") +
-                                    '<div class="automatic-program-item__config-label">' + esc(text.secondSettings) + '</div>' +
-                                    inputMarkup(text.setsSecond, "superset_sets", itemValue(item, "superset_sets", "sets"), "{% trans 'اختیاری' %}") +
-                                    inputMarkup(text.repsSecond, "superset_reps", itemValue(item, "superset_reps", "reps"), "{% trans 'اختیاری' %}") +
-                                    inputMarkup(text.restSecond, "superset_rest", itemValue(item, "superset_rest", "rest"), "{% trans 'اختیاری' %}") +
-                                    '<div class="automatic-program-item__config-label">' + esc(text.thirdSettings) + '</div>' +
-                                    inputMarkup(text.setsThird, "third_sets", itemValue(item, "third_sets", "sets"), "{% trans 'اختیاری' %}") +
-                                    inputMarkup(text.repsThird, "third_reps", itemValue(item, "third_reps", "reps"), "{% trans 'اختیاری' %}") +
-                                    inputMarkup(text.restThird, "third_rest", itemValue(item, "third_rest", "rest"), "{% trans 'اختیاری' %}") +
+                                    '<section class="automatic-program-movement automatic-program-movement--collapsed"><button type="button" class="automatic-program-movement__toggle" data-movement-toggle aria-expanded="false" aria-controls="' + secondBodyId + '"><span><strong>' + esc(text.movementSecond) + '</strong><small>' + esc(text.secondSettings) + '</small></span><span class="automatic-program-movement__toggle-icon" aria-hidden="true">⌄</span></button><div class="automatic-program-movement__body" id="' + secondBodyId + '" hidden>' + exerciseSelectMarkup(item.superset_exercise, true, text.noSuperset, "superset_exercise", item.superset_body_part_filter) + '<div class="automatic-program-item__config-label">' + esc(text.secondSettings) + '</div>' + inputMarkup(text.setsSecond, "superset_sets", itemValue(item, "superset_sets", "sets"), "{% trans 'اختیاری' %}") + inputMarkup(text.repsSecond, "superset_reps", itemValue(item, "superset_reps", "reps"), "{% trans 'اختیاری' %}") + inputMarkup(text.restSecond, "superset_rest", itemValue(item, "superset_rest", "rest"), "{% trans 'اختیاری' %}") + '</div></section>' +
+                                    '<section class="automatic-program-movement automatic-program-movement--collapsed"><button type="button" class="automatic-program-movement__toggle" data-movement-toggle aria-expanded="false" aria-controls="' + thirdBodyId + '"><span><strong>' + esc(text.movementThird) + '</strong><small>' + esc(text.thirdSettings) + '</small></span><span class="automatic-program-movement__toggle-icon" aria-hidden="true">⌄</span></button><div class="automatic-program-movement__body" id="' + thirdBodyId + '" hidden>' + exerciseSelectMarkup(item.third_exercise, true, text.noThird, "third_exercise", item.third_body_part_filter) + '<div class="automatic-program-item__config-label">' + esc(text.thirdSettings) + '</div>' + inputMarkup(text.setsThird, "third_sets", itemValue(item, "third_sets", "sets"), "{% trans 'اختیاری' %}") + inputMarkup(text.repsThird, "third_reps", itemValue(item, "third_reps", "reps"), "{% trans 'اختیاری' %}") + inputMarkup(text.restThird, "third_rest", itemValue(item, "third_rest", "rest"), "{% trans 'اختیاری' %}") + '</div></section>' +
                                     inputMarkup(text.note, "note", item.note || "", "{% trans 'نکته یا توضیح حرکت' %}") +
-                                '</div>' +
+                                '</div></div>' +
                             '</div>';
                         }).join("") +
                     '</div>' +
@@ -1654,6 +776,26 @@
             toggle.setAttribute("aria-expanded", collapsed ? "false" : "true");
             toggle.textContent = collapsed ? text.expandAll : text.collapseAll;
         }
+    }
+
+    function setItemCollapsed(item, collapsed) {
+        if (!item) return;
+        item.classList.toggle("is-collapsed", collapsed);
+        const toggle = item.querySelector("[data-item-toggle]");
+        const body = toggle ? document.getElementById(toggle.getAttribute("aria-controls")) : null;
+        if (toggle) toggle.setAttribute("aria-expanded", collapsed ? "false" : "true");
+        if (body) body.hidden = collapsed;
+        const label = toggle && toggle.querySelector("small");
+        if (label) label.textContent = collapsed ? text.expandItem : text.collapseItem;
+    }
+
+    function setMovementCollapsed(movement, collapsed) {
+        if (!movement) return;
+        movement.classList.toggle("is-collapsed", collapsed);
+        const toggle = movement.querySelector("[data-movement-toggle]");
+        const body = toggle ? document.getElementById(toggle.getAttribute("aria-controls")) : null;
+        if (toggle) toggle.setAttribute("aria-expanded", collapsed ? "false" : "true");
+        if (body) body.hidden = collapsed;
     }
 
     function setFormStatus(message, success) {
@@ -1905,6 +1047,20 @@
             if (event.target.matches("[data-exercise-select]")) hydrateExerciseSelect(event.target);
         });
         daysRoot.addEventListener("change", function (event) {
+            if (event.target.matches("[data-exercise-body-part-filter]")) {
+                const picker = event.target.closest("[data-exercise-picker]");
+                const select = picker && picker.querySelector("[data-exercise-select]");
+                const selected = select && exerciseById(select.value);
+                if (selected && event.target.value && stringId(selected.body_part_id) !== stringId(event.target.value)) {
+                    select.value = "";
+                }
+                if (select) {
+                    select.dataset.loaded = "false";
+                    hydrateExerciseSelect(select);
+                }
+                collectPreview();
+                return;
+            }
             if (event.target.matches("[data-exercise-select]")) hydrateExerciseSelect(event.target);
             if (event.target.matches("[data-day-name]")) collectPreview();
             updatePreviewSummary();
@@ -1915,11 +1071,23 @@
         daysRoot.addEventListener("click", function (event) {
             const day = event.target.closest(".automatic-day");
             if (!day) return;
-            if (event.target.matches("[data-day-toggle]")) {
+            const itemToggle = event.target.closest("[data-item-toggle]");
+            if (itemToggle) {
+                const item = itemToggle.closest(".automatic-program-item");
+                setItemCollapsed(item, !item.classList.contains("is-collapsed"));
+                return;
+            }
+            const movementToggle = event.target.closest("[data-movement-toggle]");
+            if (movementToggle) {
+                const movement = movementToggle.closest(".automatic-program-movement");
+                setMovementCollapsed(movement, !movement.classList.contains("is-collapsed"));
+                return;
+            }
+            if (event.target.closest("[data-day-toggle]")) {
                 setDayCollapsed(day, !day.classList.contains("is-collapsed"));
                 return;
             }
-            if (event.target.matches("[data-day-remove]")) {
+            if (event.target.closest("[data-day-remove]")) {
                 collectPreview();
                 const index = Number(day.dataset.day);
                 if (preview.days.length > 1) {
@@ -1929,7 +1097,7 @@
                 }
                 return;
             }
-            if (event.target.matches("[data-day-add]")) {
+            if (event.target.closest("[data-day-add]")) {
                 collectPreview();
                 const index = Number(day.dataset.day);
                 preview.days[index].items.push({
@@ -1951,7 +1119,7 @@
                 collectPreview();
                 return;
             }
-            if (event.target.matches("[data-item-remove]")) {
+            if (event.target.closest("[data-item-remove]")) {
                 collectPreview();
                 const item = event.target.closest(".automatic-program-item");
                 const index = Number(day.dataset.day);

@@ -1,4 +1,6 @@
 from django import forms
+from django.core.files.uploadedfile import UploadedFile
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from account.froms import INPUT_CLASS
@@ -12,9 +14,14 @@ from account.models import (
     ExerciseSecondaryMovementType,
     Muscle,
     User,
+    UserHealthRecord,
     WorkoutProgram,
     ExerciseAbnormalityType,
     ExerciseDifficultyLevel,
+    ExerciseGoal,
+    ExerciseRepetitionType,
+    ExerciseRestType,
+    ExerciseSetType,
 )
 from account.utils import calculate_age_from_jalali, combine_fullname, normalize_phone_number
 from account.validators import validate_image_upload, validate_media_upload, validate_pdf_upload, validate_video_upload
@@ -112,6 +119,38 @@ class AdminPersonalInfoForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+
+
+class AdminHealthRecordForm(forms.ModelForm):
+    class Meta:
+        model = UserHealthRecord
+        fields = ("category", "title", "details", "recorded_at")
+        widgets = {
+            "category": forms.Select(attrs={"class": INPUT_CLASS}),
+            "title": forms.TextInput(attrs={"class": INPUT_CLASS, "placeholder": _("مثلاً زانو درد یا داروی مصرفی")}),
+            "details": forms.Textarea(attrs={"class": INPUT_CLASS, "rows": 4, "placeholder": _("توضیحات تکمیلی را وارد کنید")}),
+            "recorded_at": forms.DateInput(attrs={"class": INPUT_CLASS, "type": "date", "dir": "ltr"}),
+        }
+
+
+class DailyMoodForm(forms.Form):
+    entry_date = forms.DateField(label=_("تاریخ ثبت"), widget=forms.DateInput(attrs={"class": INPUT_CLASS, "type": "date", "dir": "ltr"}))
+    anxiety_score = forms.IntegerField(label=_("میزان اضطراب"), min_value=0, max_value=10, widget=forms.NumberInput(attrs={"class": INPUT_CLASS, "min": 0, "max": 10, "inputmode": "numeric"}))
+    motivation_score = forms.IntegerField(label=_("میزان انگیزه"), min_value=0, max_value=10, widget=forms.NumberInput(attrs={"class": INPUT_CLASS, "min": 0, "max": 10, "inputmode": "numeric"}))
+    sleep_quality_score = forms.IntegerField(label=_("کیفیت خواب"), min_value=0, max_value=10, widget=forms.NumberInput(attrs={"class": INPUT_CLASS, "min": 0, "max": 10, "inputmode": "numeric"}))
+    training_satisfaction_score = forms.IntegerField(label=_("رضایت از کیفیت تمرین"), min_value=0, max_value=10, widget=forms.NumberInput(attrs={"class": INPUT_CLASS, "min": 0, "max": 10, "inputmode": "numeric"}))
+    resting_heart_rate_bpm = forms.IntegerField(
+        label=_("ضربان قلب استراحت صبحگاهی"),
+        min_value=30,
+        max_value=220,
+        widget=forms.NumberInput(attrs={"class": INPUT_CLASS, "min": 30, "max": 220, "inputmode": "numeric"}),
+    )
+
+    def clean_entry_date(self):
+        value = self.cleaned_data["entry_date"]
+        if value > timezone.localdate():
+            raise forms.ValidationError(_("تاریخ ثبت نمی‌تواند در آینده باشد."))
+        return value
 
 
 class AdminUserCreateForm(forms.ModelForm):
@@ -339,7 +378,8 @@ class MuscleForm(forms.ModelForm):
         }
 
     def clean_image(self):
-        return validate_image_upload(self.cleaned_data.get("image"))
+        uploaded_file = self.cleaned_data.get("image")
+        return validate_image_upload(uploaded_file) if isinstance(uploaded_file, UploadedFile) else uploaded_file
 
 
 def build_lookup_form(model, *, fields=("name", "name_en"), data=None, instance=None):
@@ -348,6 +388,15 @@ def build_lookup_form(model, *, fields=("name", "name_en"), data=None, instance=
         for field in fields
     }
     form_class = forms.modelform_factory(model, fields=fields, widgets=widgets)
+    if model in {ExerciseSetType, ExerciseRepetitionType, ExerciseRestType}:
+        widgets["goal"] = forms.TextInput(
+            attrs={
+                "class": INPUT_CLASS,
+                "placeholder": _("مثلاً strength یا volume"),
+                "dir": "ltr",
+            }
+        )
+        form_class = forms.modelform_factory(model, fields=fields, widgets=widgets)
     return form_class(data, instance=instance)
 
 
@@ -421,16 +470,20 @@ class ExerciseForm(forms.ModelForm):
         self.fields["secondary_movement_type"].empty_label = _("نامشخص")
 
     def clean_media(self):
-        return validate_media_upload(self.cleaned_data.get("media"))
+        uploaded_file = self.cleaned_data.get("media")
+        return validate_media_upload(uploaded_file) if isinstance(uploaded_file, UploadedFile) else uploaded_file
 
     def clean_video_1(self):
-        return validate_video_upload(self.cleaned_data.get("video_1"))
+        uploaded_file = self.cleaned_data.get("video_1")
+        return validate_video_upload(uploaded_file) if isinstance(uploaded_file, UploadedFile) else uploaded_file
 
     def clean_video_2(self):
-        return validate_video_upload(self.cleaned_data.get("video_2"))
+        uploaded_file = self.cleaned_data.get("video_2")
+        return validate_video_upload(uploaded_file) if isinstance(uploaded_file, UploadedFile) else uploaded_file
 
     def clean_video_3(self):
-        return validate_video_upload(self.cleaned_data.get("video_3"))
+        uploaded_file = self.cleaned_data.get("video_3")
+        return validate_video_upload(uploaded_file) if isinstance(uploaded_file, UploadedFile) else uploaded_file
 
 
 class CorrectiveExerciseForm(forms.ModelForm):
@@ -479,16 +532,20 @@ class CorrectiveExerciseForm(forms.ModelForm):
         self.fields["abnormality_type"].empty_label = _("نامشخص")
 
     def clean_media(self):
-        return validate_media_upload(self.cleaned_data.get("media"))
+        uploaded_file = self.cleaned_data.get("media")
+        return validate_media_upload(uploaded_file) if isinstance(uploaded_file, UploadedFile) else uploaded_file
 
     def clean_video_1(self):
-        return validate_video_upload(self.cleaned_data.get("video_1"))
+        uploaded_file = self.cleaned_data.get("video_1")
+        return validate_video_upload(uploaded_file) if isinstance(uploaded_file, UploadedFile) else uploaded_file
 
     def clean_video_2(self):
-        return validate_video_upload(self.cleaned_data.get("video_2"))
+        uploaded_file = self.cleaned_data.get("video_2")
+        return validate_video_upload(uploaded_file) if isinstance(uploaded_file, UploadedFile) else uploaded_file
 
     def clean_video_3(self):
-        return validate_video_upload(self.cleaned_data.get("video_3"))
+        uploaded_file = self.cleaned_data.get("video_3")
+        return validate_video_upload(uploaded_file) if isinstance(uploaded_file, UploadedFile) else uploaded_file
 
 
 class WorkoutProgramForm(forms.ModelForm):
@@ -557,15 +614,6 @@ class WorkoutProgramPayloadForm(forms.Form):
 class AutomaticProgrammingForm(forms.Form):
     """Inputs used by the automatic workout designer."""
 
-    GOAL_CHOICES = (
-        ("strength", _("قدرت")),
-        ("volume", _("حجم عضلانی")),
-        ("endurance", _("استقامت")),
-        ("fat_burning", _("چربی‌سوزی")),
-        ("power", _("توان انفجاری")),
-        ("general", _("تناسب عمومی")),
-    )
-
     user = forms.ModelChoiceField(
         queryset=User.objects.filter(is_admin=False).order_by("fullname"),
         label=_("ورزشکار"),
@@ -597,7 +645,7 @@ class AutomaticProgrammingForm(forms.Form):
         widget=forms.NumberInput(attrs={"class": INPUT_CLASS, "min": 1, "max": 50, "dir": "ltr"}),
     )
     goal = forms.ChoiceField(
-        choices=GOAL_CHOICES, initial="general", label=_("هدف برنامه"),
+        choices=(), initial="general", label=_("هدف برنامه"),
         widget=forms.Select(attrs={"class": INPUT_CLASS}),
     )
     target_secondary_movement_types = forms.ModelMultipleChoiceField(
@@ -710,6 +758,17 @@ class AutomaticProgrammingForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["user"].label_from_instance = self._user_label
+        choices = self._database_goal_choices()
+        self.fields["goal"].choices = choices
+        if self.fields["goal"].initial not in {value for value, _ in choices}:
+            self.fields["goal"].initial = choices[0][0] if choices else None
+
+    @classmethod
+    def _database_goal_choices(cls):
+        """Build the automatic-program goals from the managed goal catalog."""
+        return tuple(
+            ExerciseGoal.objects.order_by("pk").values_list("name_en", "name")
+        )
 
     @staticmethod
     def _user_label(user):

@@ -13,6 +13,10 @@ from account.services.notification_service import NotificationService
 from account.models import (
     CorrectiveExercise,
     Exercise,
+    ExerciseGoal,
+    ExerciseRepetitionType,
+    ExerciseRestType,
+    ExerciseSetType,
     WorkoutProgram,
     WorkoutProgramCorrective,
     WorkoutProgramDay,
@@ -92,6 +96,7 @@ class GymProgramService:
                             "third_exercise_name": (
                                 item.third_exercise.name if item.third_exercise_id else ""
                             ),
+                            "goal": item.goal,
                             "sets": item.sets,
                             "reps": item.reps,
                             "rest": item.rest,
@@ -208,11 +213,16 @@ class GymProgramService:
                     raise ValidationError(_("حرکت سوم باید با حرکت اصلی متفاوت باشد."))
                 if third_id and third_id == superset_id:
                     raise ValidationError(_("حرکت سوم باید با حرکت دوم متفاوت باشد."))
+                goal = self._normalize_goal(item_data.get("goal"))
+                self._validate_lookup_value(ExerciseSetType, "set_count", item_data.get("sets"), goal)
+                self._validate_lookup_value(ExerciseRepetitionType, "reps", item_data.get("reps"), goal)
+                self._validate_lookup_value(ExerciseRestType, "rest_time", item_data.get("rest"), goal)
                 WorkoutProgramExercise.objects.create(
                     day=day,
                     exercise=exercises[exercise_id],
                     superset_exercise=exercises.get(superset_id) if superset_id else None,
                     third_exercise=exercises.get(third_id) if third_id else None,
+                    goal=goal,
                     sets=self._text(item_data.get("sets"), _("تعداد ست"), required=True, max_length=40),
                     reps=self._text(item_data.get("reps"), _("تعداد تکرار"), required=True, max_length=60),
                     rest=self._text(item_data.get("rest"), _("استراحت"), max_length=40),
@@ -379,3 +389,48 @@ class GymProgramService:
         if value is None:
             value = item_data.get(fallback_key)
         return cls._text(value, label, max_length=max_length)
+
+    @staticmethod
+    def _normalize_goal(value: Any) -> str:
+        """Store the stable database key while accepting legacy Persian values."""
+        value = str(value or "").strip()
+        if not value:
+            return ""
+        goal = (
+            ExerciseGoal.objects.filter(name_en__iexact=value)
+            .order_by("pk")
+            .first()
+        )
+        if goal is None:
+            goal = ExerciseGoal.objects.filter(name__iexact=value).order_by("pk").first()
+        return goal.name_en if goal else value[:80]
+
+    @classmethod
+    def _validate_lookup_value(cls, model, field: str, value: Any, goal: str) -> None:
+        if not goal or not str(value or "").strip():
+            return
+        goal_obj = ExerciseGoal.objects.filter(name_en__iexact=goal).order_by("pk").first()
+        if goal_obj is None:
+            return
+        aliases = cls._goal_aliases(goal_obj)
+        lookup = model.objects.filter(**{f"{field}__iexact": str(value).strip()})
+        if not any((item.goal or "").strip().lower() in {alias.lower() for alias in aliases} for item in lookup):
+            raise ValidationError(_("مقدار %(field)s با هدف انتخاب‌شده سازگار نیست.") % {"field": field})
+
+    @staticmethod
+    def _goal_aliases(goal_obj) -> set[str]:
+        key = (goal_obj.name_en or "").strip().lower()
+        if key == "ggeneral":
+            key = "general"
+        aliases = {
+            "strength": ("strength", "قدرت"),
+            "volume": ("volume", "hypertrophy", "muscle gain", "حجم"),
+            "endurance": ("endurance", "استقامت"),
+            "fat_burning": ("fat_burning", "fat burn", "fat-burning", "چربی سوزی", "چربی‌سوزی"),
+            "power": ("power", "توان", "توانی", "توان انفجاری", "explosive"),
+            "general": ("general", "عمومی", "تناسب عمومی"),
+        }
+        return set(aliases.get(key, (goal_obj.name_en, goal_obj.name))) | {
+            goal_obj.name_en,
+            goal_obj.name,
+        }

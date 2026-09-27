@@ -1,0 +1,68 @@
+{% extends 'admin_portal/_shell.html' %}
+{% load i18n my_tags %}
+
+{% block title %}{% blocktrans with fullname=target_user.fullname %}فایل‌های {{ fullname }} | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block admin_content %}
+<section class="admin-screen admin-files-screen">
+    <header class="admin-screen__header admin-screen__header--split">
+        <a href="{% url 'register:admin_user_hub' target_user.id %}" class="admin-back-link" aria-label="{% trans 'بازگشت' %}">→</a>
+        <div>
+            <span class="admin-section-eyebrow">{{ target_user.fullname }}</span>
+            <h1 class="admin-screen__title">{% trans 'فایل‌های کاربر' %}</h1>
+        </div>
+    </header>
+
+    <p class="admin-screen__lead">{% trans 'فایل‌ها و برنامه‌هایی که برای این کاربر در سامانه بارگذاری شده‌اند.' %}</p>
+
+    <section class="admin-files-panel">
+        <div class="admin-files-panel__header">
+            <h2>{% trans 'برنامه‌ها و اسناد' %}</h2>
+            <a href="{% url 'register:admin_upload' target_user.id %}" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'آپلود فایل جدید' %}</a>
+        </div>
+        <div class="admin-file-list">
+            {% for document in client_documents %}
+                <article class="admin-file-row">
+                    <div>
+                        <strong>{{ document.title }}</strong>
+                        <small>{{ document.uploaded_at|date:'Y/m/d H:i' }}{% if document.uploaded_by %} — {{ document.uploaded_by.fullname }}{% endif %}</small>
+                    </div>
+                    <div class="admin-result-card__actions">
+                        <a href="{{ document.file|public_media_url }}" class="admin-secondary-btn admin-secondary-btn--small" download>{% trans 'دانلود' %}</a>
+                        <form method="post" action="{% url 'register:admin_user_file_delete' target_user.id 'document' document.pk %}" onsubmit="return confirm('{% trans "آیا از حذف این فایل اطمینان دارید؟" %}');">
+                            {% csrf_token %}
+                            <button type="submit" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'حذف' %}</button>
+                        </form>
+                    </div>
+                </article>
+            {% empty %}
+                <p class="admin-files-empty">{% trans 'هنوز سند یا برنامه‌ای برای این کاربر ثبت نشده است.' %}</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="admin-files-panel">
+        <div class="admin-files-panel__header"><h2>{% trans 'تصویرها و ویدیوها' %}</h2></div>
+        <div class="admin-file-list">
+            {% for media in client_media %}
+                <article class="admin-file-row">
+                    <div>
+                        <strong>{% if media.image %}{% trans 'تصویر' %}{% else %}{% trans 'ویدیو' %}{% endif %}</strong>
+                        <small>{% if media.image %}{{ media.image.name }}{% else %}{{ media.video.name }}{% endif %} — {{ media.uploaded_at|date:'Y/m/d H:i' }}</small>
+                    </div>
+                    <div class="admin-result-card__actions">
+                        {% if media.image %}<a href="{{ media.image|public_media_url }}" class="admin-secondary-btn admin-secondary-btn--small" download>{% trans 'دانلود تصویر' %}</a>{% endif %}
+                        {% if media.video %}<a href="{{ media.video|public_media_url }}" class="admin-secondary-btn admin-secondary-btn--small" download>{% trans 'دانلود ویدیو' %}</a>{% endif %}
+                        <form method="post" action="{% url 'register:admin_user_file_delete' target_user.id 'media' media.pk %}" onsubmit="return confirm('{% trans "آیا از حذف این فایل اطمینان دارید؟" %}');">
+                            {% csrf_token %}
+                            <button type="submit" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'حذف' %}</button>
+                        </form>
+                    </div>
+                </article>
+            {% empty %}
+                <p class="admin-files-empty">{% trans 'هنوز تصویر یا ویدیویی برای این کاربر ثبت نشده است.' %}</p>
+            {% endfor %}
+        </div>
+    </section>
+</section>
+{% endblock %}

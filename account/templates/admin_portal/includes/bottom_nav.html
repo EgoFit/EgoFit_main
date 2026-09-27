@@ -6,30 +6,51 @@
         </span>
         <span class="admin-bottom-nav__label">{% trans 'جستجو' %}</span>
     </a>
-    <a href="{% if target_user %}{% url 'register:admin_user_analysis' target_user.id %}{% else %}{% url 'register:admin_search' %}{% endif %}" class="admin-bottom-nav__item {% if active_section == 'analysis' %}is-active{% endif %}">
-        <span class="admin-bottom-nav__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none"><path d="M5 17L9 12L13 14L19 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </span>
-        <span class="admin-bottom-nav__label">{% trans 'آنالیز' %}</span>
-    </a>
-    <a href="{% if target_user %}{% url 'register:admin_user_hub' target_user.id %}{% else %}{% url 'register:admin_search' %}{% endif %}" class="admin-bottom-nav__item {% if active_section == 'records' %}is-active{% endif %}">
-        <span class="admin-bottom-nav__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none"><path d="M7 5.5H17A2.5 2.5 0 0 1 19.5 8V17A2.5 2.5 0 0 1 17 19.5H7A2.5 2.5 0 0 1 4.5 17V8A2.5 2.5 0 0 1 7 5.5Z" stroke="currentColor" stroke-width="1.8"/></svg>
-        </span>
-        <span class="admin-bottom-nav__label">{% trans 'ثبت اطلاعات' %}</span>
-    </a>
+    <details class="admin-bottom-nav__group" {% if active_section == 'analysis' or active_section == 'records' or active_section == 'clients' %}open{% endif %}>
+        <summary class="admin-bottom-nav__item admin-bottom-nav__group-toggle {% if active_section == 'analysis' or active_section == 'records' or active_section == 'clients' %}is-active{% endif %}" aria-controls="admin-user-nav-menu">
+            <span class="admin-bottom-nav__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 19V18C3.5 15.8 5.3 14 7.5 14H10.5C12.7 14 14.5 15.8 14.5 18V19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="17" cy="8.5" r="2.3" stroke="currentColor" stroke-width="1.8"/><path d="M15.5 14.2C18 14.2 20 16 20 18.2V19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </span>
+            <span class="admin-bottom-nav__label">{% trans 'کاربر' %}</span>
+            <span class="admin-bottom-nav__chevron" aria-hidden="true">⌄</span>
+        </summary>
+        <ul class="admin-bottom-nav__submenu" id="admin-user-nav-menu">
+            <li>
+                <a href="{% if target_user %}{% url 'register:admin_user_analysis' target_user.id %}{% else %}{% url 'register:admin_search' %}{% endif %}" class="admin-bottom-nav__submenu-item {% if active_section == 'analysis' %}is-active{% endif %}">
+                    <span class="admin-bottom-nav__submenu-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none"><path d="M5 17L9 12L13 14L19 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    <span>{% trans 'آنالیز' %}</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% if target_user %}{% url 'register:admin_user_hub' target_user.id %}{% else %}{% url 'register:admin_search' %}{% endif %}" class="admin-bottom-nav__submenu-item {% if active_section == 'records' %}is-active{% endif %}">
+                    <span class="admin-bottom-nav__submenu-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none"><path d="M7 5.5H17A2.5 2.5 0 0 1 19.5 8V17A2.5 2.5 0 0 1 17 19.5H7A2.5 2.5 0 0 1 4.5 17V8A2.5 2.5 0 0 1 7 5.5Z" stroke="currentColor" stroke-width="1.8"/></svg>
+                    </span>
+                    <span>{% trans 'ثبت اطلاعات' %}</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'register:admin_user_list' %}" class="admin-bottom-nav__submenu-item {% if active_section == 'clients' %}is-active{% endif %}">
+                    <span class="admin-bottom-nav__submenu-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 19V18C3.5 15.8 5.3 14 7.5 14H10.5C12.7 14 14.5 15.8 14.5 18V19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="17" cy="8.5" r="2.3" stroke="currentColor" stroke-width="1.8"/><path d="M15.5 14.2C18 14.2 20 16 20 18.2V19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                    </span>
+                    <span>{% trans 'کاربران' %}</span>
+                </a>
+            </li>
+        </ul>
+    </details>
     <a href="{% url 'register:admin_gym_library' %}" class="admin-bottom-nav__item {% if active_section == 'library' %}is-active{% endif %}">
         <span class="admin-bottom-nav__icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none"><path d="M6 4.5V19.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M18 4.5V19.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6 9H18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6 15H18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
         </span>
         <span class="admin-bottom-nav__label">{% trans 'کتابخانه' %}</span>
     </a>
-    <a href="{% url 'register:admin_user_list' %}" class="admin-bottom-nav__item {% if active_section == 'clients' %}is-active{% endif %}">
-        <span class="admin-bottom-nav__icon" aria-hidden="true">👥</span>
-        <span class="admin-bottom-nav__label">{% trans 'کاربران' %}</span>
-    </a>
     <a href="{% url 'register:admin_automatic_programming' %}" class="admin-bottom-nav__item {% if active_section == 'automatic' %}is-active{% endif %}">
-        <span class="admin-bottom-nav__icon" aria-hidden="true">✦</span>
+        <span class="admin-bottom-nav__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 3.5L13.7 9.3L19.5 11L13.7 12.7L12 18.5L10.3 12.7L4.5 11L10.3 9.3L12 3.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        </span>
         <span class="admin-bottom-nav__label">{% trans 'خودکار' %}</span>
     </a>
     <a href="{% url 'register:admin_notifications' %}" class="admin-bottom-nav__item {% if active_section == 'notifications' %}is-active{% endif %}">

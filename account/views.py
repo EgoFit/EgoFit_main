@@ -618,14 +618,14 @@ class ForgotPasswordConfirmView(View):
 
 # Compatibility exports: URLs and older integrations can continue importing
 # account views while profile and workout pages move to dedicated modules.
-from account.workout_views import (
+from account.workouts.views import (
     ProfileWorkoutMovementView,
     ProfileWorkoutProgramPerformanceView,
     ProfileWorkoutProgramPdfView,
     ProfileWorkoutProgramsView,
     _has_workout_program_access,
 )
-from account.profile_views import (  # noqa: E402,F401
+from account.profile.views import (  # noqa: E402,F401
     AddCourseToProfileView,
     ProfileAnalysisView,
     ProfileCoachView,

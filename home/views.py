@@ -446,7 +446,7 @@ class SeriesEpisodeDetailView(DetailView):
             return result
         if not result:
             return self.render_to_response(self.get_context_data(), status=400)
-        return redirect("home:series_episod", pk=self.object.pk)
+        return redirect("home:series_episodes", pk=self.object.pk)
 
 
 class EpisodeVideoStreamView(LoginRequiredMixin, View):

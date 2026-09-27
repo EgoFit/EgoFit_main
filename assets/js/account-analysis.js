@@ -40,7 +40,20 @@
     var trendData = readJSON("analysis-trend-data") || {};
     var measureData = readJSON("analysis-measure-data") || {};
     var metricSeries = readJSON("analysis-metric-series") || {};
+    var goalData = readJSON("analysis-goal-data") || {};
     var charts = [];
+
+    function goalPayload(key) {
+        if (Array.isArray(goalData)) {
+            for (var i = 0; i < goalData.length; i += 1) {
+                if (goalData[i] && goalData[i].key === key) {
+                    return goalData[i];
+                }
+            }
+            return null;
+        }
+        return goalData[key] || null;
+    }
 
     function baseOptions(colors) {
         return {
@@ -113,6 +126,43 @@
         });
     }
 
+    function buildGoalChart(canvas, payload, colors) {
+        var actualColor = colors.palette[1];
+        var datasets = [
+            {
+                label: payload.label,
+                data: payload.values || [],
+                borderColor: actualColor,
+                backgroundColor: actualColor + "1a",
+                borderWidth: 2.5,
+                tension: 0.35,
+                fill: true,
+                pointRadius: (payload.labels || []).length > 18 ? 0 : 3,
+                pointBackgroundColor: actualColor,
+                spanGaps: true,
+            },
+        ];
+        if (payload.target_values && payload.target_values.length) {
+            datasets.push({
+                label: "هدف",
+                data: payload.target_values,
+                borderColor: colors.palette[2],
+                borderWidth: 2,
+                borderDash: [6, 5],
+                pointRadius: 0,
+                fill: false,
+                spanGaps: true,
+            });
+        }
+        var opts = baseOptions(colors);
+        opts.plugins.legend = { display: true, labels: { color: colors.ticks, usePointStyle: true } };
+        return new Chart(canvas.getContext("2d"), {
+            type: "line",
+            data: { labels: payload.labels || [], datasets: datasets },
+            options: opts,
+        });
+    }
+
     var measureChart = null;
     var metricChart = null;
 
@@ -145,6 +195,15 @@
         }
 
         renderMetricChart(colors);
+
+        document.querySelectorAll("[data-goal-chart]").forEach(function (canvas) {
+            var key = canvas.getAttribute("data-goal-chart");
+            var payload = goalPayload(key);
+            if (!payload || !payload.values || !payload.values.length) {
+                return;
+            }
+            charts.push(buildGoalChart(canvas, payload, colors));
+        });
     }
 
     function renderMetricChart(colors) {

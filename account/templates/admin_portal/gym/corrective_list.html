@@ -34,7 +34,7 @@
                         </div>
                     {% endif %}
                     <div class="admin-result-card__actions">
-                        <a href="{% url 'register:admin_corrective_edit' corrective.pk %}" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'ویرایش' %}</a>
+                        <a href="{% url 'register:admin_corrective_edit' corrective.pk %}" class="admin-secondary-btn admin-secondary-btn--small admin-library-edit-btn">{% trans 'ویرایش' %}</a>
                         <form method="post" action="{% url 'register:admin_corrective_delete' corrective.pk %}">
                             {% csrf_token %}
                             <button type="submit" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'حذف' %}</button>

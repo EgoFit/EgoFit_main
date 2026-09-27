@@ -1,5 +1,7 @@
 
+{% with extra_css_file='css/fail-payment.css' %}
 {% include 'includes/header_reference.html' %}
+{% endwith %}
 {% include 'includes/header.html' %}
     <!-- start mega menu -->
 
@@ -10,15 +12,6 @@
     <div class="content">
         <div class="container-fluid">
             <div class="container-fluid">
-                <style>
-                    .line-step-box.complete:nth-child(1):before {
-                        width: 100%;
-                    }
-                    .line-step-box.complete:nth-child(2):before {
-                        width: 100%;
-                    }
-                </style>
-
                 <div class="line-step-container d-sm-block d-none">
                     <div class="line-step">
                         <div class="line-step-boxs">
@@ -116,6 +109,4 @@
     </div>
 {% include 'includes/footer.html' %}
     <!-- end content -->
-
-
 

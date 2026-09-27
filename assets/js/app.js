@@ -106,6 +106,12 @@ if (scrollToTopBtn) {
 
 document.addEventListener("DOMContentLoaded", function () {
     resetSubmitLoadingStates();
+    document.querySelectorAll("[data-gauge-pct]").forEach(function (pointer) {
+        var percentage = Number.parseFloat(pointer.getAttribute("data-gauge-pct"));
+        if (Number.isFinite(percentage)) {
+            pointer.style.insetInlineStart = Math.min(100, Math.max(0, percentage)) + "%";
+        }
+    });
 });
 
 window.addEventListener("pageshow", function () {

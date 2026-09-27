@@ -137,6 +137,48 @@ class AccountAccessTests(TestCase):
         self.assertContains(response, "account-bottom-nav")
         self.assertContains(response, "آنالیز")
 
+    def test_profile_analysis_selectors_update_selected_date_and_formula(self):
+        from account.models import BodyCircumferenceMeasurement, CaliperMeasurement
+
+        self.user.height_cm = 180
+        self.user.weight_kg = 78
+        self.user.gender = "male"
+        self.user.birth_date_jalali = "1370/02/12"
+        self.user.save(update_fields=["height_cm", "weight_kg", "gender", "birth_date_jalali"])
+        BodyCircumferenceMeasurement.objects.create(
+            user=self.user,
+            measured_at_jalali="1404/01/10",
+            height_cm=180,
+            weight_kg=78,
+            waist_cm=82,
+            neck_cm=38,
+            hips_cm=96,
+        )
+        CaliperMeasurement.objects.create(
+            user=self.user,
+            measured_at_jalali="1404/01/10",
+            chest_mm=10,
+            axilla_mm=12,
+            triceps_mm=18,
+            subscapular_mm=14,
+            abdominal_mm=20,
+            suprailiac_mm=16,
+            thigh_mm=22,
+        )
+        self.client.force_login(self.user)
+
+        response = self.client.get(
+            reverse("register:profile_analysis"),
+            {"date": "1404/01/10", "body_fat_formula": "jp4"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="date"')
+        self.assertContains(response, 'name="body_fat_formula"')
+        self.assertContains(response, 'value="1404/01/10" selected')
+        self.assertContains(response, 'value="jp4" selected')
+        self.assertContains(response, "Jackson-Pollock 4-site")
+
     def test_profile_weight_edit_page_renders_compact_sheet(self):
         self.client.force_login(self.user)
 
@@ -897,13 +939,19 @@ class LookupAndExerciseNewFieldsTests(TestCase):
         self.assertContains(response, "Dumbbell")
 
     def test_new_lookups_persist_name_en_and_show_in_list(self):
-        from account.models import ExerciseAbnormalityType, ExerciseExecutionEquipmentType, ExerciseSecondaryMovementType
+        from account.models import (
+            ExerciseAbnormalityType,
+            ExerciseExecutionEquipmentType,
+            ExerciseGoal,
+            ExerciseSecondaryMovementType,
+        )
 
         self.client.force_login(self.admin)
         cases = [
             ("abnormality-type", "گرد شانه", "Rounded Shoulders", ExerciseAbnormalityType),
             ("secondary-movement-type", "کششی", "Pull", ExerciseSecondaryMovementType),
             ("execution-equipment-type", "هالتر", "Barbell", ExerciseExecutionEquipmentType),
+            ("goal", "هدف سفارشی", "custom-goal", ExerciseGoal),
         ]
         for key, name_fa, name_en, model in cases:
             self.client.post(reverse("register:admin_lookup_add", args=[key]), {"name": name_fa, "name_en": name_en})

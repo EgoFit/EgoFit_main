@@ -67,7 +67,7 @@
                 <strong class="analysis-gauge-card__num">{{ analysis_gauges.bmi.value|default:'—' }}</strong>
                 <span class="analysis-gauge-card__cat">{{ analysis_gauges.bmi.category|default:'' }}</span>
                 <div class="analysis-gauge-bar analysis-gauge-bar--bmi">
-                    <i class="analysis-gauge-bar__ptr" style="inset-inline-start: {{ analysis_gauges.bmi.pct }}%;"></i>
+                    <i class="analysis-gauge-bar__ptr" data-gauge-pct="{{ analysis_gauges.bmi.pct }}"></i>
                 </div>
                 <div class="analysis-gauge-bar__labs">
                     <span>{% trans 'کمبود وزن' %}</span><span>{% trans 'نرمال' %}</span><span>{% trans 'اضافه وزن' %}</span><span>{% trans 'چاق' %}</span>
@@ -78,7 +78,7 @@
                 <strong class="analysis-gauge-card__num">{{ analysis_gauges.whr.value|default:'—' }}</strong>
                 <span class="analysis-gauge-card__cat">{{ analysis_gauges.whr.status|default:'' }}</span>
                 <div class="analysis-gauge-bar analysis-gauge-bar--whr">
-                    <i class="analysis-gauge-bar__ptr" style="inset-inline-start: {{ analysis_gauges.whr.pct }}%;"></i>
+                    <i class="analysis-gauge-bar__ptr" data-gauge-pct="{{ analysis_gauges.whr.pct }}"></i>
                 </div>
                 <div class="analysis-gauge-bar__labs">
                     <span>{% trans 'مطلوب' %}</span><span>{% trans 'متوسط' %}</span><span>{% trans 'پرخطر' %}</span>

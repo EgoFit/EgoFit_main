@@ -7,7 +7,7 @@ from django.core.cache import cache
 from django.db.models import Q
 
 from account.constants import GLOBAL_NOTIFICATION_CACHE_KEY, GLOBAL_NOTIFICATION_CACHE_TIMEOUT
-from account.models import Notification
+from account.models import Notification, NotificationDismissal
 from account.selectors.user_selector import UserSelector
 
 
@@ -17,6 +17,7 @@ class NotificationFeedItem:
     message: str
     created_at: object
     read: bool = False
+    key: str = ""
 
 
 class NotificationSelector:
@@ -62,20 +63,54 @@ class NotificationSelector:
                     title="خرید موفق",
                     message=f"خرید شما با موفقیت انجام شد: {course_title}",
                     created_at=order.created_at,
+                    key=f"course-order:{order.pk}",
                 )
             )
         return course_notifications
 
     @staticmethod
+    def _to_feed_item(notification: Notification) -> NotificationFeedItem:
+        return NotificationFeedItem(
+            title=notification.title,
+            message=notification.message,
+            created_at=notification.created_at,
+            read=notification.read,
+            key=f"notification:{notification.pk}",
+        )
+
+    @staticmethod
     def get_profile_notifications(user, *, limit: int = 20):
-        user_notifications = list(NotificationSelector.get_user_notifications(user, limit=limit))
-        global_notifications = NotificationSelector.get_global_notifications(limit=limit)
+        user_notifications = [
+            NotificationSelector._to_feed_item(notification)
+            for notification in NotificationSelector.get_user_notifications(user, limit=limit)
+        ]
+        global_notifications = [
+            NotificationSelector._to_feed_item(notification)
+            for notification in NotificationSelector.get_global_notifications(limit=limit)
+        ]
         course_notifications = NotificationSelector.build_course_notifications(user, limit=limit)
 
         notifications = user_notifications + global_notifications + course_notifications
-        return sorted(
+        notifications = sorted(
             notifications,
-            key=lambda item: item.created_at if hasattr(item, "created_at") else item["created_at"],
+            key=lambda item: item.created_at,
             reverse=True,
         )
+        dismissed_keys = set(
+            NotificationDismissal.objects.filter(
+                user=user,
+                notification_key__in=[notification.key for notification in notifications],
+            ).values_list("notification_key", flat=True)
+        )
+        return [notification for notification in notifications if notification.key not in dismissed_keys]
 
+    @staticmethod
+    def dismiss_profile_notification(user, notification_key: str) -> bool:
+        notification_key = (notification_key or "").strip()
+        if not notification_key:
+            return False
+        _, created = NotificationDismissal.objects.get_or_create(
+            user=user,
+            notification_key=notification_key,
+        )
+        return created

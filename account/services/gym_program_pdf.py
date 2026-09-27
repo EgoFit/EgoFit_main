@@ -327,22 +327,23 @@ def _draw_sarbarg_summary_page(
         lines = []
         reshape_text = _get_rtl_text_transformer()
         for item in items:
-            name = html.escape(reshape_text(item.corrective_exercise.name))
+            line_text = f"• {item.corrective_exercise.name}"
+            if item.sets:
+                line_text += f" — ست: {item.sets}"
+            if item.reps:
+                line_text += f" — تکرار/مدت: {item.reps}"
+            if item.note:
+                line_text += f" — {item.note}"
+
+            content = html.escape(reshape_text(line_text))
             href = _pdf_movement_media_url(item.corrective_exercise, link_base_url)
             if href:
-                name = (
+                content = (
                     f'<link href="{html.escape(href, quote=True)}">'
-                    f'<u><font color="#0563C1">{name}</font></u>'
+                    f'<u><font color="#0563C1">{content}</font></u>'
                     "</link>"
                 )
-            line = f"• {name}"
-            if item.sets:
-                line += f" — ست: {html.escape(reshape_text(item.sets))}"
-            if item.reps:
-                line += f" — تکرار/مدت: {html.escape(reshape_text(item.reps))}"
-            if item.note:
-                line += f" — {html.escape(reshape_text(item.note))}"
-            lines.append(line)
+            lines.append(content)
         return Paragraph("<br/>".join(lines), info_style)
 
     athlete = getattr(getattr(program, "user", None), "fullname", "") or "—"
@@ -1077,6 +1078,14 @@ _ARABIC_FORMS = {
 
 
 def _fallback_rtl_visual(value: str) -> str:
+    try:
+        import arabic_reshaper
+        from bidi.algorithm import get_display
+
+        return get_display(arabic_reshaper.reshape(str(value)))
+    except ImportError:
+        pass
+
     tokens = re.findall(r"[\u0600-\u06ff\u200c]+|[A-Za-z]+|[0-9]+|\s+|.", str(value))
     visual_tokens = []
     for token in reversed(tokens):

@@ -12,6 +12,7 @@ urlpatterns = [
     path('media-files/<path:path>', ResilientMediaView.as_view(), name='resilient-media'),
     path('', include('home.urls')),
     path('accounts/', include('account.urls')),
+    path('accounts/', include(('account.urls', 'account'), namespace='account')),
     path('cart/', include('cart.urls')),
 
 ]

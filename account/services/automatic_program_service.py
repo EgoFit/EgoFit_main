@@ -157,6 +157,8 @@ class AutomaticProgramService:
         used_exercise_ids = set()
         rotation_cursors = defaultdict(int)
         prescription_index = 0
+        previous_prescription = {}
+        has_explicit_movement_counts = isinstance(secondary_movement_counts, dict)
         for day_number, session_plan in enumerate(session_plans, start=1):
             items = []
             session_used_exercise_ids = set()
@@ -166,7 +168,11 @@ class AutomaticProgramService:
                 preferred_pool = preferred_by_movement_type.get(movement_type_id, [])
                 pool = by_movement_type.get(movement_type_id, [])
                 for offset in range(count):
-                    if not has_explicit_session_targets and len(items) >= int(movements):
+                    if (
+                        not has_explicit_session_targets
+                        and not has_explicit_movement_counts
+                        and len(items) >= int(movements)
+                    ):
                         break
                     if not pool:
                         break
@@ -185,7 +191,9 @@ class AutomaticProgramService:
                     prescription = self._prescription_for_index(
                         prescription_catalogs,
                         prescription_index,
+                        previous=previous_prescription,
                     )
+                    previous_prescription = prescription
                     prescription_index += 1
                     items.append(
                         {
@@ -279,13 +287,17 @@ class AutomaticProgramService:
     def _prescription_for_index(
         catalogs: Mapping[str, Sequence[str]],
         index: int,
+        previous: Mapping[str, str] | None = None,
     ) -> dict[str, str]:
-        """Choose varied set/repetition/rest values from randomized catalogs."""
-        return {
-            field: values[index % len(values)]
-            for field, values in catalogs.items()
-            if values
-        }
+        """Choose an independent, goal-specific prescription for each movement."""
+        previous = previous or {}
+        prescription = {}
+        for field, values in catalogs.items():
+            if not values:
+                continue
+            candidates = [value for value in values if value != previous.get(field)]
+            prescription[field] = random.choice(candidates or list(values))
+        return prescription
 
     @classmethod
     def _order_session_items(

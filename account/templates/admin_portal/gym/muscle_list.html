@@ -30,7 +30,7 @@
                         </div>
                     </div>
                     <div class="admin-result-card__actions">
-                        <a href="{% url 'register:admin_muscle_edit' muscle.pk %}" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'ویرایش' %}</a>
+                        <a href="{% url 'register:admin_muscle_edit' muscle.pk %}" class="admin-secondary-btn admin-secondary-btn--small admin-library-edit-btn">{% trans 'ویرایش' %}</a>
                         <form method="post" action="{% url 'register:admin_muscle_delete' muscle.pk %}">
                             {% csrf_token %}
                             <button type="submit" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'حذف' %}</button>

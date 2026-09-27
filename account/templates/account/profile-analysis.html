@@ -39,7 +39,7 @@
                 <strong class="analysis-gauge-card__num">{{ analysis_gauges.bmi.value|default:'—' }}</strong>
                 <span class="analysis-gauge-card__cat">{{ analysis_gauges.bmi.category|default:'' }}</span>
                 <div class="analysis-gauge-bar analysis-gauge-bar--bmi">
-                    <i class="analysis-gauge-bar__ptr" style="inset-inline-start: {{ analysis_gauges.bmi.pct }}%;"></i>
+                    <i class="analysis-gauge-bar__ptr" data-gauge-pct="{{ analysis_gauges.bmi.pct }}"></i>
                 </div>
                 <div class="analysis-gauge-bar__labs">
                     <span>{% trans 'کمبود وزن' %}</span><span>{% trans 'نرمال' %}</span><span>{% trans 'اضافه وزن' %}</span><span>{% trans 'چاق' %}</span>
@@ -50,7 +50,7 @@
                 <strong class="analysis-gauge-card__num">{{ analysis_gauges.whr.value|default:'—' }}</strong>
                 <span class="analysis-gauge-card__cat">{{ analysis_gauges.whr.status|default:'' }}</span>
                 <div class="analysis-gauge-bar analysis-gauge-bar--whr">
-                    <i class="analysis-gauge-bar__ptr" style="inset-inline-start: {{ analysis_gauges.whr.pct }}%;"></i>
+                    <i class="analysis-gauge-bar__ptr" data-gauge-pct="{{ analysis_gauges.whr.pct }}"></i>
                 </div>
                 <div class="analysis-gauge-bar__labs">
                     <span>{% trans 'مطلوب' %}</span><span>{% trans 'متوسط' %}</span><span>{% trans 'پرخطر' %}</span>
@@ -58,20 +58,35 @@
             </article>
         </div>
 
-        {% if analysis_dates %}
-        <form class="analysis-datepicker" method="get" data-analysis-date-form>
-            <label class="analysis-datepicker__label" for="analysis-date-select">{% trans 'تاریخ آنالیز' %}</label>
-            <select class="analysis-trend-select" id="analysis-date-select" name="date" data-analysis-date-select onchange="this.form.submit()" dir="ltr">
-                {% for d in analysis_dates %}
-                    <option value="{{ d.value }}" {% if d.value == analysis_selected_date %}selected{% endif %}>{{ d.label }}</option>
-                {% endfor %}
-            </select>
-            <noscript><button type="submit" class="analysis-datepicker__go">{% trans 'نمایش' %}</button></noscript>
-        </form>
-        {% endif %}
-
         {% if analysis_result_tiles %}
-        <p class="analysis-sec-title">{% trans 'نتایج محاسبات' %}</p>
+        <div class="analysis-results-head">
+            <p class="analysis-sec-title">{% trans 'نتایج محاسبات' %}</p>
+            {% if analysis_dates or analysis_body_fat_formulas %}
+            <form class="analysis-datepicker analysis-result-controls" method="get" data-analysis-filters-form>
+                {% if analysis_dates %}
+                <div class="analysis-result-control">
+                    <label class="analysis-datepicker__label" for="analysis-date-select">{% trans 'تاریخ آنالیز' %}</label>
+                    <select class="analysis-trend-select" id="analysis-date-select" name="date" data-analysis-date-select onchange="this.form.submit()" dir="ltr">
+                        {% for d in analysis_dates %}
+                            <option value="{{ d.value }}" {% if d.value == analysis_selected_date %}selected{% endif %}>{{ d.label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+                {% if analysis_body_fat_formulas %}
+                <div class="analysis-result-control">
+                    <label class="analysis-datepicker__label" for="analysis-body-fat-formula">{% trans 'فرمول درصد چربی و وزن خالص بدن' %}</label>
+                    <select class="analysis-trend-select" id="analysis-body-fat-formula" name="body_fat_formula" data-analysis-formula-select onchange="this.form.submit()" dir="ltr">
+                        {% for option in analysis_body_fat_formulas %}
+                            <option value="{{ option.key }}" {% if option.key == analysis_selected_body_fat_formula %}selected{% endif %}>{{ option.label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+                <noscript><button type="submit" class="analysis-datepicker__go">{% trans 'نمایش' %}</button></noscript>
+            </form>
+            {% endif %}
+        </div>
         <section class="analysis-result-grid">
             {% for tile in analysis_result_tiles %}
                 <article class="analysis-result-tile analysis-result-tile--{{ tile.tone }}">
@@ -81,6 +96,100 @@
                 </article>
             {% endfor %}
         </section>
+        {% endif %}
+
+        {% if analysis_smart_goal.available %}
+        <section class="analysis-smart-goal" aria-labelledby="analysis-smart-goal-title">
+            <header class="analysis-smart-goal__header">
+                <div class="analysis-smart-goal__intro">
+                    <span class="analysis-smart-goal__icon" aria-hidden="true">◎</span>
+                    <div>
+                        <span class="analysis-kicker">{% trans 'هدف‌گذاری هوشمند' %}</span>
+                        <h3 id="analysis-smart-goal-title">{{ analysis_smart_goal.title }}</h3>
+                        <p>{{ analysis_smart_goal.description }}</p>
+                    </div>
+                </div>
+                <span class="analysis-smart-goal__badge">{% blocktrans with weeks=analysis_smart_goal.timeframe_weeks %}بازهٔ اولیه: {{ weeks }} هفته{% endblocktrans %}</span>
+            </header>
+
+            <div class="analysis-smart-goal__metrics">
+                {% for metric in analysis_smart_goal.metrics %}
+                <article class="analysis-smart-goal__metric">
+                    <div class="analysis-smart-goal__metric-head">
+                        <span>{{ metric.label }}</span>
+                        <small>{{ metric.status }}</small>
+                    </div>
+                    <div class="analysis-smart-goal__metric-values">
+                        <strong>{{ metric.current_display }}</strong>
+                        <span aria-hidden="true">&#128284;</span>
+                        <b>{{ metric.target_display }}</b>
+                    </div>
+                    <div class="analysis-smart-goal__progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ metric.progress_pct }}" aria-label="{{ metric.label }}">
+                        <i style="width: {{ metric.progress_pct }}%"></i>
+                    </div>
+                    <small class="analysis-smart-goal__progress-label">{% blocktrans with progress=metric.progress_pct %}پیشرفت ثبت‌شده: {{ progress }}٪{% endblocktrans %}</small>
+                </article>
+                {% endfor %}
+            </div>
+
+            {% if analysis_smart_goal.has_chart_data %}
+            <div class="analysis-smart-goal__timeline-head">
+                <div>
+                    <span class="analysis-kicker">{% trans 'روند تست‌ها' %}</span>
+                    <h4>{% trans 'مسیر رسیدن به هدف' %}</h4>
+                </div>
+                <span>{% trans 'خط چین، هدف برنامه‌ریزی‌شده را نشان می‌دهد.' %}</span>
+            </div>
+            <div class="analysis-smart-goal__charts">
+                {% for chart in analysis_smart_goal.charts %}
+                    <article class="analysis-smart-goal__chart">
+                        <span>{{ chart.label }}</span>
+                        <div class="analysis-canvas"><canvas data-goal-chart="{{ chart.key }}"></canvas></div>
+                    </article>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if analysis_smart_goal.has_timeline %}
+            <div class="analysis-smart-goal__history">
+                <div class="analysis-smart-goal__timeline-head">
+                    <div>
+                        <span class="analysis-kicker">{% trans 'تست‌های ثبت‌شده' %}</span>
+                        <h4>{% trans 'پیگیری مسیر در طول زمان' %}</h4>
+                    </div>
+                </div>
+                <div class="analysis-table-card">
+                    <table class="analysis-table analysis-table--history">
+                        <thead>
+                            <tr>
+                                <th>{% trans 'تاریخ' %}</th>
+                                <th>{% trans 'منبع تست' %}</th>
+                                <th>{% trans 'وزن' %}</th>
+                                <th>{% trans 'چربی' %}</th>
+                                <th>{% trans 'توده بدون چربی' %}</th>
+                                <th>WHR</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in analysis_smart_goal.timeline_rows %}
+                            <tr>
+                                <td dir="ltr">{{ row.date }}</td>
+                                <td>{{ row.source }}</td>
+                                <td>{{ row.weight }}</td>
+                                <td>{{ row.body_fat }}</td>
+                                <td>{{ row.lean_mass }}</td>
+                                <td>{{ row.whr }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            <p class="analysis-smart-goal__note">{{ analysis_smart_goal.note }}</p>
+        </section>
+        {{ analysis_smart_goal.charts|json_script:"analysis-goal-data" }}
         {% endif %}
 
         {% if analysis_body_composition.calories_for_loss or analysis_body_composition.calories_for_gain or analysis_body_composition.protein_min_g or analysis_body_composition.protein_max_g %}
@@ -198,7 +307,7 @@
 
 {% block extra_js %}
     {{ block.super }}
-    {% if analysis_has_chart_data or analysis_metric_series %}
+    {% if analysis_has_chart_data or analysis_metric_series or analysis_smart_goal.has_chart_data %}
         <script src="{% static 'js/vendor/chart.umd.min.js' %}"></script>
         <script src="{% static 'js/account-analysis.js' %}"></script>
     {% endif %}

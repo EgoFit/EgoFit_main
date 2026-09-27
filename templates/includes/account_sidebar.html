@@ -35,6 +35,8 @@
     <nav class="account-nav">
         <a href="{% url 'register:profile' %}" class="account-nav__item {% if active_section == 'dashboard' %}is-active{% endif %}">{% trans 'پیشخوان' %}</a>
         <a href="{% url 'register:profile_analysis' %}" class="account-nav__item {% if active_section == 'analysis' %}is-active{% endif %}">{% trans 'آنالیز' %}</a>
+        <a href="{% url 'register:profile_mood' %}" class="account-nav__item {% if active_section == 'mood' %}is-active{% endif %}">{% trans 'روحیات و خلق‌وخو' %}</a>
+
         <a href="{% url 'register:profile_workout_programs' %}" class="account-nav__item {% if active_section == 'workout' %}is-active{% endif %}">{% trans 'برنامه بدنسازی' %}</a>
         <a href="{% url 'register:profile_course' %}" class="account-nav__item {% if active_section == 'courses' %}is-active{% endif %}">{% trans 'دوره‌های من' %}</a>
         <a href="{% url 'register:profile_coach' %}" class="account-nav__item {% if active_section == 'coach' %}is-active{% endif %}">{% trans 'مربی شما' %}</a>

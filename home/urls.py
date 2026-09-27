@@ -15,6 +15,7 @@ urlpatterns = [
     path('course/handle/', views.handle_form_submission, name="handle_comment"),
     path('blog/', views.BlogView.as_view(), name="blog"),  # این خط اصلاح شد
     path('blog/search/', views.BlogProductView.as_view(), name="blog_search"),
+    path('series/episodes/<int:pk>/', views.SeriesEpisodeDetailView.as_view(), name="series_episodes"),
     path('series/epidos/<int:pk>/', views.SeriesEpisodeDetailView.as_view(), name="series_episod"),
     path('episodes/<int:pk>/video/', views.EpisodeVideoStreamView.as_view(), name="episode_video"),
     path('workout-library/', views.WorkoutLibraryView.as_view(), name='workout_library'),

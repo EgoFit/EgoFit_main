@@ -183,6 +183,74 @@ class User(AbstractBaseUser):
         return bool(self.is_active and self.is_admin)
 
 
+class UserHealthRecord(models.Model):
+    class CategoryChoices(models.TextChoices):
+        DISEASE = "disease", _("بیماری")
+        ABNORMALITY = "abnormality", _("ناهنجاری")
+        INJURY = "injury", _("آسیب")
+        MEDICATION = "medication", _("دارو")
+        ALLERGY = "allergy", _("حساسیت")
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="health_records", verbose_name=_("کاربر"))
+    category = models.CharField(max_length=20, choices=CategoryChoices.choices, verbose_name=_("دسته‌بندی"))
+    title = models.CharField(max_length=160, verbose_name=_("عنوان"))
+    details = models.TextField(blank=True, verbose_name=_("جزئیات"))
+    recorded_at = models.DateField(default=timezone.localdate, verbose_name=_("تاریخ ثبت"))
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-recorded_at", "-id"]
+        verbose_name = _("سابقه سلامت کاربر")
+        verbose_name_plural = _("سوابق سلامت کاربران")
+        indexes = [models.Index(fields=["user", "category"]), models.Index(fields=["user", "recorded_at"])]
+
+    def __str__(self):
+        return f"{self.user.fullname} - {self.get_category_display()} - {self.title}"
+
+
+class DailyMoodEntry(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="mood_entries", verbose_name=_("کاربر"))
+    entry_date = models.DateField(default=timezone.localdate, verbose_name=_("تاریخ"))
+    anxiety_score = models.PositiveSmallIntegerField(validators=[MinValueValidator(0), MaxValueValidator(10)], verbose_name=_("میزان اضطراب"))
+    motivation_score = models.PositiveSmallIntegerField(validators=[MinValueValidator(0), MaxValueValidator(10)], verbose_name=_("میزان انگیزه"))
+    sleep_quality_score = models.PositiveSmallIntegerField(validators=[MinValueValidator(0), MaxValueValidator(10)], verbose_name=_("کیفیت خواب"))
+    training_satisfaction_score = models.PositiveSmallIntegerField(validators=[MinValueValidator(0), MaxValueValidator(10)], verbose_name=_("رضایت از کیفیت تمرین"))
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-entry_date", "-id"]
+        verbose_name = _("ثبت روحیات روزانه")
+        verbose_name_plural = _("ثبت روحیات روزانه")
+        constraints = [models.UniqueConstraint(fields=["user", "entry_date"], name="unique_user_mood_entry_date")]
+        indexes = [models.Index(fields=["user", "entry_date"])]
+
+    def __str__(self):
+        return f"{self.user.fullname} - {self.entry_date}"
+
+
+class DailyHeartRateEntry(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="heart_rate_entries", verbose_name=_("کاربر"))
+    entry_date = models.DateField(default=timezone.localdate, verbose_name=_("تاریخ"))
+    bpm = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(30), MaxValueValidator(220)],
+        verbose_name=_("ضربان قلب (ضربان در دقیقه)"),
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-entry_date", "-id"]
+        verbose_name = _("ثبت ضربان قلب روزانه")
+        verbose_name_plural = _("ثبت ضربان قلب روزانه")
+        constraints = [models.UniqueConstraint(fields=["user", "entry_date"], name="unique_user_heart_rate_entry_date")]
+        indexes = [models.Index(fields=["user", "entry_date"])]
+
+    def __str__(self):
+        return f"{self.user.fullname} - {self.entry_date} - {self.bpm} BPM"
+
+
 class Otp(models.Model):
     token = models.CharField(max_length=200, null=True, db_index=True)
     phone = models.CharField(max_length=11, db_index=True)
@@ -255,6 +323,21 @@ class Notification(models.Model):
             models.Index(fields=["is_global", "created_at"]),
             models.Index(fields=["sms_status", "created_at"]),
         ]
+
+
+class NotificationDismissal(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notification_dismissals")
+    notification_key = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "notification_key"],
+                name="unique_user_notification_dismissal",
+            ),
+        ]
+        indexes = [models.Index(fields=["user", "created_at"], name="account_notif_user_created_idx")]
 
 
 class BodyCircumferenceMeasurement(models.Model):
@@ -428,6 +511,7 @@ class CoachRequest(models.Model):
     thigh_left_cm = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, verbose_name=_("دور ران (چپ)"))
     calf_left_cm = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, verbose_name=_("دور ساق پا (چپ)"))
     pushed_to_measurements = models.BooleanField(default=False, verbose_name=_("به اندازه‌گیری‌ها افزوده شد"))
+    admin_read_at = models.DateTimeField(null=True, blank=True, verbose_name=_("زمان مشاهده توسط ادمین"))
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING, db_index=True, verbose_name=_("وضعیت"))
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -627,6 +711,19 @@ class ExerciseSportType(models.Model):
         ordering = ["name"]
         verbose_name = "نوع ورزش"
         verbose_name_plural = "انواع ورزش"
+
+    def __str__(self):
+        return self.name
+
+
+class ExerciseGoal(models.Model):
+    name = models.CharField(max_length=80, unique=True, verbose_name=_("هدف"))
+    name_en = models.CharField(max_length=80, unique=True, verbose_name=_("نام انگلیسی هدف"))
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = "هدف برنامه"
+        verbose_name_plural = "اهداف برنامه"
 
     def __str__(self):
         return self.name
@@ -924,6 +1021,7 @@ class WorkoutProgramExercise(models.Model):
         related_name="third_program_items",
         verbose_name=_("حرکت سوم"),
     )
+    goal = models.CharField(max_length=80, blank=True, verbose_name=_("هدف حرکت"))
     sets = models.CharField(max_length=40, verbose_name=_("تعداد ست"))
     reps = models.CharField(max_length=60, verbose_name=_("تعداد تکرار"))
     rest = models.CharField(max_length=40, blank=True, verbose_name=_("استراحت"))
@@ -1165,6 +1263,70 @@ class WorkoutPerformanceRecord(models.Model):
             self.Mode.BODY_WEIGHT: _("کیلوگرم"),
             self.Mode.TIME: _("ثانیه"),
         }.get(self.mode, "")
+
+
+class WorkoutBestRecord(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="workout_best_records",
+        verbose_name=_("ورزشکار"),
+    )
+    exercise = models.ForeignKey(
+        Exercise,
+        on_delete=models.PROTECT,
+        related_name="workout_best_records",
+        verbose_name=_("حرکت"),
+    )
+    program = models.ForeignKey(
+        WorkoutProgram,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="best_records",
+        verbose_name=_("برنامه"),
+    )
+    program_exercise = models.ForeignKey(
+        WorkoutProgramExercise,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="best_records",
+        verbose_name=_("حرکت برنامه"),
+    )
+    value = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        validators=[MinValueValidator(0)],
+        verbose_name=_("بهترین رکورد (کیلوگرم)"),
+    )
+    recorded_at = models.DateTimeField(auto_now=True, verbose_name=_("تاریخ ثبت"))
+
+    class Meta:
+        verbose_name = "بهترین رکورد حرکت"
+        verbose_name_plural = "بهترین رکوردهای حرکات"
+        ordering = ["-recorded_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "exercise"],
+                name="unique_workout_best_record",
+            ),
+            models.CheckConstraint(
+                check=models.Q(value__gt=0),
+                name="workout_best_record_value_positive",
+            ),
+        ]
+        indexes = [
+            models.Index(fields=["user", "exercise"], name="account_wor_user_id_4d1f6e_idx"),
+            models.Index(fields=["user", "recorded_at"], name="account_wor_user_id_9a1c3b_idx"),
+        ]
+
+    def clean(self):
+        if self.value is not None and self.value <= 0:
+            raise ValidationError({"value": _("مقدار رکورد باید بیشتر از صفر باشد.")})
+
+    def __str__(self):
+        return f"{self.user.fullname} - {self.exercise.name} - {self.value}"
 
 
 class BirthdaySmsLog(models.Model):

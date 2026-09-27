@@ -134,6 +134,8 @@
 
     .account-bottom-nav,
     .admin-bottom-nav {
+        --bottom-nav-icon-size: 20px;
+        --bottom-nav-label-size: 0.62rem;
         inset-inline: 4px;
         bottom: calc(4px + env(safe-area-inset-bottom, 0px));
         gap: 2px;
@@ -160,6 +162,19 @@
     .admin-bottom-nav__icon svg {
         width: 20px;
         height: 20px;
+    }
+
+    .account-bottom-nav__submenu-icon,
+    .admin-bottom-nav__submenu-icon {
+        width: var(--bottom-nav-icon-size);
+        height: var(--bottom-nav-icon-size);
+        font-size: var(--bottom-nav-icon-size);
+    }
+
+    .account-bottom-nav__submenu-icon svg,
+    .admin-bottom-nav__submenu-icon svg {
+        width: var(--bottom-nav-icon-size);
+        height: var(--bottom-nav-icon-size);
     }
 
     .account-bottom-nav__label,
@@ -739,6 +754,11 @@
 }
 
 @media (max-width: 370px) {
+    .account-bottom-nav,
+    .admin-bottom-nav {
+        --bottom-nav-label-size: 0.58rem;
+    }
+
     .dashboard-glass-header__brand-copy strong {
         max-width: 92px;
         overflow: hidden;
@@ -763,5 +783,42 @@
     .account-bottom-nav__label,
     .admin-bottom-nav__label {
         font-size: 0.58rem;
+    }
+}
+
+/* Profile analysis: keep result cards compact on very narrow phones. */
+@media (max-width: 560px) {
+    .account-dashboard .analysis-smart-goal__metrics {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 360px) {
+    .account-dashboard .analysis-result-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 7px;
+    }
+
+    .account-dashboard .analysis-result-tile {
+        aspect-ratio: auto;
+        min-height: 108px;
+        gap: 4px;
+        padding: 9px 7px;
+        border-radius: 13px;
+    }
+
+    .account-dashboard .analysis-result-tile__label {
+        font-size: 0.7rem;
+        line-height: 1.45;
+    }
+
+    .account-dashboard .analysis-result-tile__value {
+        font-size: 1.2rem;
+    }
+
+    .account-dashboard .analysis-result-tile__status {
+        max-width: 100%;
+        padding-inline: 7px;
+        font-size: 0.65rem;
     }
 }

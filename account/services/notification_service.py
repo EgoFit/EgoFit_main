@@ -97,6 +97,9 @@ class NotificationService:
     def get_notifications_count(self, user) -> int:
         return NotificationSelector.get_notifications_count(user)
 
+    def dismiss_profile_notification(self, user, notification_key: str) -> bool:
+        return NotificationSelector.dismiss_profile_notification(user, notification_key)
+
     def send_sms_broadcast(self, notification):
         if not notification.is_global or not notification.send_sms_to_all:
             self.repository.mark_sms_not_requested(notification)

@@ -1856,6 +1856,21 @@ body {
         min-height: 38px;
         border-radius: 11px;
     }
+
+    /* Keep the authenticated-user control compact on tablet and mobile.
+     * The desktop label and chevron cannot fit inside the icon-sized button. */
+    .modern-user-btn {
+        flex: 0 0 38px;
+        min-width: 38px;
+        max-width: 38px;
+        padding: 0;
+        gap: 0;
+        overflow: hidden;
+    }
+
+    .modern-user-btn > span:not(.modern-user__avatar) {
+        display: none;
+    }
 }
 
 @media (max-width: 520px) {

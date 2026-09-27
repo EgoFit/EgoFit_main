@@ -109,10 +109,15 @@
 </section>
 
 {{ program_payload|json_script:"program-payload" }}
+{{ goal_catalog|json_script:"goal-catalog" }}
 {{ exercise_catalog|json_script:"exercise-catalog" }}
+{{ body_part_catalog|json_script:"body-part-catalog" }}
 {{ set_catalog|json_script:"set-catalog" }}
+{{ set_goal_catalog|json_script:"set-goal-catalog" }}
 {{ repetition_catalog|json_script:"repetition-catalog" }}
+{{ repetition_goal_catalog|json_script:"repetition-goal-catalog" }}
 {{ rest_catalog|json_script:"rest-catalog" }}
+{{ rest_goal_catalog|json_script:"rest-goal-catalog" }}
 {{ corrective_catalog|json_script:"corrective-catalog" }}
 {% endblock %}
 
@@ -134,10 +139,15 @@
 
         (function () {
             const payload = JSON.parse(document.getElementById("program-payload").textContent || "{}");
+            const goals = JSON.parse(document.getElementById("goal-catalog").textContent || "[]");
             const exercises = JSON.parse(document.getElementById("exercise-catalog").textContent || "[]");
+            const bodyParts = JSON.parse(document.getElementById("body-part-catalog").textContent || "[]");
             const sets = JSON.parse(document.getElementById("set-catalog").textContent || "[]");
+            const setGoals = JSON.parse(document.getElementById("set-goal-catalog").textContent || "[]");
             const repetitions = JSON.parse(document.getElementById("repetition-catalog").textContent || "[]");
+            const repetitionGoals = JSON.parse(document.getElementById("repetition-goal-catalog").textContent || "[]");
             const rests = JSON.parse(document.getElementById("rest-catalog").textContent || "[]");
+            const restGoals = JSON.parse(document.getElementById("rest-goal-catalog").textContent || "[]");
             const correctives = JSON.parse(document.getElementById("corrective-catalog").textContent || "[]");
             const daysRoot = document.getElementById("program-days");
             const correctivesRoot = document.getElementById("program-correctives");
@@ -157,11 +167,23 @@
                 });
             }
 
-            function exerciseOptions(selected, allowEmpty, emptyLabel) {
+            function bodyPartOptions(selected) {
+                let html = '<option value="">همه بخش‌های بدن</option>';
+                bodyParts.forEach(function (bodyPart) {
+                    const isSelected = String(bodyPart.id) === String(selected || "") ? " selected" : "";
+                    html += '<option value="' + escapeHtml(bodyPart.id) + '"' + isSelected + '>' +
+                        escapeHtml(bodyPart.name) + '</option>';
+                });
+                return html;
+            }
+
+            function exerciseOptions(selected, allowEmpty, emptyLabel, bodyPartFilter) {
                 let html = allowEmpty
                     ? '<option value="">' + escapeHtml(emptyLabel || "بدون سوپرست") + '</option>'
                     : '<option value="">حرکت را انتخاب کنید</option>';
-                exercises.forEach(function (exercise) {
+                exercises.filter(function (exercise) {
+                    return !bodyPartFilter || String(exercise.body_part_id) === String(bodyPartFilter);
+                }).forEach(function (exercise) {
                     const isSelected = String(exercise.id) === String(selected || "") ? " selected" : "";
                     html += '<option value="' + exercise.id + '"' + isSelected + '>' +
                         escapeHtml(exercise.name + (exercise.muscle ? " — " + exercise.muscle : "")) + '</option>';
@@ -169,7 +191,56 @@
                 return html;
             }
 
-            function lookupOptions(items, selected, allowEmpty, emptyLabel) {
+            function exercisePickerMarkup(selected, allowEmpty, emptyLabel, bodyPartFilter, exerciseKey, label, className) {
+                return '<div class="program-item-exercise-picker ' + (className || '') + '">' +
+                    '<label class="program-item-body-part-filter"><span>فیلتر بخش بدن</span><select class="program-item-body-part-filter-select" data-exercise-key="' + escapeHtml(exerciseKey) + '">' + bodyPartOptions(bodyPartFilter) + '</select></label>' +
+                    '<label><span>' + escapeHtml(label) + '</span><select class="' + escapeHtml(exerciseKey) + '">' + exerciseOptions(selected, allowEmpty, emptyLabel, bodyPartFilter) + '</select></label>' +
+                    '</div>';
+            }
+
+            function normalizeGoal(value) {
+                return String(value || "").trim().toLowerCase().replace(/[\u200c\s-]+/g, "_");
+            }
+
+            function goalOptions(selected) {
+                let html = '<option value="">هدف حرکت را انتخاب کنید</option>';
+                const selectedValue = String(selected || "");
+                let selectedExists = false;
+                goals.forEach(function (goal) {
+                    const value = String(goal.value || "");
+                    const isSelected = value === selectedValue ? " selected" : "";
+                    selectedExists = selectedExists || value === selectedValue;
+                    html += '<option value="' + escapeHtml(value) + '"' + isSelected + '>' +
+                        escapeHtml(goal.label || value) + '</option>';
+                });
+                if (selectedValue && !selectedExists) {
+                    html += '<option value="' + escapeHtml(selectedValue) + '" selected>' +
+                        escapeHtml(selectedValue) + '</option>';
+                }
+                return html;
+            }
+
+            function selectedGoal(selected) {
+                const selectedValue = String(selected || "");
+                return goals.find(function (goal) {
+                    return String(goal.value || "") === selectedValue;
+                }) || null;
+            }
+
+            function lookupItemsForGoal(items, selectedGoalValue, goalItems) {
+                if (!selectedGoalValue) return items;
+                const goal = selectedGoal(selectedGoalValue);
+                if (!goal) return items;
+                const accepted = [goal.value].concat(goal.aliases || []).map(normalizeGoal);
+                const isGeneral = accepted.indexOf("general") !== -1 || accepted.indexOf("تناسب_عمومی") !== -1;
+                return items.filter(function (item, index) {
+                    const itemGoal = normalizeGoal((goalItems[index] || {}).goal);
+                    return accepted.indexOf(itemGoal) !== -1 || (isGeneral && !itemGoal);
+                });
+            }
+
+            function lookupOptions(items, selected, allowEmpty, emptyLabel, selectedGoalValue, goalItems) {
+                items = lookupItemsForGoal(items, selectedGoalValue, goalItems || []);
                 let html = allowEmpty ? '<option value="">' + escapeHtml(emptyLabel) + '</option>' : "";
                 const selectedValue = String(selected || "");
                 let selectedExists = false;
@@ -180,7 +251,7 @@
                     html += '<option value="' + escapeHtml(value) + '"' + isSelected + '>' +
                         escapeHtml(item.label || value) + '</option>';
                 });
-                if (selectedValue && !selectedExists) {
+                if (selectedValue && !selectedExists && !selectedGoalValue) {
                     html += '<option value="' + escapeHtml(selectedValue) + '" selected>' +
                         escapeHtml(selectedValue) + '</option>';
                 }
@@ -223,22 +294,23 @@
                             return '<div class="admin-program-item" data-item-index="' + itemIndex + '">' +
                                 '<div class="admin-program-item__top"><strong>حرکت ' + (itemIndex + 1) + '</strong><button type="button" class="admin-secondary-btn admin-secondary-btn--small remove-item">حذف</button></div>' +
                                 '<div class="admin-program-item__grid">' +
-                                '<label>حرکت اصلی<select class="program-item-exercise">' + exerciseOptions(item.exercise, false) + '</select></label>' +
+                                exercisePickerMarkup(item.exercise, false, "", item.body_part_filter, "program-item-exercise", "حرکت اصلی", "program-item-exercise-picker--main") +
+                                '<label>هدف حرکت<select class="program-item-goal">' + goalOptions(item.goal) + '</select></label>' +
                                 '<div class="admin-program-item__config-label">تنظیمات حرکت اصلی</div>' +
-                                '<label>ست حرکت اصلی<select class="program-item-sets">' + lookupOptions(sets, item.sets, false, "") + '</select></label>' +
-                                '<label>تکرار حرکت اصلی<select class="program-item-reps">' + lookupOptions(repetitions, item.reps, false, "") + '</select></label>' +
-                                '<label>استراحت حرکت اصلی<select class="program-item-rest">' + lookupOptions(rests, item.rest, true, "بدون استراحت") + '</select></label>' +
+                                '<label>ست حرکت اصلی<select class="program-item-sets">' + lookupOptions(sets, item.sets, false, "", item.goal, setGoals) + '</select></label>' +
+                                '<label>تکرار حرکت اصلی<select class="program-item-reps">' + lookupOptions(repetitions, item.reps, false, "", item.goal, repetitionGoals) + '</select></label>' +
+                                '<label>استراحت حرکت اصلی<select class="program-item-rest">' + lookupOptions(rests, item.rest, true, "بدون استراحت", item.goal, restGoals) + '</select></label>' +
                                 '<section class="admin-program-movement admin-program-movement--collapsed">' +
                                 '<button type="button" class="admin-program-movement__toggle" aria-expanded="false" aria-controls="' + supersetBodyId + '">' +
                                 '<span><strong>حرکت دوم سوپرست</strong><small>برای افزودن یا ویرایش حرکت دوم باز کنید</small></span>' +
                                 '<span class="admin-program-movement__toggle-icon" aria-hidden="true">⌄</span>' +
                                 '</button>' +
                                 '<div class="admin-program-movement__body" id="' + supersetBodyId + '" hidden>' +
-                                '<label class="admin-program-movement__wide">حرکت دوم سوپرست<select class="program-item-superset">' + exerciseOptions(item.superset_exercise, true) + '</select></label>' +
+                                '<div class="admin-program-movement__wide">' + exercisePickerMarkup(item.superset_exercise, true, "بدون سوپرست", item.superset_body_part_filter, "program-item-superset", "حرکت دوم سوپرست", "") + '</div>' +
                                 '<div class="admin-program-item__config-label">تنظیمات حرکت دوم</div>' +
-                                '<label>ست حرکت دوم<select class="program-item-superset-sets">' + lookupOptions(sets, movementValue(item, "superset_sets", "sets"), false, "") + '</select></label>' +
-                                '<label>تکرار حرکت دوم<select class="program-item-superset-reps">' + lookupOptions(repetitions, movementValue(item, "superset_reps", "reps"), false, "") + '</select></label>' +
-                                '<label>استراحت حرکت دوم<select class="program-item-superset-rest">' + lookupOptions(rests, movementValue(item, "superset_rest", "rest"), true, "بدون استراحت") + '</select></label>' +
+                                '<label>ست حرکت دوم<select class="program-item-superset-sets">' + lookupOptions(sets, movementValue(item, "superset_sets", "sets"), false, "", item.goal, setGoals) + '</select></label>' +
+                                '<label>تکرار حرکت دوم<select class="program-item-superset-reps">' + lookupOptions(repetitions, movementValue(item, "superset_reps", "reps"), false, "", item.goal, repetitionGoals) + '</select></label>' +
+                                '<label>استراحت حرکت دوم<select class="program-item-superset-rest">' + lookupOptions(rests, movementValue(item, "superset_rest", "rest"), true, "بدون استراحت", item.goal, restGoals) + '</select></label>' +
                                 '</div></section>' +
                                 '<section class="admin-program-movement admin-program-movement--collapsed">' +
                                 '<button type="button" class="admin-program-movement__toggle" aria-expanded="false" aria-controls="' + thirdBodyId + '">' +
@@ -246,11 +318,11 @@
                                 '<span class="admin-program-movement__toggle-icon" aria-hidden="true">⌄</span>' +
                                 '</button>' +
                                 '<div class="admin-program-movement__body" id="' + thirdBodyId + '" hidden>' +
-                                '<label class="admin-program-movement__wide">حرکت سوم<select class="program-item-third">' + exerciseOptions(item.third_exercise, true, "بدون حرکت سوم") + '</select></label>' +
+                                '<div class="admin-program-movement__wide">' + exercisePickerMarkup(item.third_exercise, true, "بدون حرکت سوم", item.third_body_part_filter, "program-item-third", "حرکت سوم", "") + '</div>' +
                                 '<div class="admin-program-item__config-label">تنظیمات حرکت سوم</div>' +
-                                '<label>ست حرکت سوم<select class="program-item-third-sets">' + lookupOptions(sets, movementValue(item, "third_sets", "sets"), false, "") + '</select></label>' +
-                                '<label>تکرار حرکت سوم<select class="program-item-third-reps">' + lookupOptions(repetitions, movementValue(item, "third_reps", "reps"), false, "") + '</select></label>' +
-                                '<label>استراحت حرکت سوم<select class="program-item-third-rest">' + lookupOptions(rests, movementValue(item, "third_rest", "rest"), true, "بدون استراحت") + '</select></label>' +
+                                '<label>ست حرکت سوم<select class="program-item-third-sets">' + lookupOptions(sets, movementValue(item, "third_sets", "sets"), false, "", item.goal, setGoals) + '</select></label>' +
+                                '<label>تکرار حرکت سوم<select class="program-item-third-reps">' + lookupOptions(repetitions, movementValue(item, "third_reps", "reps"), false, "", item.goal, repetitionGoals) + '</select></label>' +
+                                '<label>استراحت حرکت سوم<select class="program-item-third-rest">' + lookupOptions(rests, movementValue(item, "third_rest", "rest"), true, "بدون استراحت", item.goal, restGoals) + '</select></label>' +
                                 '</div></section>' +
                                 '<label class="admin-program-item__wide">نکته<input class="program-item-note" value="' + escapeHtml(item.note || "") + '" placeholder="نکته یا توضیح حرکت"></label>' +
                                 '</div></div>';
@@ -279,8 +351,12 @@
                         items: Array.from(dayElement.querySelectorAll(".admin-program-item")).map(function (itemElement) {
                             return {
                                 exercise: itemElement.querySelector(".program-item-exercise").value,
+                                body_part_filter: itemElement.querySelector(".program-item-body-part-filter-select[data-exercise-key='program-item-exercise']").value,
+                                goal: itemElement.querySelector(".program-item-goal").value,
                                 superset_exercise: itemElement.querySelector(".program-item-superset").value,
+                                superset_body_part_filter: itemElement.querySelector(".program-item-body-part-filter-select[data-exercise-key='program-item-superset']").value,
                                 third_exercise: itemElement.querySelector(".program-item-third").value,
+                                third_body_part_filter: itemElement.querySelector(".program-item-body-part-filter-select[data-exercise-key='program-item-third']").value,
                                 sets: itemElement.querySelector(".program-item-sets").value,
                                 reps: itemElement.querySelector(".program-item-reps").value,
                                 rest: itemElement.querySelector(".program-item-rest").value,
@@ -340,8 +416,11 @@
                 } else if (action.classList.contains("add-item")) {
                     state.days[dayIndex].items.push({
                         exercise: "",
+                        body_part_filter: "",
                         superset_exercise: "",
+                        superset_body_part_filter: "",
                         third_exercise: "",
+                        third_body_part_filter: "",
                         sets: "",
                         reps: "",
                         rest: "",
@@ -357,6 +436,40 @@
                     const itemIndex = Number(action.closest(".admin-program-item").dataset.itemIndex);
                     state.days[dayIndex].items.splice(itemIndex, 1);
                 }
+                render();
+            });
+            daysRoot.addEventListener("change", function (event) {
+                if (event.target.matches(".program-item-body-part-filter-select")) {
+                    collect();
+                    const itemElement = event.target.closest(".admin-program-item");
+                    const dayElement = event.target.closest(".admin-program-day");
+                    const item = state.days[Number(dayElement.dataset.dayIndex)].items[Number(itemElement.dataset.itemIndex)];
+                    const exerciseKey = {
+                        "program-item-exercise": "exercise",
+                        "program-item-superset": "superset_exercise",
+                        "program-item-third": "third_exercise",
+                    }[event.target.dataset.exerciseKey];
+                    const filterKey = exerciseKey === "exercise" ? "body_part_filter" : exerciseKey.replace("_exercise", "") + "_body_part_filter";
+                    item[filterKey] = event.target.value;
+                    const selectedExercise = exercises.find(function (exercise) {
+                        return String(exercise.id) === String(item[exerciseKey] || "");
+                    });
+                    if (selectedExercise && event.target.value && String(selectedExercise.body_part_id) !== String(event.target.value)) {
+                        item[exerciseKey] = "";
+                    }
+                    render();
+                    return;
+                }
+                if (!event.target.matches(".program-item-goal")) return;
+                collect();
+                const itemElement = event.target.closest(".admin-program-item");
+                const dayElement = event.target.closest(".admin-program-day");
+                const item = state.days[Number(dayElement.dataset.dayIndex)].items[Number(itemElement.dataset.itemIndex)];
+                item.goal = event.target.value;
+                [
+                    "sets", "reps", "rest", "superset_sets", "superset_reps", "superset_rest",
+                    "third_sets", "third_reps", "third_rest"
+                ].forEach(function (key) { item[key] = ""; });
                 render();
             });
             correctivesRoot.addEventListener("click", function (event) {

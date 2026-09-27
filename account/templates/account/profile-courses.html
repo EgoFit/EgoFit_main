@@ -14,7 +14,7 @@
     <section class="course-library-grid">
         {% for item in items %}
             <article class="account-card">
-                <a href="{% url 'home:series_episod' item.id %}" class="block overflow-hidden rounded-3xl">
+                <a href="{% url 'home:series_episodes' item.id %}" class="block overflow-hidden rounded-3xl">
                     <img src="{{ item.image|public_media_url }}" alt="{{ item.title }}" class="h-48 w-full object-cover" loading="lazy">
                 </a>
                 <div class="mt-4 grid gap-3">
@@ -30,7 +30,7 @@
                         {% else %}
                             <strong class="text-slate-900">{% blocktrans with price=item.discount_price %}{{ price }} تومان{% endblocktrans %}</strong>
                         {% endif %}
-                        <a href="{% url 'home:series_episod' item.id %}" class="cta-primary">{% trans 'ادامه یادگیری' %}</a>
+                        <a href="{% url 'home:series_episodes' item.id %}" class="cta-primary">{% trans 'ادامه یادگیری' %}</a>
                     </div>
                 </div>
             </article>

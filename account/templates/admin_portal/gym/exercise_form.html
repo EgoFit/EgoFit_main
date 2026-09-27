@@ -190,50 +190,6 @@
         }());
     </script>
 
-    <form method="post" enctype="multipart/form-data" class="admin-form-grid admin-form-grid--stacked admin-form-grid--cols2">
-        {% csrf_token %}
-        {% if form.non_field_errors %}
-            <div class="admin-form-errors">
-                {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
-            </div>
-        {% endif %}
-        <div class="field-group"><label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>{{ form.name }}{{ form.name.errors }}</div>
-        <div class="field-group"><label for="{{ form.name_en.id_for_label }}">{{ form.name_en.label }}</label>{{ form.name_en }}{{ form.name_en.errors }}</div>
-        <div class="field-group"><label for="{{ form.primary_muscle.id_for_label }}">{{ form.primary_muscle.label }}</label>{{ form.primary_muscle }}{{ form.primary_muscle.errors }}</div>
-        <div class="field-group"><label for="{{ form.secondary_muscle.id_for_label }}">{{ form.secondary_muscle.label }}</label>{{ form.secondary_muscle }}{{ form.secondary_muscle.errors }}</div>
-        <div class="field-group"><label for="{{ form.body_part.id_for_label }}">{{ form.body_part.label }}</label>{{ form.body_part }}{{ form.body_part.errors }}</div>
-        <div class="field-group"><label for="{{ form.movement_type.id_for_label }}">{{ form.movement_type.label }}</label>{{ form.movement_type }}{{ form.movement_type.errors }}</div>
-        <div class="field-group"><label for="{{ form.joint_type.id_for_label }}">{{ form.joint_type.label }}</label>{{ form.joint_type }}{{ form.joint_type.errors }}</div>
-        <div class="field-group"><label for="{{ form.power_type.id_for_label }}">{{ form.power_type.label }}</label>{{ form.power_type }}{{ form.power_type.errors }}</div>
-        <div class="field-group"><label for="{{ form.difficulty_level.id_for_label }}">{{ form.difficulty_level.label }}</label>{{ form.difficulty_level }}{{ form.difficulty_level.errors }}</div>
-        <div class="field-group"><label for="{{ form.equipment_type.id_for_label }}">{{ form.equipment_type.label }}</label>{{ form.equipment_type }}{{ form.equipment_type.errors }}</div>
-        <div class="field-group"><label for="{{ form.execution_equipment_type.id_for_label }}">{{ form.execution_equipment_type.label }}</label>{{ form.execution_equipment_type }}{{ form.execution_equipment_type.errors }}</div>
-        <div class="field-group"><label for="{{ form.secondary_movement_type.id_for_label }}">{{ form.secondary_movement_type.label }}</label>{{ form.secondary_movement_type }}{{ form.secondary_movement_type.errors }}</div>
-        <div class="field-group"><label for="{{ form.pressure_type.id_for_label }}">{{ form.pressure_type.label }}</label>{{ form.pressure_type }}{{ form.pressure_type.errors }}</div>
-        <div class="field-group admin-form-grid__full"><label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>{{ form.description }}{{ form.description.errors }}</div>
-        <div class="field-group admin-form-grid__full">
-            <label for="{{ form.media.id_for_label }}">{{ form.media.label }}</label>
-            {{ form.media }}{{ form.media.errors }}
-        </div>
-        <fieldset class="admin-form-grid__full admin-video-fieldset">
-            <legend>{% trans 'ویدیوهای حرکت' %}</legend>
-            <p class="admin-form-help">{% trans 'برای هر حرکت می‌توانید تا سه ویدیو ثبت کنید.' %}</p>
-            <div class="admin-video-field-grid">
-                <div class="field-group">
-                    <label for="{{ form.video_1.id_for_label }}">{{ form.video_1.label }}</label>
-                    {{ form.video_1 }}{{ form.video_1.errors }}
-                </div>
-                <div class="field-group">
-                    <label for="{{ form.video_2.id_for_label }}">{{ form.video_2.label }}</label>
-                    {{ form.video_2 }}{{ form.video_2.errors }}
-                </div>
-                <div class="field-group">
-                    <label for="{{ form.video_3.id_for_label }}">{{ form.video_3.label }}</label>
-                    {{ form.video_3 }}{{ form.video_3.errors }}
-                </div>
-            </div>
-        </fieldset>
-        <button type="submit" class="admin-primary-btn">{% trans 'ثبت' %}</button>
-    </form>
+    {% include 'admin_portal/gym/partials/exercise_fields.html' %}
 </section>
 {% endblock %}

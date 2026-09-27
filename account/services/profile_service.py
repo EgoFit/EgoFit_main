@@ -143,6 +143,13 @@ class ProfileService:
         """Return notifications for the profile notifications page."""
         return self.account_service.get_notifications_feed(user)
 
+    def dismiss_profile_notification(self, *, user: Any, notification_key: str) -> bool:
+        """Hide a notification from the user's profile feed."""
+        return self.account_service.dismiss_profile_notification(
+            user=user,
+            notification_key=notification_key,
+        )
+
     def request_phone_change(
         self,
         *,

@@ -6,6 +6,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
+from account.admin_forms import AutomaticProgrammingForm
 from account.services.automatic_program_service import AutomaticProgramService
 from account.models import (
     CorrectiveExercise,
@@ -14,6 +15,7 @@ from account.models import (
     ExerciseBodyPart,
     ExerciseDifficultyLevel,
     ExerciseEquipmentType,
+    ExerciseGoal,
     ExerciseJointType,
     ExerciseMovementType,
     ExercisePowerType,
@@ -774,6 +776,15 @@ class GymProgramPortalTests(TestCase):
         self.assertEqual(item["sets"], "DB-SET")
         self.assertEqual(item["reps"], "DB-REPS")
         self.assertEqual(item["rest"], "DB-REST")
+
+    def test_automatic_program_form_loads_goals_from_database(self):
+        ExerciseGoal.objects.create(name="هدف سفارشی", name_en="custom-goal")
+
+        choices = dict(AutomaticProgrammingForm().fields["goal"].choices)
+
+        self.assertIn("custom-goal", choices)
+        self.assertEqual(choices["custom-goal"], "هدف سفارشی")
+        self.assertIn("strength", choices)
 
     def test_automatic_view_accepts_per_session_targets_and_searches_athletes(self):
         secondary_type = ExerciseSecondaryMovementType.objects.create(name="هدف جلسه")

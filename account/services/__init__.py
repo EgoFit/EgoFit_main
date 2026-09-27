@@ -53,6 +53,7 @@ __all__ = [
     "OTPService",
     "PasswordService",
     "ProfileService",
+    "MoodService",
     "SessionService",
     "NotificationService",
 ]
@@ -75,6 +76,10 @@ def __getattr__(name: str):
         from account.services.profile_service import ProfileService
 
         return ProfileService
+    if name == "MoodService":
+        from account.services.mood_service import MoodService
+
+        return MoodService
     if name == "SessionService":
         from account.services.session_service import SessionService
 

@@ -14,7 +14,23 @@
         <div class="timeline-list">
             {% for notification in notifications %}
                 <article class="timeline-item">
-                    <strong>{{ notification.title }}</strong>
+                    <div class="profile-notification__header">
+                        <strong>{{ notification.title }}</strong>
+                        <form method="post" class="profile-notification__dismiss-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="notification_key" value="{{ notification.key }}">
+                            <button
+                                type="submit"
+                                class="profile-notification__dismiss"
+                                aria-label="{% trans 'حذف اعلان' %}"
+                                title="{% trans 'حذف اعلان' %}"
+                            >
+                                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
                     <p class="mt-2">{{ notification.message }}</p>
                     <span>{% blocktrans with time=notification.created_at|timesince %}{{ time }} پیش{% endblocktrans %}</span>
                 </article>

@@ -23,6 +23,7 @@ from account.models import (
     ExerciseBodyPart,
     ExerciseDifficultyLevel,
     ExerciseEquipmentType,
+    ExerciseGoal,
     ExerciseJointType,
     ExerciseMovementType,
     ExercisePowerType,
@@ -32,6 +33,7 @@ from account.models import (
     User,
     UserSession,
     WorkoutPerformanceRecord,
+    WorkoutBestRecord,
     WorkoutProgram,
     WorkoutProgramPayment,
     WorkoutProgramCorrective,
@@ -572,6 +574,15 @@ class WorkoutPerformanceRecordAdmin(admin.ModelAdmin):
     ordering = ("-updated_at",)
 
 
+@admin.register(WorkoutBestRecord)
+class WorkoutBestRecordAdmin(admin.ModelAdmin):
+    list_display = ("exercise", "user", "value", "recorded_at", "program")
+    list_select_related = ("user", "exercise", "program")
+    list_filter = ("recorded_at",)
+    search_fields = ("exercise__name", "user__fullname", "user__phone", "program__title")
+    ordering = ("-recorded_at",)
+
+
 @admin.register(Muscle)
 class MuscleAdmin(admin.ModelAdmin):
     list_display = ("name",)
@@ -605,6 +616,13 @@ class CorrectiveExerciseAdmin(admin.ModelAdmin):
 class _LookupModelAdmin(admin.ModelAdmin):
     list_display = ("name",)
     search_fields = ("name",)
+    ordering = ("name",)
+
+
+@admin.register(ExerciseGoal)
+class ExerciseGoalAdmin(admin.ModelAdmin):
+    list_display = ("name", "name_en")
+    search_fields = ("name", "name_en")
     ordering = ("name",)
 
 

@@ -167,7 +167,7 @@
                                 <span class="font-black text-xl text-success">دسترسی ادمین فعال است</span>
                             </div>
                             <div class="purchase-card__actions">
-                                <a href="{% url 'home:series_episod' seriesmodel.id %}" class="cta-primary cta-primary--strong w-full">مشاهده جلسات دوره</a>
+                                <a href="{% url 'home:series_episodes' seriesmodel.id %}" class="cta-primary cta-primary--strong w-full">مشاهده جلسات دوره</a>
                             </div>
                         {% elif seriesmodel.free == True %}
                             <div class="purchase-card__price">
@@ -186,7 +186,7 @@
                                 <span class="font-black text-xl text-success">خریداری شده</span>
                             </div>
                             <div class="purchase-card__actions">
-                                <a href="{% url 'home:series_episod' seriesmodel.id %}" class="cta-primary cta-primary--strong w-full">ورود به جلسات دوره</a>
+                                <a href="{% url 'home:series_episodes' seriesmodel.id %}" class="cta-primary cta-primary--strong w-full">ورود به جلسات دوره</a>
                             </div>
                         {% else %}
                             <div class="purchase-card__price">

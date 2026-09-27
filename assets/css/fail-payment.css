@@ -1,0 +1,4 @@
+.line-step-box.complete:nth-child(1):before,
+.line-step-box.complete:nth-child(2):before {
+    width: 100%;
+}

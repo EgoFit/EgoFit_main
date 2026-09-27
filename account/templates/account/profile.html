@@ -58,7 +58,7 @@
         {% if recent_courses %}
             <div class="dashboard-courses__list">
                 {% for item in recent_courses %}
-                    <a href="{% url 'home:series_episod' item.id %}" class="dashboard-course-card">
+                    <a href="{% url 'home:series_episodes' item.id %}" class="dashboard-course-card">
                         <span class="dashboard-course-card__thumb">
                             {% if item.image %}<img src="{{ item.image|public_media_url }}" alt="" loading="lazy">{% endif %}
                         </span>

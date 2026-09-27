@@ -24,5 +24,6 @@
     <link rel="stylesheet" href="{% static 'css/dependencies/plyr.min.css' %}" />
     <link rel="stylesheet" href="{% static 'css/fonts.css' %}" />
     <link rel="stylesheet" href="{% static 'css/app.css' %}" />
+    {% if extra_css_file %}<link rel="stylesheet" href="{% static extra_css_file %}" />{% endif %}
     <title>ایگوفیت</title>
 </head>
