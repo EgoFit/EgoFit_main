@@ -20,6 +20,7 @@ urlpatterns = [
     path("admin/users/<int:user_id>/files/<str:file_kind>/<int:pk>/delete/", views.AdminUserFileDeleteView.as_view(), name="admin_user_file_delete"),
     path("admin/users/<int:user_id>/role/", views.AdminRoleToggleView.as_view(), name="admin_role_toggle"),
     path("admin/users/<int:user_id>/coach-requests/read/", views.AdminUserCoachRequestsReadView.as_view(), name="admin_user_coach_requests_read"),
+    path("admin/users/<int:user_id>/coach-requests/<int:pk>/delete/", views.AdminUserCoachRequestDeleteView.as_view(), name="admin_user_coach_request_delete"),
     path("admin/coach-requests/<int:pk>/handled/", views.CoachRequestMarkHandledView.as_view(), name="admin_coach_request_handled"),
     path("admin/coach-requests/<int:pk>/push-measurements/", views.CoachRequestPushMeasurementsView.as_view(), name="admin_coach_request_push"),
     path("admin/notifications/", views.AdminNotificationsView.as_view(), name="admin_notifications"),

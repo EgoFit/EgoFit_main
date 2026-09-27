@@ -1,32 +1,93 @@
-{% load my_tags i18n %}{% comment %}Submitted body data + attachments + push-to-measurements action for a coach request. Expects `coach_request`.{% endcomment %}
-{% if coach_request.has_body_data %}
-    <div class="coach-req-body">
-        <div class="coach-req-body__chips">
-            {% if coach_request.height_cm %}<span>{% trans 'قد' %}: {{ coach_request.height_cm }}</span>{% endif %}
-            {% if coach_request.weight_kg %}<span>{% trans 'وزن' %}: {{ coach_request.weight_kg }}</span>{% endif %}
-            {% if coach_request.wrist_cm %}<span>{% trans 'مچ' %}: {{ coach_request.wrist_cm }}</span>{% endif %}
-            {% if coach_request.forearm_cm %}<span>{% trans 'ساعد' %}: {{ coach_request.forearm_cm }}</span>{% endif %}
-            {% if coach_request.arm_rest_cm %}<span>{% trans 'بازو آزاد' %}: {{ coach_request.arm_rest_cm }}</span>{% endif %}
-            {% if coach_request.arm_flexed_cm %}<span>{% trans 'بازو منقبض' %}: {{ coach_request.arm_flexed_cm }}</span>{% endif %}
-            {% if coach_request.chest_cm %}<span>{% trans 'سینه' %}: {{ coach_request.chest_cm }}</span>{% endif %}
-            {% if coach_request.shoulders_cm %}<span>{% trans 'سرشانه' %}: {{ coach_request.shoulders_cm }}</span>{% endif %}
-            {% if coach_request.waist_cm %}<span>{% trans 'کمر' %}: {{ coach_request.waist_cm }}</span>{% endif %}
-            {% if coach_request.abdomen_cm %}<span>{% trans 'شکم' %}: {{ coach_request.abdomen_cm }}</span>{% endif %}
-            {% if coach_request.hips_cm %}<span>{% trans 'باسن' %}: {{ coach_request.hips_cm }}</span>{% endif %}
-            {% if coach_request.thigh_cm %}<span>{% trans 'ران' %}: {{ coach_request.thigh_cm }}</span>{% endif %}
-            {% if coach_request.calf_cm %}<span>{% trans 'ساق' %}: {{ coach_request.calf_cm }}</span>{% endif %}
-            {% if coach_request.thigh_left_cm %}<span>{% trans 'ران (چپ)' %}: {{ coach_request.thigh_left_cm }}</span>{% endif %}
-            {% if coach_request.calf_left_cm %}<span>{% trans 'ساق (چپ)' %}: {{ coach_request.calf_left_cm }}</span>{% endif %}
+{% load my_tags i18n %}
+<div class="coach-req-detail">
+    <div class="coach-req-detail__section">
+        <h3>{% trans 'اطلاعات درخواست' %}</h3>
+        <div class="coach-req-detail__table-wrap">
+            <table class="coach-req-detail__table">
+                <tbody>
+                    <tr><th>{% trans 'تعداد جلسات' %}</th><td>{{ coach_request.get_sessions_per_week_display }}</td></tr>
+                    <tr>
+                        <th>{% trans 'برنامه‌های درخواستی' %}</th>
+                        <td>
+                            {% if coach_request.wants_diet or coach_request.wants_workout %}
+                                {% if coach_request.wants_diet %}{% trans 'برنامه غذایی' %}{% endif %}
+                                {% if coach_request.wants_diet and coach_request.wants_workout %}، {% endif %}
+                                {% if coach_request.wants_workout %}{% trans 'برنامه تمرینی' %}{% endif %}
+                            {% else %}{% trans 'انتخاب نشده' %}{% endif %}
+                        </td>
+                    </tr>
+                    <tr><th>{% trans 'تاریخ ارسال' %}</th><td>{{ coach_request.created_at|date:"Y/m/d H:i" }}</td></tr>
+                    <tr><th>{% trans 'وضعیت' %}</th><td>{{ coach_request.get_status_display }}</td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
-{% endif %}
-{% with files=coach_request.attachments.all %}
-    {% if files %}
-        <div class="coach-req-files">
-            <span class="coach-req-files__label">{% trans 'پیوست‌ها' %}:</span>
-            {% for attachment in files %}
-                <a href="{{ attachment.file|public_media_url }}" target="_blank" rel="noopener" class="coach-req-files__item">{{ forloop.counter }}</a>
-            {% endfor %}
+
+    {% if coach_request.has_body_data %}
+        <div class="coach-req-detail__section">
+            <h3>{% trans 'اندازه‌های ارسال‌شده' %}</h3>
+            <div class="coach-req-detail__table-wrap">
+                <table class="coach-req-detail__table">
+                    <tbody>
+                        {% if coach_request.height_cm %}<tr><th>{% trans 'قد' %}</th><td>{{ coach_request.height_cm }} {% trans 'سانتی‌متر' %}</td></tr>{% endif %}
+                        {% if coach_request.weight_kg %}<tr><th>{% trans 'وزن' %}</th><td>{{ coach_request.weight_kg }} {% trans 'کیلوگرم' %}</td></tr>{% endif %}
+                        {% if coach_request.wrist_cm %}<tr><th>{% trans 'دور مچ دست' %}</th><td>{{ coach_request.wrist_cm }} {% trans 'سانتی‌متر' %}</td></tr>{% endif %}
+                        {% if coach_request.forearm_cm %}<tr><th>{% trans 'دور ساعد' %}</th><td>{{ coach_request.forearm_cm }} {% trans 'سانتی‌متر' %}</td></tr>{% endif %}
+                        {% if coach_request.arm_rest_cm %}<tr><th>{% trans 'دور بازو آزاد' %}</th><td>{{ coach_request.arm_rest_cm }} {% trans 'سانتی‌متر' %}</td></tr>{% endif %}
+                        {% if coach_request.arm_flexed_cm %}<tr><th>{% trans 'دور بازو منقبض' %}</th><td>{{ coach_request.arm_flexed_cm }} {% trans 'سانتی‌متر' %}</td></tr>{% endif %}
+                        {% if coach_request.chest_cm %}<tr><th>{% trans 'دور سینه' %}</th><td>{{ coach_request.chest_cm }} {% trans 'سانتی‌متر' %}</td></tr>{% endif %}
+                        {% if coach_request.shoulders_cm %}<tr><th>{% trans 'دور سرشانه' %}</th><td>{{ coach_request.shoulders_cm }} {% trans 'سانتی‌متر' %}</td></tr>{% endif %}
+                        {% if coach_request.waist_cm %}<tr><th>{% trans 'دور کمر' %}</th><td>{{ coach_request.waist_cm }} {% trans 'سانتی‌متر' %}</td></tr>{% endif %}
+                        {% if coach_request.abdomen_cm %}<tr><th>{% trans 'دور شکم' %}</th><td>{{ coach_request.abdomen_cm }} {% trans 'سانتی‌متر' %}</td></tr>{% endif %}
+                        {% if coach_request.hips_cm %}<tr><th>{% trans 'دور باسن' %}</th><td>{{ coach_request.hips_cm }} {% trans 'سانتی‌متر' %}</td></tr>{% endif %}
+                        {% if coach_request.thigh_cm %}<tr><th>{% trans 'دور ران' %}</th><td>{{ coach_request.thigh_cm }} {% trans 'سانتی‌متر' %}</td></tr>{% endif %}
+                        {% if coach_request.calf_cm %}<tr><th>{% trans 'دور ساق' %}</th><td>{{ coach_request.calf_cm }} {% trans 'سانتی‌متر' %}</td></tr>{% endif %}
+                        {% if coach_request.thigh_left_cm %}<tr><th>{% trans 'دور ران (چپ)' %}</th><td>{{ coach_request.thigh_left_cm }} {% trans 'سانتی‌متر' %}</td></tr>{% endif %}
+                        {% if coach_request.calf_left_cm %}<tr><th>{% trans 'دور ساق (چپ)' %}</th><td>{{ coach_request.calf_left_cm }} {% trans 'سانتی‌متر' %}</td></tr>{% endif %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     {% endif %}
-{% endwith %}
+
+    {% if coach_request.pain_notes or coach_request.illness_notes or coach_request.diet_restrictions %}
+        <div class="coach-req-detail__section">
+            <h3>{% trans 'توضیحات کاربر' %}</h3>
+            <div class="coach-req-detail__table-wrap">
+                <table class="coach-req-detail__table">
+                    <tbody>
+                        {% if coach_request.pain_notes %}<tr><th>{% trans 'درد یا آسیب' %}</th><td class="coach-req-detail__multiline">{{ coach_request.pain_notes }}</td></tr>{% endif %}
+                        {% if coach_request.illness_notes %}<tr><th>{% trans 'بیماری زمینه‌ای' %}</th><td class="coach-req-detail__multiline">{{ coach_request.illness_notes }}</td></tr>{% endif %}
+                        {% if coach_request.diet_restrictions %}<tr><th>{% trans 'محدودیت‌های غذایی' %}</th><td class="coach-req-detail__multiline">{{ coach_request.diet_restrictions }}</td></tr>{% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+
+    {% with files=coach_request.attachments.all %}
+        {% if files %}
+            <div class="coach-req-detail__section">
+                <h3>{% trans 'فایل‌های ارسالی' %}</h3>
+                <div class="coach-req-media-list">
+                    {% for attachment in files %}
+                        {% with url=attachment.file|public_media_url name=attachment.file.name|cut:'coach_requests/' %}
+                            {% if enable_media_preview and attachment.is_image %}
+                                <button type="button" class="coach-req-media-thumb" data-media-open data-media-kind="image" data-media-url="{{ url }}" data-media-title="{{ name }}" aria-label="{% trans 'نمایش تصویر' %}: {{ name }}">
+                                    <img src="{{ url }}" alt="{{ name }}" loading="lazy">
+                                </button>
+                            {% elif enable_media_preview and attachment.is_video %}
+                                <button type="button" class="coach-req-media-thumb coach-req-media-thumb--video" data-media-open data-media-kind="video" data-media-url="{{ url }}" data-media-title="{{ name }}" aria-label="{% trans 'پخش ویدیو' %}: {{ name }}">
+                                    <video src="{{ url }}#t=0.1" preload="metadata" muted playsinline></video>
+                                    <span aria-hidden="true">▶</span>
+                                </button>
+                            {% else %}
+                                <a href="{{ url }}" target="_blank" rel="noopener" class="coach-req-file-link">{{ forloop.counter }}. {{ name }}</a>
+                            {% endif %}
+                        {% endwith %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    {% endwith %}
+</div>

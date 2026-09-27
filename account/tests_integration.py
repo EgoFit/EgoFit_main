@@ -111,6 +111,43 @@ class FrontendBackendIntegrationTests(TestCase):
         self.assertEqual(page.status_code, 200)
         self.assertContains(page, Path(saved_attachment.file.name).name)
 
+    def test_admin_user_hub_renders_coach_request_details_and_deletes_request(self):
+        admin = User.objects.create_user(
+            fullname="integration_admin",
+            phone="09126666666",
+            password="StrongPass123",
+            is_admin=True,
+        )
+        coach_request = CoachRequest.objects.create(
+            user=self.user,
+            sessions_per_week="3",
+            wants_workout=True,
+            height_cm=180,
+            pain_notes="زانو درد",
+        )
+        self.client.force_login(admin)
+
+        page = self.client.get(reverse("register:admin_user_hub", args=[self.user.pk]))
+
+        self.assertEqual(page.status_code, 200)
+        self.assertContains(page, "اندازه‌های ارسال‌شده")
+        self.assertContains(page, "زانو درد")
+        self.assertContains(page, "حذف پیام")
+        self.assertContains(
+            page,
+            reverse("register:admin_user_coach_request_delete", args=[self.user.pk, coach_request.pk]),
+        )
+
+        response = self.client.post(
+            reverse(
+                "register:admin_user_coach_request_delete",
+                args=[self.user.pk, coach_request.pk],
+            )
+        )
+
+        self.assertRedirects(response, reverse("register:admin_user_hub", args=[self.user.pk]))
+        self.assertFalse(CoachRequest.objects.filter(pk=coach_request.pk).exists())
+
     def test_course_comment_submission_saves_pending_comment_and_returns_course_page(self):
         series = self.create_series(free=True)
         self.client.force_login(self.user)

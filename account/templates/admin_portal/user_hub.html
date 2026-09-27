@@ -161,7 +161,14 @@
                                     ({{ coach_request.created_at|date:"Y/m/d" }})
                                 </span>
                             </div>
+                            <form method="post" action="{% url 'register:admin_user_coach_request_delete' target_user.id coach_request.pk %}" onsubmit="return confirm('{% trans "آیا از حذف این پیام اطمینان دارید؟ این عمل غیرقابل بازگشت است." %}');">
+                                {% csrf_token %}
+                                <button type="submit" class="admin-icon-btn admin-icon-btn--danger" aria-label="{% trans 'حذف پیام' %}" title="{% trans 'حذف پیام' %}">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6m4-6v6M9 7V4h6v3m-9 0 1 13h8l1-13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </button>
+                            </form>
                         </div>
+                        {% include 'admin_portal/_coach_request_detail.html' with coach_request=coach_request enable_media_preview=True %}
                         {% if coach_request.status == "pending" %}
                             <div class="admin-result-card__actions">
                                 <form method="post" action="{% url 'register:admin_coach_request_handled' coach_request.pk %}">
@@ -181,6 +188,17 @@
 
     <a href="{% url 'register:admin_search' %}?query={{ target_user.fullname|urlencode }}" class="admin-primary-btn">{% trans 'جستجو' %}</a>
 </section>
+<div class="admin-media-modal" data-media-modal hidden aria-hidden="true">
+    <div class="admin-media-modal__backdrop" data-media-close></div>
+    <div class="admin-media-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="admin-media-modal-title">
+        <button type="button" class="admin-media-modal__close" data-media-close aria-label="{% trans 'بستن' %}" title="{% trans 'بستن' %}">×</button>
+        <h2 id="admin-media-modal-title" class="admin-media-modal__title"></h2>
+        <div class="admin-media-modal__content">
+            <img data-media-modal-image alt="">
+            <video data-media-modal-video controls playsinline preload="metadata"></video>
+        </div>
+    </div>
+</div>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         var requestsPanel = document.querySelector("[data-coach-requests-panel]");
@@ -198,6 +216,46 @@
                 var badge = requestsPanel.querySelector("[data-coach-request-badge]");
                 if (badge) badge.remove();
             });
+        });
+
+        var mediaModal = document.querySelector("[data-media-modal]");
+        if (!mediaModal) return;
+        var modalImage = mediaModal.querySelector("[data-media-modal-image]");
+        var modalVideo = mediaModal.querySelector("[data-media-modal-video]");
+        var modalTitle = mediaModal.querySelector(".admin-media-modal__title");
+
+        function closeMediaModal() {
+            mediaModal.hidden = true;
+            mediaModal.setAttribute("aria-hidden", "true");
+            document.body.classList.remove("admin-media-modal-open");
+            modalImage.removeAttribute("src");
+            modalVideo.pause();
+            modalVideo.removeAttribute("src");
+            modalVideo.load();
+        }
+
+        document.querySelectorAll("[data-media-open]").forEach(function (trigger) {
+            trigger.addEventListener("click", function () {
+                var kind = trigger.dataset.mediaKind;
+                modalTitle.textContent = trigger.dataset.mediaTitle || "";
+                modalImage.hidden = kind !== "image";
+                modalVideo.hidden = kind !== "video";
+                if (kind === "image") {
+                    modalImage.src = trigger.dataset.mediaUrl;
+                    modalImage.alt = trigger.dataset.mediaTitle || "";
+                } else {
+                    modalVideo.src = trigger.dataset.mediaUrl;
+                }
+                mediaModal.hidden = false;
+                mediaModal.setAttribute("aria-hidden", "false");
+                document.body.classList.add("admin-media-modal-open");
+            });
+        });
+        mediaModal.querySelectorAll("[data-media-close]").forEach(function (closeTrigger) {
+            closeTrigger.addEventListener("click", closeMediaModal);
+        });
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape" && !mediaModal.hidden) closeMediaModal();
         });
     });
 </script>

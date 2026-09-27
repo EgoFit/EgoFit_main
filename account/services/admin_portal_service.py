@@ -12,6 +12,7 @@ from account.models import (
     CaliperMeasurement,
     ClientDocument,
     ClientMedia,
+    CoachRequest,
     UserHealthRecord,
     User,
     WorkoutBestRecord,
@@ -247,9 +248,15 @@ class AdminPortalService:
             "latest_workout_programs": list(WorkoutProgram.objects.filter(user=user)[:4]),
             "workout_records": list(workout_records),
             "workout_record_query": workout_record_query,
-            "coach_requests": list(user.coach_requests.all()[:10]),
+            "coach_requests": list(user.coach_requests.prefetch_related("attachments").all()[:10]),
             "unread_coach_requests_count": self.coach_request_service.get_unread_pending_count(user=user),
         }
+
+    def delete_coach_request(self, *, coach_request: CoachRequest) -> None:
+        for attachment in coach_request.attachments.all():
+            if attachment.file:
+                attachment.file.delete(save=False)
+        coach_request.delete()
 
     def mark_pending_coach_requests_read(self, *, user=None) -> int:
         return self.coach_request_service.mark_pending_as_read(user=user)

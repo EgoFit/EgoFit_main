@@ -197,6 +197,14 @@ class AdminUserCoachRequestsReadView(AdminUserMixin, View):
         return JsonResponse({"marked_read": count})
 
 
+class AdminUserCoachRequestDeleteView(AdminUserMixin, View):
+    def post(self, request, user_id, pk):
+        coach_request = get_object_or_404(CoachRequest, pk=pk, user=self.target_user)
+        admin_portal_service.delete_coach_request(coach_request=coach_request)
+        messages.success(request, _("پیام کاربر با موفقیت حذف شد."))
+        return redirect("register:admin_user_hub", user_id=self.target_user.pk)
+
+
 class AdminPersonalInfoView(AdminUserMixin, View):
     template_name = "admin_portal/personal_info.html"
     active_section = "records"
