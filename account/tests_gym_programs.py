@@ -1,5 +1,6 @@
 import json
 from datetime import date
+from decimal import Decimal
 from unittest.mock import patch
 
 from django.test import TestCase
@@ -25,9 +26,11 @@ from account.models import (
     ExerciseSetType,
     Muscle,
     User,
+    WorkoutBestRecord,
     WorkoutProgram,
     WorkoutProgramCorrective,
     WorkoutProgramDay,
+    WorkoutProgramDayProgress,
     WorkoutProgramExercise,
     WorkoutPerformanceRecord,
     WorkoutProgramFeedback,
@@ -1248,7 +1251,7 @@ class GymProgramPortalTests(TestCase):
         self.assertEqual(rendered_modes[f"performance_{first_item.pk}_main"], "weight")
         self.assertEqual(rendered_modes[f"performance_{second_item.pk}_main"], "time")
 
-    def test_same_movement_and_repetition_target_has_one_performance_row_per_day(self):
+    def test_same_movement_has_best_record_input_for_each_table_row(self):
         program = WorkoutProgram.objects.create(
             user=self.client_user,
             prescribed_by=self.admin,
@@ -1284,12 +1287,8 @@ class GymProgramPortalTests(TestCase):
         )
         self.assertContains(
             response,
-            f'data-performance-key="performance_{first_item.pk}_main"',
-            count=1,
-        )
-        self.assertContains(
-            response,
-            "برای این حرکت فقط یک ردیف و به تعداد ست برنامه ثبت می‌شود.",
+            f'name="best_record_{self.exercise_one.pk}"',
+            count=2,
         )
 
         response = self.client.post(
@@ -1359,7 +1358,7 @@ class GymProgramPortalTests(TestCase):
             1,
         )
 
-    def test_previous_record_for_repetition_target_is_shown_on_later_program(self):
+    def test_best_record_is_shown_in_program_rows(self):
         program = WorkoutProgram.objects.create(
             user=self.client_user,
             prescribed_by=self.admin,
@@ -1374,13 +1373,9 @@ class GymProgramPortalTests(TestCase):
             sets="۲",
             reps="۸",
         )
-        WorkoutPerformanceRecord.objects.create(
+        WorkoutBestRecord.objects.create(
             user=self.client_user,
             exercise=self.exercise_one,
-            program=program,
-            repetitions="۸",
-            mode=WorkoutPerformanceRecord.Mode.WEIGHT,
-            set_number=1,
             value=50,
         )
 
@@ -1407,5 +1402,125 @@ class GymProgramPortalTests(TestCase):
         response = self.client.get(reverse("register:profile_workout_programs"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "رکورد قبلی برای این تعداد تکرار")
-        self.assertContains(response, "50")
+        self.assertContains(response, f'name="best_record_{self.exercise_one.pk}"')
+        self.assertContains(response, 'value="50.00"')
+
+    def test_best_record_and_weekly_completion_are_saved_per_user_and_per_day(self):
+        program = WorkoutProgram.objects.create(
+            user=self.client_user,
+            prescribed_by=self.admin,
+            title="برنامه سه هفته‌ای",
+            start_date=date(2026, 9, 1),
+            end_date=date(2026, 9, 21),
+            is_published=True,
+        )
+        first_day = WorkoutProgramDay.objects.create(program=program, name="روز اول", order=1)
+        second_day = WorkoutProgramDay.objects.create(program=program, name="روز دوم", order=2)
+        WorkoutProgramExercise.objects.create(
+            day=first_day,
+            exercise=self.exercise_one,
+            sets="۳",
+            reps="۱۰",
+        )
+        WorkoutProgramExercise.objects.create(
+            day=second_day,
+            exercise=self.exercise_two,
+            sets="۳",
+            reps="۱۰",
+        )
+        for phase in ("warmup", "cooldown"):
+            WorkoutProgramCorrective.objects.create(
+                program=program,
+                corrective_exercise=self.corrective,
+                phase=phase,
+                reps="۳۰ ثانیه",
+            )
+        other_user = User.objects.create(phone="09129990003", fullname="other_athlete")
+        WorkoutBestRecord.objects.create(
+            user=other_user,
+            exercise=self.exercise_one,
+            value=Decimal("98.75"),
+        )
+        self.client.force_login(self.client_user)
+        save_url = reverse("register:profile_workout_program_performance", args=[program.pk])
+
+        response = self.client.post(
+            save_url,
+            {
+                "day_id": str(first_day.pk),
+                f"best_record_{self.exercise_one.pk}": "57.25",
+                "difficulty": "8",
+            },
+        )
+        self.assertRedirects(response, reverse("register:profile_workout_programs"))
+        self.assertEqual(
+            WorkoutBestRecord.objects.get(user=self.client_user, exercise=self.exercise_one).value,
+            Decimal("57.25"),
+        )
+
+        self.client.post(
+            save_url,
+            {
+                "day_id": str(second_day.pk),
+                f"best_record_{self.exercise_two.pk}": "",
+                "difficulty": "6",
+            },
+        )
+        for _ in range(4):
+            self.client.post(
+                save_url,
+                {
+                    "day_id": str(first_day.pk),
+                    f"best_record_{self.exercise_one.pk}": "",
+                    "difficulty": "7",
+                },
+            )
+
+        self.assertEqual(
+            WorkoutProgramDayProgress.objects.get(day=first_day).completed_count,
+            3,
+        )
+        self.assertEqual(
+            WorkoutProgramDayProgress.objects.get(day=second_day).completed_count,
+            1,
+        )
+        self.assertEqual(
+            WorkoutBestRecord.objects.get(user=self.client_user, exercise=self.exercise_one).value,
+            Decimal("57.25"),
+        )
+
+        athlete_page = self.client.get(reverse("register:profile_workout_programs"))
+        rendered_program = next(
+            item for item in athlete_page.context["programs"] if item.pk == program.pk
+        )
+        self.assertEqual(rendered_program.duration_weeks, 3)
+        rendered_days = {day.pk: day for day in rendered_program.days.all()}
+        self.assertEqual(rendered_days[first_day.pk].completed_count, 3)
+        self.assertEqual(rendered_days[first_day.pk].completion_checks, range(1, 4))
+        self.assertEqual(rendered_days[second_day.pk].completed_count, 1)
+        self.assertContains(athlete_page, f'name="best_record_{self.exercise_one.pk}"')
+        self.assertContains(athlete_page, 'value="57.25"')
+        self.assertContains(athlete_page, 'step="0.01"')
+        self.assertContains(athlete_page, 'placeholder="ثبت نشده"')
+        self.assertContains(athlete_page, "ثبت رکورد (کیلوگرم)")
+        self.assertContains(
+            athlete_page,
+            f'id="workout-completion-{first_day.pk}-3" type="checkbox" disabled checked',
+        )
+        rendered_html = athlete_page.content.decode()
+        self.assertNotIn('<details class="workout-day" open', rendered_html)
+        self.assertLess(
+            rendered_html.index('class="workout-corrective workout-corrective--warmup"'),
+            rendered_html.index('<details class="workout-day"'),
+        )
+        self.assertLess(
+            rendered_html.index('<details class="workout-day"'),
+            rendered_html.index('class="workout-corrective workout-corrective--cooldown"'),
+        )
+
+        self.client.force_login(self.admin)
+        admin_page = self.client.get(
+            reverse("register:admin_user_hub", args=[self.client_user.pk])
+        )
+        self.assertContains(admin_page, "57.25")
+        self.assertNotContains(admin_page, "98.75")

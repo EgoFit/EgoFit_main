@@ -1,5 +1,5 @@
 {% extends 'admin_portal/_shell.html' %}
-{% load i18n %}
+{% load i18n static %}
 
 {% block title %}{% blocktrans %}ثبت اطلاعات کاربر | ایگوفیت{% endblocktrans %}{% endblock %}
 
@@ -229,46 +229,7 @@
                 });
             });
         }
-
-        var mediaModal = document.querySelector("[data-media-modal]");
-        if (!mediaModal) return;
-        var modalImage = mediaModal.querySelector("[data-media-modal-image]");
-        var modalVideo = mediaModal.querySelector("[data-media-modal-video]");
-        var modalTitle = mediaModal.querySelector(".admin-media-modal__title");
-
-        function closeMediaModal() {
-            mediaModal.hidden = true;
-            mediaModal.setAttribute("aria-hidden", "true");
-            document.body.classList.remove("admin-media-modal-open");
-            modalImage.removeAttribute("src");
-            modalVideo.pause();
-            modalVideo.removeAttribute("src");
-            modalVideo.load();
-        }
-
-        document.querySelectorAll("[data-media-open]").forEach(function (trigger) {
-            trigger.addEventListener("click", function () {
-                var kind = trigger.dataset.mediaKind;
-                modalTitle.textContent = trigger.dataset.mediaTitle || "";
-                modalImage.hidden = kind !== "image";
-                modalVideo.hidden = kind !== "video";
-                if (kind === "image") {
-                    modalImage.src = trigger.dataset.mediaUrl;
-                    modalImage.alt = trigger.dataset.mediaTitle || "";
-                } else {
-                    modalVideo.src = trigger.dataset.mediaUrl;
-                }
-                mediaModal.hidden = false;
-                mediaModal.setAttribute("aria-hidden", "false");
-                document.body.classList.add("admin-media-modal-open");
-            });
-        });
-        mediaModal.querySelectorAll("[data-media-close]").forEach(function (closeTrigger) {
-            closeTrigger.addEventListener("click", closeMediaModal);
-        });
-        document.addEventListener("keydown", function (event) {
-            if (event.key === "Escape" && !mediaModal.hidden) closeMediaModal();
-        });
     });
 </script>
+<script src="{% static 'js/admin-media-modal.js' %}"></script>
 {% endblock %}

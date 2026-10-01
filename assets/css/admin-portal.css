@@ -1190,7 +1190,7 @@
 .admin-media-modal {
     position: fixed;
     inset: 0;
-    z-index: 1000;
+    z-index: 10000;
     display: grid;
     place-items: center;
     padding: 24px;

@@ -53,6 +53,9 @@ build/
 dist/
 *.egg-info/
 .eggs/
+node_modules/
+test-results/
+playwright-report/
 
 # Project-specific generated files
 account.zip

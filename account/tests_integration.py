@@ -131,6 +131,14 @@ class FrontendBackendIntegrationTests(TestCase):
             training_experience_years=5,
             training_sports="بدنسازی و شنا",
         )
+        CoachRequestAttachment.objects.create(
+            request=coach_request,
+            file="coach_requests/progress-photo.jpg",
+        )
+        CoachRequestAttachment.objects.create(
+            request=coach_request,
+            file="coach_requests/progress-video.mp4",
+        )
         self.client.force_login(admin)
 
         page = self.client.get(reverse("register:admin_user_hub", args=[self.user.pk]))
@@ -141,17 +149,21 @@ class FrontendBackendIntegrationTests(TestCase):
         self.assertContains(page, "سوابق تمرینی")
         self.assertContains(page, "بدنسازی و شنا")
         self.assertContains(page, "حذف پیام")
+        self.assertContains(page, 'data-media-kind="image"')
+        self.assertContains(page, 'data-media-kind="video"')
+        self.assertContains(page, 'js/admin-media-modal.js')
         self.assertContains(
             page,
             reverse("register:admin_user_coach_request_delete", args=[self.user.pk, coach_request.pk]),
         )
 
-        response = self.client.post(
-            reverse(
-                "register:admin_user_coach_request_delete",
-                args=[self.user.pk, coach_request.pk],
+        with patch.object(CoachRequestAttachment._meta.get_field("file").storage, "delete"):
+            response = self.client.post(
+                reverse(
+                    "register:admin_user_coach_request_delete",
+                    args=[self.user.pk, coach_request.pk],
+                )
             )
-        )
 
         self.assertRedirects(response, reverse("register:admin_user_hub", args=[self.user.pk]))
         self.assertFalse(CoachRequest.objects.filter(pk=coach_request.pk).exists())

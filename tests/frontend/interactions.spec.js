@@ -245,3 +245,87 @@ test.describe("account and comment interactions", () => {
     expect(await page.evaluate(() => window.__fetchCalls[0][0])).toBe("/course/1/");
   });
 });
+
+test.describe("admin user hub media previews", () => {
+  test("opens images and videos in a root-level modal on desktop, tablet, and mobile", async ({ page }) => {
+    await page.route("https://media.example.test/**", (route) => route.abort());
+    await page.setContent(`
+      <main style="height: 220px; overflow: hidden; transform: translateZ(0); position: relative">
+        <button id="open-photo" type="button" data-media-open data-media-kind="image"
+          data-media-url="https://media.example.test/photo.jpg" data-media-title="progress photo">
+          <img src="https://media.example.test/photo.jpg" alt="progress photo">
+        </button>
+        <button id="open-video" type="button" data-media-open data-media-kind="video"
+          data-media-url="https://media.example.test/video.mp4" data-media-title="progress video">
+          <span>play video</span>
+        </button>
+        <div class="admin-media-modal" data-media-modal hidden aria-hidden="true">
+          <div class="admin-media-modal__backdrop" data-media-close></div>
+          <div class="admin-media-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <button class="admin-media-modal__close" type="button" data-media-close aria-label="close">×</button>
+            <h2 id="modal-title" class="admin-media-modal__title"></h2>
+            <div class="admin-media-modal__content">
+              <img data-media-modal-image alt="">
+              <video data-media-modal-video controls playsinline preload="metadata"></video>
+            </div>
+          </div>
+        </div>
+      </main>
+    `);
+    await page.addStyleTag({
+      content: fs.readFileSync(path.join(projectRoot, "assets/css/admin-portal.css"), "utf8"),
+    });
+    await loadScript(page, "assets/js/admin-media-modal.js");
+
+    const modal = page.locator("[data-media-modal]");
+    const close = page.locator(".admin-media-modal__close");
+    for (const viewport of [
+      { width: 1365, height: 900 },
+      { width: 768, height: 1024 },
+      { width: 390, height: 844 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await page.locator("#open-photo").click();
+      await expect(modal).toBeVisible();
+      await expect(modal).toHaveAttribute("aria-hidden", "false");
+      await expect(page.locator("[data-media-modal-image]")).toBeVisible();
+      await expect(page.locator(".admin-media-modal__title")).toHaveText("progress photo");
+      expect(await modal.evaluate((element) => element.parentElement === document.body)).toBe(true);
+      const bounds = await modal.boundingBox();
+      expect(bounds.x).toBe(0);
+      expect(bounds.width).toBe(viewport.width);
+      await close.click();
+      await expect(modal).toBeHidden();
+      await expect(page.locator("#open-photo")).toBeFocused();
+    }
+
+    await page.locator("#open-video").click();
+    await expect(modal).toBeVisible();
+    await expect(page.locator("[data-media-modal-video]")).toBeVisible();
+    await expect(page.locator(".admin-media-modal__title")).toHaveText("progress video");
+    await page.keyboard.press("Escape");
+    await expect(modal).toBeHidden();
+    await expect(page.locator("body")).not.toHaveClass(/admin-media-modal-open/);
+  });
+
+  test("keeps the workout best-record entry at half its former column width", async ({ page }) => {
+    await page.setViewportSize({ width: 1200, height: 800 });
+    await page.setContent(`
+      <div class="workout-table-wrap">
+        <table class="workout-table">
+          <thead><tr><th>حرکت</th><th>ست</th><th>تکرار</th><th>استراحت</th><th>نکته</th><th>ثبت رکورد</th></tr></thead>
+          <tbody><tr>
+            <td>اسکوات</td><td>۳</td><td>۱۰</td><td>۶۰</td><td>—</td>
+            <td><label class="workout-record-input"><input type="number" placeholder="ثبت نشده"></label></td>
+          </tr></tbody>
+        </table>
+      </div>
+    `);
+    await page.addStyleTag({
+      content: fs.readFileSync(path.join(projectRoot, "assets/css/account.css"), "utf8"),
+    });
+
+    const bounds = await page.locator(".workout-table td:last-child").boundingBox();
+    expect(bounds.width).toBeLessThanOrEqual(75);
+  });
+});

@@ -2988,13 +2988,17 @@
 
 .workout-record-input {
     display: block;
-    width: 110px;
-    min-width: 100px;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
 }
 
 .workout-record-input input {
+    box-sizing: border-box;
     width: 100%;
     min-width: 0;
+    padding-inline: 3px;
+    font-size: 0.68rem;
     text-align: center;
 }
 
@@ -3008,9 +3012,10 @@
 
 .workout-table th:last-child,
 .workout-table td:last-child {
-    width: 130px;
-    min-width: 100px;
-    max-width: 130px;
+    width: 65px;
+    min-width: 65px;
+    max-width: 65px;
+    padding-inline: 4px;
 }
 
 .workout-table th {
