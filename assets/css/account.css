@@ -2801,6 +2801,89 @@
     scroll-margin-top: 24px;
 }
 
+.workout-day__summary {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    cursor: pointer;
+    list-style: none;
+}
+
+.workout-day__summary::-webkit-details-marker {
+    display: none;
+}
+
+.workout-day__chevron {
+    flex: 0 0 auto;
+    order: 2;
+    color: var(--account-brand, #3454d1);
+    font-size: 1.25rem;
+    transition: transform 180ms ease;
+}
+
+.workout-day[open] .workout-day__chevron {
+    transform: rotate(180deg);
+}
+
+.workout-day__content {
+    display: grid;
+    gap: 16px;
+    padding-top: 16px;
+}
+
+.workout-day__summary .workout-day__heading {
+    order: 1;
+    flex: 1 1 auto;
+}
+
+.workout-day__summary .workout-day-completions {
+    order: 3;
+    flex: 1 1 100%;
+}
+
+.workout-day-completions {
+    display: grid;
+    gap: 10px;
+    padding: 12px 14px;
+    border: 1px solid rgba(52, 84, 209, 0.14);
+    border-radius: 14px;
+    background: rgba(52, 84, 209, 0.05);
+}
+
+.workout-day-completions__heading,
+.workout-day-completions__list {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.workout-day-completions__heading {
+    justify-content: space-between;
+    color: var(--account-text, #334155);
+    font-size: 0.82rem;
+}
+
+.workout-day-completions__heading span {
+    color: var(--account-brand, #3454d1);
+    font-weight: 900;
+}
+
+.workout-day-completions__list label {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--account-muted, #6b7280);
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
+.workout-day-completions__list input {
+    accent-color: var(--account-brand, #3454d1);
+}
+
 .workout-day::before {
     position: absolute;
     inset-block: 20px;

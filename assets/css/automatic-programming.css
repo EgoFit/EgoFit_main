@@ -125,6 +125,80 @@
         min-width: 0;
     }
 
+    .automatic-program-type-field {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        align-items: start;
+        padding: 12px;
+        border: 1px solid rgba(52, 84, 209, .13);
+        border-radius: 14px;
+        background: rgba(52, 84, 209, .035);
+    }
+
+    .automatic-program-type-field__label,
+    .automatic-program-type-field__select {
+        display: grid;
+        align-content: center;
+        min-height: 44px;
+    }
+
+    .automatic-program-type-field__label label {
+        color: #334155;
+        font-size: .78rem;
+        font-weight: 800;
+    }
+
+    .automatic-program-methods {
+        display: grid;
+        gap: 7px;
+        min-width: 0;
+        padding: 10px;
+        border: 1px solid rgba(148, 163, 184, .28);
+        border-radius: 11px;
+        background: rgba(255, 255, 255, .72);
+    }
+
+    .automatic-program-methods__option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        min-height: 30px;
+        margin: 0;
+        color: #334155;
+        font-size: .76rem;
+        font-weight: 750;
+        cursor: pointer;
+    }
+
+    .automatic-program-methods__option input {
+        flex: 0 0 auto;
+        width: 16px;
+        height: 16px;
+        accent-color: #3454d1;
+    }
+
+    .automatic-program-type-field > ul.errorlist {
+        grid-column: 1 / -1;
+        margin: 0;
+    }
+
+    .dark .automatic-program-type-field {
+        border-color: rgba(125, 211, 252, .2);
+        background: rgba(30, 64, 175, .12);
+    }
+
+    .dark .automatic-program-type-field__label label,
+    .dark .automatic-program-methods__option {
+        color: #e2e8f0;
+    }
+
+    .dark .automatic-program-methods {
+        border-color: rgba(148, 163, 184, .3);
+        background: rgba(15, 23, 42, .58);
+    }
+
     .automatic-design-panel .field-group > label,
     .automatic-target-library > label,
     .automatic-date-field > label {
@@ -160,8 +234,8 @@
     }
 
     .automatic-athlete-picker > select {
-        height: 116px;
-        min-height: 116px;
+        height: 44px;
+        min-height: 44px;
         padding: 8px;
     }
 
@@ -256,6 +330,30 @@
 
     .automatic-session-target__counts {
         gap: 9px;
+    }
+
+    .automatic-session-target__patterns {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 8px;
+        margin: 0;
+    }
+
+    .automatic-session-target__pattern-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(80px, .32fr);
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        border: 1px solid rgba(52, 84, 209, .16);
+        border-radius: 12px;
+        background: rgba(52, 84, 209, .04);
+        font-size: .76rem;
+        font-weight: 750;
+    }
+
+    .automatic-session-target__pattern-row input {
+        min-height: 40px;
     }
 
     .automatic-session-target__row {

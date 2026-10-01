@@ -66,6 +66,13 @@
                 <div class="coach-check-row">
                     <label class="coach-check"><input type="checkbox" name="wants_diet" {% if form.wants_diet.value %}checked{% endif %}> <span>{{ form.fields.wants_diet.label }}</span></label>
                     <label class="coach-check"><input type="checkbox" name="wants_workout" {% if form.wants_workout.value %}checked{% endif %}> <span>{{ form.fields.wants_workout.label }}</span></label>
+                    <label class="coach-check"><input type="checkbox" name="save_only" {% if form.save_only.value %}checked{% endif %}> <span>{{ form.fields.save_only.label }}</span></label>
+                </div>
+                <div class="field-group coach-workout-types-field">
+                    <span id="coach-workout-types-label" class="coach-workout-types-field__label">{{ form.workout_types.label }}</span>
+                    {{ form.workout_types }}
+                    <small id="coach-workout-types-help" class="coach-fieldset__hint">{% trans 'هر تعداد گزینه که برای برنامه‌تان مناسب است لمس کنید؛ گزینه‌های انتخاب‌شده با رنگ و علامت مشخص می‌شوند.' %}</small>
+                    {{ form.workout_types.errors }}
                 </div>
             </fieldset>
 
@@ -77,41 +84,91 @@
                 </div>
             </fieldset>
 
-            <fieldset class="coach-fieldset">
-                <legend>{% trans 'دورسنجی (سانتی‌متر)' %}</legend>
-                <p class="coach-fieldset__hint">{% trans 'فیلدهای ستاره‌دار اجباری هستند.' %}</p>
-                <div class="coach-measure-grid">
-                    {% include 'account/_coach_field.html' with field=form.wrist_cm %}
-                    {% include 'account/_coach_field.html' with field=form.forearm_cm %}
-                    {% include 'account/_coach_field.html' with field=form.arm_rest_cm %}
-                    {% include 'account/_coach_field.html' with field=form.arm_flexed_cm %}
-                    {% include 'account/_coach_field.html' with field=form.chest_cm %}
-                    {% include 'account/_coach_field.html' with field=form.shoulders_cm %}
-                    {% include 'account/_coach_field.html' with field=form.waist_cm %}
-                    {% include 'account/_coach_field.html' with field=form.abdomen_cm %}
-                    {% include 'account/_coach_field.html' with field=form.hips_cm %}
-                    {% include 'account/_coach_field.html' with field=form.thigh_cm %}
-                    {% include 'account/_coach_field.html' with field=form.calf_cm %}
-                    {% include 'account/_coach_field.html' with field=form.thigh_left_cm %}
-                    {% include 'account/_coach_field.html' with field=form.calf_left_cm %}
-                </div>
-            </fieldset>
+            <details class="coach-collapsible">
+                <summary class="coach-collapsible__summary">
+                    <span><span class="coach-collapsible__eyebrow">{% trans 'اطلاعات تکمیلی' %}</span><strong>{% trans 'دورسنجی (سانتی‌متر)' %}</strong></span>
+                    <span class="coach-collapsible__icon" aria-hidden="true">⌄</span>
+                </summary>
+                <fieldset class="coach-fieldset coach-fieldset--collapsible">
+                    <p class="coach-fieldset__hint">{% trans 'فیلدهای ستاره‌دار اجباری هستند.' %}</p>
+                    <div class="coach-measure-grid">
+                        {% include 'account/_coach_field.html' with field=form.wrist_cm %}
+                        {% include 'account/_coach_field.html' with field=form.forearm_cm %}
+                        {% include 'account/_coach_field.html' with field=form.arm_rest_cm %}
+                        {% include 'account/_coach_field.html' with field=form.arm_flexed_cm %}
+                        {% include 'account/_coach_field.html' with field=form.chest_cm %}
+                        {% include 'account/_coach_field.html' with field=form.shoulders_cm %}
+                        {% include 'account/_coach_field.html' with field=form.waist_cm %}
+                        {% include 'account/_coach_field.html' with field=form.abdomen_cm %}
+                        {% include 'account/_coach_field.html' with field=form.hips_cm %}
+                        {% include 'account/_coach_field.html' with field=form.thigh_cm %}
+                        {% include 'account/_coach_field.html' with field=form.calf_cm %}
+                        {% include 'account/_coach_field.html' with field=form.thigh_left_cm %}
+                        {% include 'account/_coach_field.html' with field=form.calf_left_cm %}
+                    </div>
+                </fieldset>
+            </details>
 
-            <fieldset class="coach-fieldset">
-                <legend>{% trans 'سلامتی و محدودیت‌ها' %}</legend>
-                <div class="field-group">
-                    <label for="{{ form.pain_notes.id_for_label }}">{{ form.pain_notes.label }}</label>
-                    {{ form.pain_notes }}
-                </div>
-                <div class="field-group">
-                    <label for="{{ form.illness_notes.id_for_label }}">{{ form.illness_notes.label }}</label>
-                    {{ form.illness_notes }}
-                </div>
-                <div class="field-group">
-                    <label for="{{ form.diet_restrictions.id_for_label }}">{{ form.diet_restrictions.label }}</label>
-                    {{ form.diet_restrictions }}
-                </div>
-            </fieldset>
+            <details class="coach-collapsible">
+                <summary class="coach-collapsible__summary">
+                    <span><span class="coach-collapsible__eyebrow">{% trans 'اطلاعات تکمیلی' %}</span><strong>{% trans 'سنجش با کالیپر' %}</strong></span>
+                    <span class="coach-collapsible__icon" aria-hidden="true">⌄</span>
+                </summary>
+                <fieldset class="coach-fieldset coach-fieldset--collapsible">
+                    <p class="coach-fieldset__hint">{% trans 'همه فیلدها اختیاری هستند و مقدارها را بر حسب میلی‌متر وارد کنید.' %}</p>
+                    <div class="coach-measure-grid">
+                        {% include 'account/_coach_field.html' with field=form.chest_armpit_men_mm %}
+                        {% include 'account/_coach_field.html' with field=form.axilla_mm %}
+                        {% include 'account/_coach_field.html' with field=form.subscapular_mm %}
+                        {% include 'account/_coach_field.html' with field=form.abdominal_mm %}
+                        {% include 'account/_coach_field.html' with field=form.suprailiac_mm %}
+                        {% include 'account/_coach_field.html' with field=form.chest_mm %}
+                        {% include 'account/_coach_field.html' with field=form.biceps_mm %}
+                        {% include 'account/_coach_field.html' with field=form.triceps_mm %}
+                        {% include 'account/_coach_field.html' with field=form.thigh_mm %}
+                        {% include 'account/_coach_field.html' with field=form.calf_mm %}
+                    </div>
+                </fieldset>
+            </details>
+
+            <details class="coach-collapsible">
+                <summary class="coach-collapsible__summary">
+                    <span><span class="coach-collapsible__eyebrow">{% trans 'اطلاعات تکمیلی' %}</span><strong>{% trans 'سلامتی و محدودیت‌ها' %}</strong></span>
+                    <span class="coach-collapsible__icon" aria-hidden="true">⌄</span>
+                </summary>
+                <fieldset class="coach-fieldset coach-fieldset--collapsible">
+                    <div class="field-group">
+                        <label for="{{ form.pain_notes.id_for_label }}">{{ form.pain_notes.label }}</label>
+                        {{ form.pain_notes }}
+                    </div>
+                    <div class="field-group">
+                        <label for="{{ form.illness_notes.id_for_label }}">{{ form.illness_notes.label }}</label>
+                        {{ form.illness_notes }}
+                    </div>
+                    <div class="field-group">
+                        <label for="{{ form.diet_restrictions.id_for_label }}">{{ form.diet_restrictions.label }}</label>
+                        {{ form.diet_restrictions }}
+                    </div>
+                </fieldset>
+            </details>
+
+            <details class="coach-collapsible">
+                <summary class="coach-collapsible__summary">
+                    <span><span class="coach-collapsible__eyebrow">{% trans 'اطلاعات تکمیلی' %}</span><strong>{% trans 'سوابق تمرینی' %}</strong></span>
+                    <span class="coach-collapsible__icon" aria-hidden="true">⌄</span>
+                </summary>
+                <fieldset class="coach-fieldset coach-fieldset--collapsible">
+                    <p class="coach-fieldset__hint">{% trans 'سابقه تمرین و ورزش‌هایی را که انجام داده‌اید برای مربی بنویسید.' %}</p>
+                    <div class="coach-measure-grid coach-measure-grid--pair">
+                        {% include 'account/_coach_field.html' with field=form.training_experience_years %}
+                    </div>
+                    <div class="field-group">
+                        <label for="{{ form.training_sports.id_for_label }}">{{ form.training_sports.label }}</label>
+                        {{ form.training_sports }}
+                        {{ form.training_sports.errors }}
+                    </div>
+                </fieldset>
+            </details>
 
             <fieldset class="coach-fieldset">
                 <legend>{% trans 'فایل‌های پیوست' %}</legend>

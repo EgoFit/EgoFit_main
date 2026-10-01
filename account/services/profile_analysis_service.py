@@ -170,18 +170,52 @@ class ProfileAnalysisService:
         import jdatetime
         from datetime import timedelta
 
-        timestamps = []
+        measurement_dates = []
         for record in user.circumference_records.all()[:100]:
-            timestamps.append(record.recorded_at)
+            measurement_dates.append(cls._parse_jalali_date_obj(cls._record_jalali_date(record)))
         for record in user.caliper_records.all()[:100]:
-            timestamps.append(record.recorded_at)
+            measurement_dates.append(cls._parse_jalali_date_obj(cls._record_jalali_date(record)))
 
-        if timestamps:
-            return cls._jalali_from_datetime(min(timestamps)), cls._jalali_from_datetime(max(timestamps))
+        if measurement_dates:
+            return min(measurement_dates).strftime("%Y/%m/%d"), max(measurement_dates).strftime("%Y/%m/%d")
 
         today = jdatetime.date.today()
         start = jdatetime.date.fromgregorian(date=today.togregorian() - timedelta(days=90))
         return start.strftime("%Y/%m/%d"), today.strftime("%Y/%m/%d")
+
+    @classmethod
+    def _analysis_date_options(cls, user) -> list[str]:
+        dates = set()
+        for record in user.circumference_records.all()[:120]:
+            value = cls._validate_jalali_date(cls._record_jalali_date(record))
+            if value:
+                dates.add(value)
+        for record in user.caliper_records.all()[:120]:
+            value = cls._validate_jalali_date(cls._record_jalali_date(record))
+            if value:
+                dates.add(value)
+
+        if not dates:
+            start, end = cls._default_analysis_date_range(user)
+            dates.update((start, end))
+        return sorted(dates, key=cls._parse_jalali_date_obj, reverse=True)
+
+    @classmethod
+    def _resolve_analysis_date_range(
+        cls,
+        user,
+        start: str | None = None,
+        end: str | None = None,
+    ) -> tuple[str, str, Any, Any]:
+        default_start, default_end = cls._default_analysis_date_range(user)
+        start_date = cls._validate_jalali_date(start) or default_start
+        end_date = cls._validate_jalali_date(end) or default_end
+        start_j = cls._parse_jalali_date_obj(start_date)
+        end_j = cls._parse_jalali_date_obj(end_date)
+        if start_j > end_j:
+            start_date, end_date = end_date, start_date
+            start_j, end_j = end_j, start_j
+        return start_date, end_date, start_j, end_j
 
     @staticmethod
     def _resolve_age(user) -> int | None:
@@ -381,7 +415,7 @@ class ProfileAnalysisService:
                             series.append((j_date, value))
         elif metric in ("whr", "whtr"):
             for record in circ_records:
-                j_date = self._parse_jalali_date_obj(self._jalali_from_datetime(record.recorded_at))
+                j_date = self._parse_jalali_date_obj(self._record_jalali_date(record))
                 if start_j <= j_date <= end_j:
                     value = (
                         self._whr_from_circumference(record)
@@ -425,19 +459,19 @@ class ProfileAnalysisService:
             bmi = calculate_bmi(user.weight_kg, user.height_cm)
             if bmi is not None:
                 for record in circ_records:
-                    j_date = self._parse_jalali_date_obj(self._jalali_from_datetime(record.recorded_at))
+                    j_date = self._parse_jalali_date_obj(self._record_jalali_date(record))
                     if start_j <= j_date <= end_j:
                         series.append((j_date, bmi))
         elif metric == "bmr":
             bmr = self._bmr_value(user, age)
             if bmr is not None:
                 for record in circ_records:
-                    j_date = self._parse_jalali_date_obj(self._jalali_from_datetime(record.recorded_at))
+                    j_date = self._parse_jalali_date_obj(self._record_jalali_date(record))
                     if start_j <= j_date <= end_j:
                         series.append((j_date, bmr))
         else:
             for record in circ_records:
-                j_date = self._parse_jalali_date_obj(self._jalali_from_datetime(record.recorded_at))
+                j_date = self._parse_jalali_date_obj(self._record_jalali_date(record))
                 if start_j <= j_date <= end_j:
                     paired_caliper = self._find_caliper_for_datetime(user, record.recorded_at, caliper_records=cal_records)
                     value = self._metric_value_from_records(
@@ -519,12 +553,17 @@ class ProfileAnalysisService:
             return int(round(float(value)))
         return round(float(value), decimals)
 
-    def get_analysis_metric_series(self, user: Any, *, body_fat_formula: str | None = None) -> dict[str, Any]:
+    def get_analysis_metric_series(
+        self,
+        user: Any,
+        *,
+        body_fat_formula: str | None = None,
+        start: str | None = None,
+        end: str | None = None,
+    ) -> dict[str, Any]:
         """Return normalized trend-series data for the analysis charts."""
         """Per-metric labelled time series for the client-side metric dropdown chart."""
-        default_start, default_end = self._default_analysis_date_range(user)
-        start_j = self._parse_jalali_date_obj(default_start)
-        end_j = self._parse_jalali_date_obj(default_end)
+        start_date, end_date, start_j, end_j = self._resolve_analysis_date_range(user, start, end)
         selected_body_fat_formula = self._resolve_body_fat_formula(body_fat_formula)
         series: dict = {}
         for option in self.ANALYSIS_METRIC_OPTIONS:
@@ -604,20 +643,16 @@ class ProfileAnalysisService:
         """Build the selected body-composition analysis context for the profile page."""
         valid_metrics = {option["key"] for option in self.ANALYSIS_METRIC_OPTIONS}
         selected_metric = metric if metric in valid_metrics else "body_fat"
-        default_start, default_end = self._default_analysis_date_range(user)
-        start_date = self._validate_jalali_date(start) or default_start
-        end_date = self._validate_jalali_date(end) or default_end
-
-        if use_full_chart_range:
-            chart_start_date, chart_end_date = default_start, default_end
+        if use_full_chart_range and not start and not end:
+            chart_start_date, chart_end_date = self._default_analysis_date_range(user)
+            start_j = self._parse_jalali_date_obj(chart_start_date)
+            end_j = self._parse_jalali_date_obj(chart_end_date)
         else:
-            chart_start_date, chart_end_date = start_date, end_date
-
-        start_j = self._parse_jalali_date_obj(chart_start_date)
-        end_j = self._parse_jalali_date_obj(chart_end_date)
-        if start_j > end_j:
-            start_j, end_j = end_j, start_j
-            chart_start_date, chart_end_date = chart_end_date, chart_start_date
+            chart_start_date, chart_end_date, start_j, end_j = self._resolve_analysis_date_range(
+                user,
+                start,
+                end,
+            )
 
         bmi = calculate_bmi(user.weight_kg, user.height_cm)
         bmi_label = bmi_category_label(bmi)
@@ -813,6 +848,12 @@ class ProfileAnalysisService:
             },
         ]
 
+        analysis_range_dates = self._analysis_date_options(user)
+        for value in (chart_start_date, chart_end_date):
+            if value not in analysis_range_dates:
+                analysis_range_dates.append(value)
+        analysis_range_dates.sort(key=self._parse_jalali_date_obj, reverse=True)
+
         return {
             "analysis_has_data": has_data,
             "analysis_selected_metric": selected_metric,
@@ -821,6 +862,9 @@ class ProfileAnalysisService:
             "analysis_range_label": range_label,
             "analysis_start_date": chart_start_date,
             "analysis_end_date": chart_end_date,
+            "analysis_range_dates": [{"value": value, "label": value} for value in analysis_range_dates],
+            "analysis_selected_start_date": chart_start_date,
+            "analysis_selected_end_date": chart_end_date,
             "analysis_dates": [{"value": value, "label": value} for value in circ_dates],
             "analysis_selected_date": selected_date,
             "analysis_circ_dates": analysis_circ_dates,
@@ -1286,7 +1330,14 @@ class ProfileAnalysisService:
             "current_date": timeline_rows[0]["date"] if timeline_rows else None,
         }
 
-    def get_analysis_dashboard_data(self, user: Any, *, body_fat_formula: str | None = None) -> dict[str, Any]:
+    def get_analysis_dashboard_data(
+        self,
+        user: Any,
+        *,
+        body_fat_formula: str | None = None,
+        start: str | None = None,
+        end: str | None = None,
+    ) -> dict[str, Any]:
         """Build the dashboard cards, history rows, and gauges for body analysis."""
         """JSON-ready time-series + gauges + history rows for the analysis dashboard (Chart.js)."""
         age = self._resolve_age(user)
@@ -1294,11 +1345,19 @@ class ProfileAnalysisService:
         activity_factor = activity_factor_for_level(user.activity_level)
         selected_body_fat_formula = self._resolve_body_fat_formula(body_fat_formula)
 
-        circ_records = sorted(user.circumference_records.all()[:80], key=lambda r: r.recorded_at)
-        cal_records = sorted(user.caliper_records.all()[:80], key=lambda r: r.recorded_at)
+        circ_records_all = sorted(user.circumference_records.all()[:120], key=lambda r: r.recorded_at)
+        cal_records_all = sorted(user.caliper_records.all()[:120], key=lambda r: r.recorded_at)
+        range_start, range_end, start_j, end_j = self._resolve_analysis_date_range(user, start, end)
+
+        def in_range(record):
+            value = self._parse_jalali_date_obj(self._record_jalali_date(record))
+            return start_j <= value <= end_j
+
+        circ_records = [record for record in circ_records_all if in_range(record)]
+        cal_records = [record for record in cal_records_all if in_range(record)]
 
         def jdate(record) -> str:
-            return self._jalali_from_datetime(record.recorded_at)
+            return self._record_jalali_date(record)
 
         circ_labels = [jdate(record) for record in circ_records]
 
@@ -1445,7 +1504,7 @@ class ProfileAnalysisService:
 
         # --- Gauges ------------------------------------------------------------
         bmi_now = calculate_bmi(user.weight_kg, user.height_cm)
-        latest_circ = circ_records[-1] if circ_records else None
+        latest_circ = circ_records_all[-1] if circ_records_all else None
         whr_now = self._whr_from_circumference(latest_circ) if latest_circ else None
 
         def clamp_pct(value: float) -> int:
@@ -1467,7 +1526,7 @@ class ProfileAnalysisService:
         }
 
         # --- Headline body stat cards (latest values) --------------------------
-        latest = circ_records[-1] if circ_records else None
+        latest = circ_records_all[-1] if circ_records_all else None
         stat_cards = []
 
         def add_card(icon, label, value, unit):
@@ -1485,8 +1544,8 @@ class ProfileAnalysisService:
 
         smart_goal = self._build_smart_goal_data(
             user,
-            circ_records=circ_records,
-            cal_records=cal_records,
+            circ_records=circ_records_all,
+            cal_records=cal_records_all,
             age=age,
             body_fat_formula=selected_body_fat_formula,
         )

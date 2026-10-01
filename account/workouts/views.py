@@ -20,6 +20,7 @@ from account.models import (
     WorkoutBestRecord,
     WorkoutProgram,
     WorkoutProgramDay,
+    WorkoutProgramDayProgress,
     WorkoutProgramExercise,
     WorkoutProgramFeedback,
     WorkoutProgramPayment,
@@ -92,6 +93,12 @@ class ProfileWorkoutProgramsView(AccountPageMixin, UserPortalRequiredMixin, Temp
             program.user_feedback = latest_feedback_by_program.get(program.pk)
             for day_index, day in enumerate(program.days.all()):
                 day.user_feedback = feedback_by_day.get(day.pk)
+                day.completion_weeks = program.duration_weeks
+                day.completed_count = min(
+                    getattr(getattr(day, "progress", None), "completed_count", 0),
+                    program.duration_weeks,
+                )
+                day.completion_checks = range(1, program.duration_weeks + 1)
                 if day.user_feedback is None and day_index == 0:
                     day.user_feedback = legacy_feedback_by_program.get(program.pk)
             self._attach_performance_context(program)
@@ -575,6 +582,7 @@ class ProfileWorkoutProgramPerformanceView(UserPortalRequiredMixin, View):
                     day=selected_day,
                     defaults={"difficulty": difficulty},
                 )
+            self._mark_day_completed(selected_day, program)
 
         if saved_count:
             messages.success(
@@ -659,12 +667,22 @@ class ProfileWorkoutProgramPerformanceView(UserPortalRequiredMixin, View):
                         )
                     else:
                         messages.error(request, _("سطح دشواری باید عددی بین صفر تا ۱۰ باشد."))
+            self._mark_day_completed(selected_day, program)
 
         if saved_count:
             messages.success(request, _("رکوردهای جدید با موفقیت ثبت شد."))
         elif not fields:
             messages.info(request, _("مقداری برای ثبت انتخاب نشده است."))
         return redirect("register:profile_workout_programs")
+
+    @staticmethod
+    def _mark_day_completed(day, program):
+        if day is None:
+            return
+        progress, _ = WorkoutProgramDayProgress.objects.select_for_update().get_or_create(day=day)
+        if progress.completed_count < program.duration_weeks:
+            progress.completed_count += 1
+            progress.save(update_fields=["completed_count", "updated_at"])
 
     @staticmethod
     def _parse_performance_value(raw_value):

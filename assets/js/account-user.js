@@ -334,6 +334,27 @@
         });
     }
 
+    function initCoachWorkoutTypes(root) {
+        var list = root.querySelector("#id_workout_types");
+        if (!list) {
+            return;
+        }
+
+        list.querySelectorAll('input[type="checkbox"]').forEach(function (input) {
+            var label = input.closest("label");
+            if (!label) {
+                return;
+            }
+
+            function syncSelectedState() {
+                label.classList.toggle("is-selected", input.checked);
+            }
+
+            input.addEventListener("change", syncSelectedState);
+            syncSelectedState();
+        });
+    }
+
     document.addEventListener("focusin", function (event) {
         var target = event.target;
         if (!target || target.tagName !== "INPUT") {
@@ -351,6 +372,7 @@
         document.querySelectorAll(".blood-group-grid").forEach(initBloodGroupChips);
         document.querySelectorAll("[data-analysis-root]").forEach(initAnalysisScreen);
         document.querySelectorAll("[data-coach-form]").forEach(initCoachFileChips);
+        document.querySelectorAll("[data-coach-form]").forEach(initCoachWorkoutTypes);
         initSubmitLoading(document);
         if (typeof resetSubmitLoadingStates === "function") {
             resetSubmitLoadingStates();

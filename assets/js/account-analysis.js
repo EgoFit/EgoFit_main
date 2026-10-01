@@ -218,7 +218,7 @@
             metricChart = null;
         }
         var series = metricSeries[select.value];
-        var hasData = series && series.values && series.values.length >= 2;
+        var hasData = series && series.values && series.values.length >= 1;
         if (empty) {
             empty.hidden = !!hasData;
         }

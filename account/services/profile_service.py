@@ -82,11 +82,15 @@ class ProfileService:
         user: Any,
         *,
         body_fat_formula: str | None = None,
+        start: str | None = None,
+        end: str | None = None,
     ) -> dict[str, Any]:
         """Return body-composition trend data for the profile analysis page."""
         return self.analysis_service.get_analysis_metric_series(
             user,
             body_fat_formula=body_fat_formula,
+            start=start,
+            end=end,
         )
 
     def get_analysis_context(
@@ -120,11 +124,15 @@ class ProfileService:
         user: Any,
         *,
         body_fat_formula: str | None = None,
+        start: str | None = None,
+        end: str | None = None,
     ) -> dict[str, Any]:
         """Return analysis cards, history rows, and gauges."""
         return self.analysis_service.get_analysis_dashboard_data(
             user,
             body_fat_formula=body_fat_formula,
+            start=start,
+            end=end,
         )
 
     def get_learning_courses(self, user: Any):

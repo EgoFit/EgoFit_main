@@ -47,14 +47,14 @@
                     </div>
                     <div class="admin-result-card__actions">
                         <a href="{% url 'register:admin_user_hub' coach_request.user.id %}" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'مشاهده کاربر' %}</a>
-                        {% if coach_request.has_body_data and not coach_request.pushed_to_measurements %}
+                        {% if not coach_request.pushed_to_measurements or not coach_request.pushed_to_caliper or not coach_request.pushed_health_to_records or not coach_request.pushed_attachments_to_files %}
                             <form method="post" action="{% url 'register:admin_coach_request_push' coach_request.pk %}">
                                 {% csrf_token %}
                                 <input type="hidden" name="next" value="{% url 'register:admin_notifications' %}">
-                                <button type="submit" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'افزودن اندازه‌ها به اندازه‌گیری‌ها' %}</button>
+                                <button type="submit" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'ذخیره اطلاعات در دیتابیس' %}</button>
                             </form>
-                        {% elif coach_request.pushed_to_measurements %}
-                            <span class="coach-req-pushed">{% trans 'به اندازه‌گیری‌ها افزوده شد' %}</span>
+                        {% else %}
+                            <span class="coach-req-pushed">{% trans 'اطلاعات در دیتابیس ذخیره شد' %}</span>
                         {% endif %}
                         <form method="post" action="{% url 'register:admin_coach_request_handled' coach_request.pk %}">
                             {% csrf_token %}

@@ -55,7 +55,7 @@ class GymProgramService:
             .prefetch_related(
                 Prefetch(
                     "days",
-                    queryset=WorkoutProgramDay.objects.prefetch_related(
+                    queryset=WorkoutProgramDay.objects.select_related("progress").prefetch_related(
                         Prefetch(
                             "items",
                             queryset=WorkoutProgramExercise.objects.select_related(

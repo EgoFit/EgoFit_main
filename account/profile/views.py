@@ -140,15 +140,21 @@ class ProfileAnalysisView(AccountPageMixin, UserPortalRequiredMixin, TemplateVie
             )
         )
         selected_body_fat_formula = context.get("analysis_selected_body_fat_formula")
+        start = self.request.GET.get("start")
+        end = self.request.GET.get("end")
         context.update(
             profile_service.get_analysis_dashboard_data(
                 self.request.user,
                 body_fat_formula=selected_body_fat_formula,
+                start=start,
+                end=end,
             )
         )
         context["analysis_metric_series"] = profile_service.get_analysis_metric_series(
             self.request.user,
             body_fat_formula=selected_body_fat_formula,
+            start=start,
+            end=end,
         )
         return context
 

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import jdatetime
+from django.core.files.base import ContentFile
+from django.db import transaction
 from django.db.models import Count, Q
 from django.utils.translation import gettext_lazy as _
 
@@ -227,11 +229,35 @@ class AdminPortalService:
         )
         return context
 
-    def get_analysis_dashboard_data(self, user: User, *, body_fat_formula: str | None = None) -> dict:
-        return self.profile_service.get_analysis_dashboard_data(user, body_fat_formula=body_fat_formula)
+    def get_analysis_dashboard_data(
+        self,
+        user: User,
+        *,
+        body_fat_formula: str | None = None,
+        start: str | None = None,
+        end: str | None = None,
+    ) -> dict:
+        return self.profile_service.get_analysis_dashboard_data(
+            user,
+            body_fat_formula=body_fat_formula,
+            start=start,
+            end=end,
+        )
 
-    def get_analysis_metric_series(self, user: User, *, body_fat_formula: str | None = None) -> dict:
-        return self.profile_service.get_analysis_metric_series(user, body_fat_formula=body_fat_formula)
+    def get_analysis_metric_series(
+        self,
+        user: User,
+        *,
+        body_fat_formula: str | None = None,
+        start: str | None = None,
+        end: str | None = None,
+    ) -> dict:
+        return self.profile_service.get_analysis_metric_series(
+            user,
+            body_fat_formula=body_fat_formula,
+            start=start,
+            end=end,
+        )
 
     def get_user_summary_context(self, user: User, *, workout_record_query="") -> dict:
         workout_record_query = " ".join(str(workout_record_query or "").split())
@@ -310,6 +336,83 @@ class AdminPortalService:
         coach_request.pushed_to_measurements = True
         coach_request.save(update_fields=["pushed_to_measurements"])
         return instance
+
+    COACH_REQUEST_CALIPER_FIELDS = (
+        "chest_armpit_men_mm", "axilla_mm", "subscapular_mm", "abdominal_mm", "suprailiac_mm",
+        "chest_mm", "biceps_mm", "triceps_mm", "thigh_mm", "calf_mm",
+    )
+
+    @transaction.atomic
+    def save_coach_request_to_database(self, *, coach_request, uploaded_by=None) -> dict:
+        """Copy submitted measurements and attachments into the user's records once."""
+        result = {"measurements": None, "caliper": None, "health": 0, "attachments": 0}
+        if not coach_request.pushed_to_measurements and coach_request.has_body_data:
+            result["measurements"] = self.push_coach_request_to_measurements(coach_request)
+        if not coach_request.pushed_to_measurements:
+            coach_request.pushed_to_measurements = True
+        if not coach_request.pushed_to_caliper and coach_request.has_caliper_data:
+            values = {field: getattr(coach_request, field) for field in self.COACH_REQUEST_CALIPER_FIELDS}
+            result["caliper"] = CaliperMeasurement.objects.create(
+                user=coach_request.user,
+                measured_at_jalali=jdatetime.date.today().strftime("%Y/%m/%d"),
+                **values,
+            )
+            coach_request.pushed_to_caliper = True
+        elif not coach_request.pushed_to_caliper:
+            coach_request.pushed_to_caliper = True
+
+        if not coach_request.pushed_health_to_records:
+            if coach_request.pain_notes:
+                UserHealthRecord.objects.create(
+                    user=coach_request.user,
+                    category=UserHealthRecord.CategoryChoices.INJURY,
+                    title="درد یا آسیب ثبت‌شده از درخواست مربی",
+                    details=coach_request.pain_notes,
+                )
+                result["health"] += 1
+            if coach_request.illness_notes:
+                UserHealthRecord.objects.create(
+                    user=coach_request.user,
+                    category=UserHealthRecord.CategoryChoices.DISEASE,
+                    title="بیماری زمینه‌ای ثبت‌شده از درخواست مربی",
+                    details=coach_request.illness_notes,
+                )
+                result["health"] += 1
+            coach_request.pushed_health_to_records = True
+
+        if not coach_request.pushed_attachments_to_files:
+            for attachment in coach_request.attachments.all():
+                if not attachment.file:
+                    continue
+                filename = str(attachment.file.name or "").rsplit("/", 1)[-1]
+                with attachment.file.open("rb"):
+                    contents = ContentFile(attachment.file.read())
+                if attachment.is_image or attachment.is_video:
+                    media = ClientMedia(user=coach_request.user, uploaded_by=uploaded_by)
+                    if attachment.is_image:
+                        media.image.save(filename, contents, save=False)
+                    else:
+                        media.video.save(filename, contents, save=False)
+                    media.save()
+                    NotificationService.schedule_media_uploaded(media)
+                else:
+                    document = ClientDocument(
+                        user=coach_request.user,
+                        uploaded_by=uploaded_by,
+                        title=f"پیوست درخواست مربی - {filename}"[:120],
+                    )
+                    document.file.save(filename, contents, save=False)
+                    document.save()
+                    NotificationService.schedule_document_uploaded(document)
+                result["attachments"] += 1
+            coach_request.pushed_attachments_to_files = True
+
+        update_fields = [
+            "pushed_to_measurements", "pushed_to_caliper", "pushed_health_to_records",
+            "pushed_attachments_to_files",
+        ]
+        coach_request.save(update_fields=update_fields)
+        return result
 
     def toggle_admin_role(self, *, actor: User, target: User, make_admin: bool) -> None:
         if actor.pk == target.pk:

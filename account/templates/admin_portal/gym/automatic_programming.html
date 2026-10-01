@@ -23,6 +23,14 @@
         </span>
     </header>
 
+    <div class="automatic-form-tip" role="note">
+        <span aria-hidden="true">i</span>
+        <div>
+            <strong>{% trans 'مبنای نسخهٔ تمرین' %}</strong>
+            <p>{% trans 'راهنمای ACSM سال ۲۰۲۶ برای بزرگسالان سالم، دست‌کم ۲ ست در هر حرکت را پیشنهاد می‌کند؛ برای قدرت معمولاً ۲ تا ۳ ست و برای رشد عضله حدود ۱۰ ست هفتگی برای هر گروه عضلانی یک مرجع عمومی است. این مقادیر باید با سطح، بازیابی و شرایط ورزشکار تنظیم شوند.' %}</p>
+        </div>
+    </div>
+
     <nav class="automatic-program-steps" aria-label="{% trans 'مراحل طراحی برنامه' %}">
         <div class="automatic-program-step">
             <span class="automatic-program-step__number">۱</span>
@@ -59,7 +67,38 @@
                 {% for field in form %}
                     {% if field.name == 'movements_per_session' %}
                         {{ field.as_hidden }}
-                    {% elif field.name != 'secondary_movement_counts_json' and field.name != 'session_movement_targets_json' and field.name != 'target_secondary_movement_types' %}
+                    {% elif field.name == 'program_type' %}
+                        <div class="field-group automatic-program-type-field">
+                            <div class="automatic-program-type-field__label">
+                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            </div>
+                            <div class="automatic-program-type-field__select">
+                                {{ field }}
+                            </div>
+                            <div class="automatic-program-methods" aria-label="{{ form.training_methods.label }}">
+                                {% for checkbox in form.training_methods %}
+                                    {% if forloop.counter <= 3 %}
+                                        <label class="automatic-program-methods__option">
+                                            {{ checkbox.tag }}
+                                            <span>{{ checkbox.choice_label }}</span>
+                                        </label>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="automatic-program-methods" aria-label="{{ form.training_methods.label }}">
+                                {% for checkbox in form.training_methods %}
+                                    {% if forloop.counter > 3 %}
+                                        <label class="automatic-program-methods__option">
+                                            {{ checkbox.tag }}
+                                            <span>{{ checkbox.choice_label }}</span>
+                                        </label>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            {% if form.training_methods.help_text %}<small>{{ form.training_methods.help_text }}</small>{% endif %}
+                            {{ form.training_methods.errors }}
+                        </div>
+                    {% elif field.name != 'training_methods' and field.name != 'secondary_movement_counts_json' and field.name != 'session_movement_targets_json' and field.name != 'applied_settings' and field.name != 'target_secondary_movement_types' %}
                         <div class="field-group {% if field.name == 'abnormalities' %}admin-form-grid__full automatic-field--abnormalities{% endif %} {% if field.name == 'gender' %}automatic-field--gender{% endif %} {% if field.name == 'sessions_per_week' %}automatic-field--sessions{% endif %} {% if field.name == 'goal' %}automatic-field--goal{% endif %} {% if field.name == 'title' %}automatic-field--title{% endif %} {% if field.name == 'is_published' or field.name == 'requires_payment' %}admin-checkbox-field{% endif %}">
                             {% if field.name == 'user' %}
                                 <label for="{{ field.id_for_label }}">{{ field.label }}</label>
@@ -96,6 +135,8 @@
                 <span aria-hidden="true">i</span>
                 <p>{% trans 'برای پیشنهادهای دقیق‌تر، بخش هدف جلسه‌ها را جداگانه تنظیم کنید. اگر کتابخانه برای سطح انتخاب‌شده حرکت نداشته باشد، سیستم از سطح‌های ساده‌تر استفاده می‌کند.' %}</p>
             </div>
+            {{ form.applied_settings }}
+            <button type="submit" name="action" value="apply" class="admin-secondary-btn automatic-apply-settings" data-busy-text="{% trans 'در حال اعمال…' %}">{% trans 'اعمال تغییرات' %}</button>
         </section>
 
         <section id="session-movement-targets" class="admin-form-panel automatic-session-targets">
@@ -168,6 +209,17 @@
 
                 <div id="automatic-preview-summary" class="automatic-preview-summary" aria-live="polite"></div>
 
+                {% if preview.warnings %}
+                    <div class="automatic-form-tip automatic-volume-warnings" role="status">
+                        <span aria-hidden="true">!</span>
+                        <div>
+                            <strong>{% trans 'بازبینی حجم هفتگی' %}</strong>
+                            <p>{% trans 'این برآورد از نسخهٔ اولیه ساخته شده است؛ بعد از تغییر تعداد ست‌ها یا افزودن حرکت، مجموع را دوباره بررسی کنید.' %}</p>
+                            <ul>{% for warning in preview.warnings %}<li>{{ warning }}</li>{% endfor %}</ul>
+                        </div>
+                    </div>
+                {% endif %}
+
                 <div class="automatic-preview-toolbar">
                     <p>{% trans 'تغییرات شما تا زمان فشردن «ذخیره و ارسال به کاربر» فقط در همین پیش‌نمایش باقی می‌ماند.' %}</p>
                     <button type="button" class="admin-secondary-btn admin-secondary-btn--small" data-preview-toggle>{% trans 'جمع کردن همه روزها' %}</button>
@@ -180,7 +232,7 @@
 
                 <div class="automatic-form-status" data-form-status role="alert" aria-live="assertive"></div>
                 <div class="automatic-program-actions">
-                    <button type="submit" name="action" value="save" class="admin-primary-btn" data-busy-text="{% trans 'در حال انتشار…' %}">{% trans 'ذخیره و ارسال به کاربر' %}</button>
+                    <button type="submit" name="action" value="save" class="admin-primary-btn" data-busy-text="{% trans 'در حال ذخیره…' %}">{% trans 'ذخیره برنامه' %}</button>
                     <button type="submit" name="action" value="generate" class="admin-secondary-btn" data-busy-text="{% trans 'در حال تولید…' %}">{% trans 'تولید دوباره' %}</button>
                 </div>
             </section>
@@ -216,6 +268,7 @@
 {{ exercise_catalog|json_script:"automatic-exercises" }}
 {{ body_part_catalog|json_script:"automatic-body-parts" }}
 {{ corrective_catalog|json_script:"automatic-corrective-catalog" }}
+{{ athlete_catalog|json_script:"automatic-athletes" }}
 {% endblock %}
 
 {% block extra_js %}
@@ -228,10 +281,12 @@
     const exerciseNode = document.getElementById("automatic-exercises");
     const bodyPartNode = document.getElementById("automatic-body-parts");
     const correctiveNode = document.getElementById("automatic-corrective-catalog");
+    const athleteNode = document.getElementById("automatic-athletes");
     const preview = parseJson(previewNode ? previewNode.textContent : "", {days: [], correctives: []});
     const exercises = parseJson(exerciseNode ? exerciseNode.textContent : "", []);
     const bodyParts = parseJson(bodyPartNode ? bodyPartNode.textContent : "", []);
     const correctiveCatalog = parseJson(correctiveNode ? correctiveNode.textContent : "", []);
+    const athleteCatalog = parseJson(athleteNode ? athleteNode.textContent : "", []);
     const editor = document.getElementById("automatic-program-editor");
     const movementTypeCatalog = document.getElementById("id_target_secondary_movement_types");
     const sessionTargetsList = document.getElementById("session-movement-target-list");
@@ -239,6 +294,7 @@
     const sessionsInput = document.getElementById("id_sessions_per_week");
     const athleteSearch = document.getElementById("automatic-athlete-search");
     const athleteSelect = document.getElementById("id_user");
+    const titleInput = document.getElementById("id_title");
     const daysRoot = document.getElementById("automatic-days");
     const correctiveRoot = document.getElementById("automatic-correctives-editor");
     const daysInput = document.getElementById("id_days_json");
@@ -249,6 +305,7 @@
     const endDateInput = document.getElementById("id_end_date");
     const sessionCopyButton = document.querySelector("[data-session-copy]");
     const previewToggleButton = document.querySelector("[data-preview-toggle]");
+    const jalaliToday = "{{ jalali_today|escapejs }}";
 
     const text = {
         noAthlete: "{% trans 'هنوز ورزشکاری انتخاب نشده است.' %}",
@@ -340,6 +397,14 @@
         return Math.max(1, Math.min(7, Number(sessionsInput && sessionsInput.value) || 1));
     }
 
+    function updateAutomaticTitle() {
+        if (!athleteSelect || !titleInput) return;
+        const athlete = athleteCatalog.find(function (item) {
+            return stringId(item.id) === stringId(athleteSelect.value);
+        });
+        titleInput.value = athlete ? athlete.name + " - " + jalaliToday : "";
+    }
+
     function movementOptions() {
         if (!movementTypeCatalog) return [];
         return Array.from(movementTypeCatalog.options).map(function (option) {
@@ -378,6 +443,19 @@
         });
     }
 
+    function patternEntries(target) {
+        if (!target || !Array.isArray(target.patterns)) return [];
+        return target.patterns.map(function (entry) {
+            return {
+                movement_pattern: stringId(entry && (entry.movement_pattern ?? entry.id)),
+                count: Math.max(0, Math.min(20, clampCount(entry && entry.count, 0))),
+                label: String(entry && entry.label || ""),
+            };
+        }).filter(function (entry) {
+            return entry.movement_pattern;
+        });
+    }
+
     function sessionTargetData() {
         return Array.isArray(sessionTargetState) ? sessionTargetState.map(function (target) {
             const entries = targetEntries(target);
@@ -388,7 +466,13 @@
                 movementTypes.push(entry.movement_type);
                 counts[entry.movement_type] = entry.count;
             });
-            return {targets: entries, movement_types: movementTypes, counts: counts};
+            return {
+                name: String(target && target.name || ""),
+                targets: entries,
+                patterns: patternEntries(target),
+                movement_types: movementTypes,
+                counts: counts,
+            };
         }) : [];
     }
 
@@ -419,7 +503,22 @@
             }).filter(function (target) {
                 return target.movement_type;
             });
-            sessionTargetState[index] = {targets: targets};
+            const patterns = Array.from(card.querySelectorAll("[data-session-pattern-row]")).map(function (row) {
+                const countInput = row.querySelector("[data-session-pattern-count]");
+                return {
+                    movement_pattern: stringId(row.dataset.patternId),
+                    count: Math.max(0, Math.min(20, clampCount(countInput && countInput.value, 0))),
+                    label: row.dataset.patternLabel || "",
+                };
+            }).filter(function (pattern) {
+                return pattern.movement_pattern;
+            });
+            const previous = sessionTargetState[index] || {};
+            sessionTargetState[index] = {
+                name: previous.name || "",
+                targets: targets,
+                patterns: patterns,
+            };
         });
         sessionTargetState = sessionTargetState.slice(0, sessionCount());
         const data = sessionTargetData();
@@ -448,12 +547,21 @@
             const currentEntries = targetEntries(current).filter(function (entry) {
                 return available.has(entry.movement_type);
             });
-            if (currentEntries.length) return {targets: currentEntries};
+            const currentPatterns = patternEntries(current);
+            if (currentEntries.length || (Array.isArray(current.patterns) && current.patterns.length)) {
+                return {
+                    name: String(current.name || ""),
+                    targets: currentEntries,
+                    patterns: currentPatterns,
+                };
+            }
             const defaultTypes = initiallySelected.length ? initiallySelected : (options.length ? [options[0].id] : []);
             return {
+                name: String(current.name || ""),
                 targets: defaultTypes.map(function (id) {
                     return {movement_type: id, count: 1};
                 }),
+                patterns: [],
             };
         });
     }
@@ -485,7 +593,10 @@
         });
         const selectedLabel = card.querySelector("[data-session-selected-label]");
         if (selectedLabel) {
-            selectedLabel.textContent = selected.size + " " + text.sections + " • " + total + " " + text.movements;
+            const patternTotal = Array.from(card.querySelectorAll("[data-session-pattern-count]")).reduce(function (sum, input) {
+                return sum + Math.max(0, clampCount(input.value, 0));
+            }, 0);
+            selectedLabel.textContent = selected.size + " " + text.sections + " • " + (total + patternTotal) + " " + text.movements;
         }
         card.querySelectorAll("[data-session-target-remove]").forEach(function (button) {
             button.disabled = rows.length <= 1;
@@ -506,13 +617,24 @@
             '</select></label>' +
             '<label><span>' + esc(text.movements) + '</span><input class="admin-input" type="number" min="1" max="20" inputmode="numeric" dir="ltr" data-session-target-count aria-label="' + esc(text.movements) + '" value="' + esc(Math.max(1, Math.min(20, clampCount(count, 1)))) + '"></label>' +
             '<button type="button" class="admin-secondary-btn automatic-session-target__remove" data-session-target-remove aria-label="' + esc(text.remove) + '">' + esc(text.remove) + '</button>' +
-        '</div>';
+            '</div>';
+    }
+
+    function patternRowMarkup(pattern) {
+        return '<label class="automatic-session-target__pattern-row" data-session-pattern-row data-pattern-id="' + esc(pattern.movement_pattern) + '" data-pattern-label="' + esc(pattern.label) + '">' +
+            '<span>' + esc(pattern.label || pattern.movement_pattern) + '</span>' +
+            '<input class="admin-input" type="number" min="0" max="20" inputmode="numeric" dir="ltr" data-session-pattern-count aria-label="' + esc(pattern.label || text.movements) + '" value="' + esc(pattern.count) + '">' +
+        '</label>';
     }
 
     function renderSessionTargets() {
         if (!sessionTargetsList) return;
         const options = movementOptions();
-        if (!options.length) {
+        sessionTargetState = normalizedSessionTargets();
+        const hasPatternTargets = sessionTargetState.some(function (target) {
+            return patternEntries(target).length > 0;
+        });
+        if (!options.length && !hasPatternTargets) {
             sessionTargetsList.innerHTML = '<p class="automatic-session-targets__empty">' + esc("{% trans 'هیچ بخش هدفی برای انتخاب وجود ندارد.' %}") + '</p>';
             sessionTargetState = [];
             if (sessionTargetsInput) sessionTargetsInput.value = "[]";
@@ -520,13 +642,15 @@
             return;
         }
 
-        sessionTargetState = normalizedSessionTargets();
         sessionTargetsList.innerHTML = sessionTargetState.map(function (target, index) {
             return '<article class="automatic-session-target" data-session-target="' + index + '">' +
                 '<div class="automatic-session-target__head">' +
-                    '<div class="automatic-session-target__head-copy"><strong>' + esc(text.sessions) + ' ' + (index + 1) + '</strong><small>' + esc("{% trans 'هر جلسه تنظیمات مستقل دارد' %}") + '</small></div>' +
+                    '<div class="automatic-session-target__head-copy"><strong>' + esc(target.name || (text.sessions + ' ' + (index + 1))) + '</strong><small>' + esc("{% trans 'هر جلسه تنظیمات مستقل دارد' %}") + '</small></div>' +
                     '<span class="automatic-session-target__badge" data-session-selected-label></span>' +
                 '</div>' +
+                (patternEntries(target).length ? '<div class="automatic-session-target__patterns">' + patternEntries(target).map(function (entry) {
+                    return patternRowMarkup(entry);
+                }).join('') + '</div>' : '') +
                 '<div class="automatic-session-target__counts" data-session-target-rows>' +
                     targetEntries(target).map(function (entry) { return targetRowMarkup(options, entry); }).join("") +
                 '</div>' +
@@ -913,7 +1037,7 @@
             collectSessionTargets();
         });
         sessionTargetsList.addEventListener("input", function (event) {
-            if (event.target.matches("[data-session-target-count]")) {
+            if (event.target.matches("[data-session-target-count], [data-session-pattern-count]")) {
                 const card = event.target.closest("[data-session-target]");
                 refreshSessionTargetCard(card);
                 collectSessionTargets();
@@ -958,11 +1082,18 @@
         sessionCopyButton.addEventListener("click", function () {
             collectSessionTargets();
             const first = targetEntries(sessionTargetState[0]);
-            if (!first.length) return;
+            const firstPatterns = patternEntries(sessionTargetState[0]);
+            if (!first.length && !firstPatterns.length) return;
             sessionTargetState = Array.from({length: sessionCount()}, function () {
-                return {targets: first.map(function (entry) {
-                    return {movement_type: entry.movement_type, count: entry.count};
-                })};
+                return {
+                    name: "",
+                    targets: first.map(function (entry) {
+                        return {movement_type: entry.movement_type, count: entry.count};
+                    }),
+                    patterns: firstPatterns.map(function (entry) {
+                        return {movement_pattern: entry.movement_pattern, count: entry.count, label: entry.label};
+                    }),
+                };
             });
             renderSessionTargets();
             setFormStatus(text.copied, true);
@@ -1027,6 +1158,7 @@
         athleteSelect.addEventListener("change", function () {
             updateAthleteSelection();
             updateAthleteSearch();
+            updateAutomaticTitle();
         });
         if (athleteClear) athleteClear.addEventListener("click", function () {
             athleteSearch.value = "";
@@ -1040,6 +1172,7 @@
         });
         updateAthleteSearch();
         updateAthleteSelection();
+        updateAutomaticTitle();
     }
 
     if (daysRoot) {

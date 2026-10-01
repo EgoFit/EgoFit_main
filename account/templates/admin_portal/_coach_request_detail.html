@@ -9,19 +9,37 @@
                     <tr>
                         <th>{% trans 'برنامه‌های درخواستی' %}</th>
                         <td>
-                            {% if coach_request.wants_diet or coach_request.wants_workout %}
+                            {% if coach_request.wants_diet or coach_request.wants_workout or coach_request.save_only %}
                                 {% if coach_request.wants_diet %}{% trans 'برنامه غذایی' %}{% endif %}
                                 {% if coach_request.wants_diet and coach_request.wants_workout %}، {% endif %}
                                 {% if coach_request.wants_workout %}{% trans 'برنامه تمرینی' %}{% endif %}
+                                {% if coach_request.save_only %}{% if coach_request.wants_diet or coach_request.wants_workout %}، {% endif %}{% trans 'صرفا جهت ذخیره سازی در دیتابیس' %}{% endif %}
                             {% else %}{% trans 'انتخاب نشده' %}{% endif %}
                         </td>
                     </tr>
+                    {% if coach_request.workout_type_labels %}
+                        <tr><th>{% trans 'انواع تمرین' %}</th><td><div class="coach-req-body__chips">{% for label in coach_request.workout_type_labels %}<span>{{ label }}</span>{% endfor %}</div></td></tr>
+                    {% endif %}
                     <tr><th>{% trans 'تاریخ ارسال' %}</th><td>{{ coach_request.created_at|date:"Y/m/d H:i" }}</td></tr>
                     <tr><th>{% trans 'وضعیت' %}</th><td>{{ coach_request.get_status_display }}</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
+
+    {% if coach_request.training_experience_years is not None or coach_request.training_sports %}
+        <div class="coach-req-detail__section">
+            <h3>{% trans 'سوابق تمرینی' %}</h3>
+            <div class="coach-req-detail__table-wrap">
+                <table class="coach-req-detail__table">
+                    <tbody>
+                        {% if coach_request.training_experience_years is not None %}<tr><th>{% trans 'سابقه تمرین' %}</th><td>{{ coach_request.training_experience_years }} {% trans 'سال' %}</td></tr>{% endif %}
+                        {% if coach_request.training_sports %}<tr><th>{% trans 'ورزش‌های انجام‌شده' %}</th><td class="coach-req-detail__multiline">{{ coach_request.training_sports }}</td></tr>{% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
 
     {% if coach_request.has_body_data %}
         <div class="coach-req-detail__section">
@@ -44,6 +62,28 @@
                         {% if coach_request.calf_cm %}<tr><th>{% trans 'دور ساق' %}</th><td>{{ coach_request.calf_cm }} {% trans 'سانتی‌متر' %}</td></tr>{% endif %}
                         {% if coach_request.thigh_left_cm %}<tr><th>{% trans 'دور ران (چپ)' %}</th><td>{{ coach_request.thigh_left_cm }} {% trans 'سانتی‌متر' %}</td></tr>{% endif %}
                         {% if coach_request.calf_left_cm %}<tr><th>{% trans 'دور ساق (چپ)' %}</th><td>{{ coach_request.calf_left_cm }} {% trans 'سانتی‌متر' %}</td></tr>{% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if coach_request.has_caliper_data %}
+        <div class="coach-req-detail__section">
+            <h3>{% trans 'اندازه‌های کالیپر ارسال‌شده' %}</h3>
+            <div class="coach-req-detail__table-wrap">
+                <table class="coach-req-detail__table">
+                    <tbody>
+                        {% if coach_request.chest_armpit_men_mm %}<tr><th>{% trans 'سینه' %}</th><td>{{ coach_request.chest_armpit_men_mm }} {% trans 'میلی‌متر' %}</td></tr>{% endif %}
+                        {% if coach_request.axilla_mm %}<tr><th>{% trans 'زیربغل' %}</th><td>{{ coach_request.axilla_mm }} {% trans 'میلی‌متر' %}</td></tr>{% endif %}
+                        {% if coach_request.subscapular_mm %}<tr><th>{% trans 'تحت کتفی' %}</th><td>{{ coach_request.subscapular_mm }} {% trans 'میلی‌متر' %}</td></tr>{% endif %}
+                        {% if coach_request.abdominal_mm %}<tr><th>{% trans 'شکم' %}</th><td>{{ coach_request.abdominal_mm }} {% trans 'میلی‌متر' %}</td></tr>{% endif %}
+                        {% if coach_request.suprailiac_mm %}<tr><th>{% trans 'سه‌تیغ خاصره' %}</th><td>{{ coach_request.suprailiac_mm }} {% trans 'میلی‌متر' %}</td></tr>{% endif %}
+                        {% if coach_request.chest_mm %}<tr><th>{% trans 'کمر' %}</th><td>{{ coach_request.chest_mm }} {% trans 'میلی‌متر' %}</td></tr>{% endif %}
+                        {% if coach_request.biceps_mm %}<tr><th>{% trans 'جلوبازو' %}</th><td>{{ coach_request.biceps_mm }} {% trans 'میلی‌متر' %}</td></tr>{% endif %}
+                        {% if coach_request.triceps_mm %}<tr><th>{% trans 'پشت بازو' %}</th><td>{{ coach_request.triceps_mm }} {% trans 'میلی‌متر' %}</td></tr>{% endif %}
+                        {% if coach_request.thigh_mm %}<tr><th>{% trans 'جلوی ران' %}</th><td>{{ coach_request.thigh_mm }} {% trans 'میلی‌متر' %}</td></tr>{% endif %}
+                        {% if coach_request.calf_mm %}<tr><th>{% trans 'پشت ساق پا' %}</th><td>{{ coach_request.calf_mm }} {% trans 'میلی‌متر' %}</td></tr>{% endif %}
                     </tbody>
                 </table>
             </div>

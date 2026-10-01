@@ -272,6 +272,30 @@ def validate_coach_request_file(uploaded_file):
 
 
 class CoachRequestForm(forms.ModelForm):
+    WORKOUT_TYPE_CHOICES = (
+        (_("فضای تمرین"), (
+            ("gym_weights", _("تمرین با وزنه در باشگاه")),
+            ("home", _("تمرین در خانه")),
+        )),
+        (_("تمرین‌های هوازی خارج از باشگاه"), (
+            ("outdoor_running", _("دویدن")),
+            ("outdoor_swimming", _("شنا")),
+            ("outdoor_hiking", _("کوهنوردی")),
+            ("outdoor_cycling", _("دوچرخه‌سواری")),
+        )),
+    )
+
+    workout_types = forms.MultipleChoiceField(
+        label=_("انواع برنامه تمرینی"),
+        required=False,
+        choices=WORKOUT_TYPE_CHOICES,
+        widget=forms.CheckboxSelectMultiple(attrs={
+            "class": "coach-workout-types",
+            "aria-describedby": "coach-workout-types-help",
+            "aria-labelledby": "coach-workout-types-label",
+        }),
+    )
+
     class Meta:
         from account.models import CoachRequest
 
@@ -280,6 +304,10 @@ class CoachRequestForm(forms.ModelForm):
             "sessions_per_week",
             "wants_diet",
             "wants_workout",
+            "save_only",
+            "workout_types",
+            "training_experience_years",
+            "training_sports",
             "height_cm",
             "weight_kg",
             "wrist_cm",
@@ -295,6 +323,16 @@ class CoachRequestForm(forms.ModelForm):
             "calf_cm",
             "thigh_left_cm",
             "calf_left_cm",
+            "chest_armpit_men_mm",
+            "axilla_mm",
+            "subscapular_mm",
+            "abdominal_mm",
+            "suprailiac_mm",
+            "chest_mm",
+            "biceps_mm",
+            "triceps_mm",
+            "thigh_mm",
+            "calf_mm",
             "pain_notes",
             "illness_notes",
             "diet_restrictions",
@@ -303,6 +341,14 @@ class CoachRequestForm(forms.ModelForm):
             "sessions_per_week": forms.Select(attrs={"class": INPUT_CLASS}),
             "wants_diet": forms.CheckboxInput(attrs={"class": "coach-request-checkbox"}),
             "wants_workout": forms.CheckboxInput(attrs={"class": "coach-request-checkbox"}),
+            "save_only": forms.CheckboxInput(attrs={"class": "coach-request-checkbox"}),
+            "training_sports": forms.Textarea(
+                attrs={
+                    "class": INPUT_CLASS,
+                    "rows": 3,
+                    "placeholder": _("مثلاً بدنسازی، شنا و دویدن"),
+                }
+            ),
             "pain_notes": forms.Textarea(attrs={"class": INPUT_CLASS, "rows": 3, "placeholder": _("در صورت وجود درد یا آسیب، توضیح دهید")}),
             "illness_notes": forms.Textarea(attrs={"class": INPUT_CLASS, "rows": 3, "placeholder": _("بیماری زمینه‌ای (اختیاری)")}),
             "diet_restrictions": forms.Textarea(attrs={"class": INPUT_CLASS, "rows": 3, "placeholder": _("محدودیت‌های غذایی (اختیاری)")}),
@@ -340,13 +386,38 @@ class CoachRequestForm(forms.ModelForm):
                     "data-select-all-on-focus": "true",
                 }
             )
+        self.fields["training_experience_years"].widget = forms.NumberInput(
+            attrs={
+                "class": INPUT_CLASS,
+                "inputmode": "numeric",
+                "dir": "ltr",
+                "step": "1",
+                "min": "0",
+                "max": "100",
+                "data-select-all-on-focus": "true",
+            }
+        )
+        for name in (
+            "chest_armpit_men_mm", "axilla_mm", "subscapular_mm", "abdominal_mm", "suprailiac_mm",
+            "chest_mm", "biceps_mm", "triceps_mm", "thigh_mm", "calf_mm",
+        ):
+            self.fields[name].widget = forms.NumberInput(
+                attrs={
+                    "class": INPUT_CLASS,
+                    "inputmode": "decimal",
+                    "dir": "ltr",
+                    "step": "0.1",
+                    "min": "0",
+                    "data-select-all-on-focus": "true",
+                }
+            )
         for name in self.REQUIRED_BODY_FIELDS:
             self.fields[name].required = True
 
     def clean(self):
         cleaned_data = super().clean()
-        if not cleaned_data.get("wants_diet") and not cleaned_data.get("wants_workout"):
-            raise ValidationError(_("حداقل یکی از برنامه غذایی یا برنامه تمرینی را انتخاب کنید."))
+        if not any(cleaned_data.get(name) for name in ("wants_diet", "wants_workout", "save_only")):
+            raise ValidationError(_("حداقل یکی از نوع درخواست‌ها را انتخاب کنید."))
         return cleaned_data
 
 

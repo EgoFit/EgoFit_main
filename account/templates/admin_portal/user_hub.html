@@ -169,6 +169,17 @@
                             </form>
                         </div>
                         {% include 'admin_portal/_coach_request_detail.html' with coach_request=coach_request enable_media_preview=True %}
+                        <div class="admin-result-card__actions">
+                            {% if not coach_request.pushed_to_measurements or not coach_request.pushed_to_caliper or not coach_request.pushed_health_to_records or not coach_request.pushed_attachments_to_files %}
+                                <form method="post" action="{% url 'register:admin_coach_request_push' coach_request.pk %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{% url 'register:admin_user_hub' target_user.id %}">
+                                    <button type="submit" class="admin-secondary-btn admin-secondary-btn--small">{% trans 'ذخیره اطلاعات در دیتابیس' %}</button>
+                                </form>
+                            {% else %}
+                                <span class="coach-req-pushed">{% trans 'اطلاعات در دیتابیس ذخیره شد' %}</span>
+                            {% endif %}
+                        </div>
                         {% if coach_request.status == "pending" %}
                             <div class="admin-result-card__actions">
                                 <form method="post" action="{% url 'register:admin_coach_request_handled' coach_request.pk %}">
@@ -202,21 +213,22 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         var requestsPanel = document.querySelector("[data-coach-requests-panel]");
-        if (!requestsPanel || !requestsPanel.querySelector("[data-coach-request-badge]")) return;
-        requestsPanel.addEventListener("toggle", function () {
-            if (!requestsPanel.open || requestsPanel.dataset.readMarked === "true") return;
-            var csrf = document.cookie.split(";").map(function (item) { return item.trim(); }).find(function (item) { return item.indexOf("csrftoken=") === 0; });
-            fetch(requestsPanel.dataset.markReadUrl, {
-                method: "POST",
-                credentials: "same-origin",
-                headers: { "X-CSRFToken": csrf ? decodeURIComponent(csrf.split("=")[1]) : "" }
-            }).then(function (response) {
-                if (!response.ok) return;
-                requestsPanel.dataset.readMarked = "true";
-                var badge = requestsPanel.querySelector("[data-coach-request-badge]");
-                if (badge) badge.remove();
+        if (requestsPanel && requestsPanel.querySelector("[data-coach-request-badge]")) {
+            requestsPanel.addEventListener("toggle", function () {
+                if (!requestsPanel.open || requestsPanel.dataset.readMarked === "true") return;
+                var csrf = document.cookie.split(";").map(function (item) { return item.trim(); }).find(function (item) { return item.indexOf("csrftoken=") === 0; });
+                fetch(requestsPanel.dataset.markReadUrl, {
+                    method: "POST",
+                    credentials: "same-origin",
+                    headers: { "X-CSRFToken": csrf ? decodeURIComponent(csrf.split("=")[1]) : "" }
+                }).then(function (response) {
+                    if (!response.ok) return;
+                    requestsPanel.dataset.readMarked = "true";
+                    var badge = requestsPanel.querySelector("[data-coach-request-badge]");
+                    if (badge) badge.remove();
+                });
             });
-        });
+        }
 
         var mediaModal = document.querySelector("[data-media-modal]");
         if (!mediaModal) return;

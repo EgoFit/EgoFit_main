@@ -16,6 +16,16 @@ IMAGE_FILE_EXTENSIONS = frozenset(
 )
 
 
+class ExerciseTrainingMethod(models.TextChoices):
+    NORMAL = "normal", _("معمولی")
+    PYRAMID = "pyramid", "Pyramid"
+    REVERSE_PYRAMID = "reverse_pyramid", "Reverse Pyramid"
+    TWENTY_ONE_REPS = "21_reps", "21 Reps"
+    DROP_SET = "drop_set", "Drop Set"
+    LOW_TO_HIGH = "low_to_high", "Low To High"
+    HIGH_TO_LOW = "high_to_low", "High To Low"
+
+
 def _is_video_file_name(name):
     suffix = str(name or "").rsplit(".", 1)
     return len(suffix) == 2 and suffix[1].lower() in VIDEO_FILE_EXTENSIONS
@@ -477,6 +487,15 @@ class ClientDocumentPayment(models.Model):
 
 
 class CoachRequest(models.Model):
+    WORKOUT_TYPE_LABELS = {
+        "gym_weights": _("تمرین با وزنه در باشگاه"),
+        "home": _("تمرین در خانه"),
+        "outdoor_running": _("دویدن"),
+        "outdoor_swimming": _("شنا"),
+        "outdoor_hiking": _("کوهنوردی"),
+        "outdoor_cycling": _("دوچرخه‌سواری"),
+    }
+
     class SessionsPerWeek(models.TextChoices):
         ONE = "1", _("۱ جلسه در هفته")
         TWO = "2", _("۲ جلسه در هفته")
@@ -494,6 +513,15 @@ class CoachRequest(models.Model):
     sessions_per_week = models.CharField(max_length=20, choices=SessionsPerWeek.choices, verbose_name=_("تعداد جلسات در هفته"))
     wants_diet = models.BooleanField(default=False, verbose_name=_("درخواست برنامه غذایی"))
     wants_workout = models.BooleanField(default=False, verbose_name=_("درخواست برنامه تمرینی"))
+    save_only = models.BooleanField(default=False, verbose_name=_("صرفا جهت ذخیره سازی در دیتابیس"))
+    workout_types = models.JSONField(default=list, blank=True, verbose_name=_("انواع برنامه تمرینی"))
+    training_experience_years = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        validators=[MaxValueValidator(100)],
+        verbose_name=_("سابقه تمرین (سال)"),
+    )
+    training_sports = models.TextField(blank=True, verbose_name=_("ورزش‌های انجام‌شده"))
     pain_notes = models.TextField(blank=True, verbose_name=_("درد یا آسیب"))
     illness_notes = models.TextField(blank=True, verbose_name=_("بیماری زمینه‌ای"))
     diet_restrictions = models.TextField(blank=True, verbose_name=_("محدودیت‌های غذایی"))
@@ -513,7 +541,20 @@ class CoachRequest(models.Model):
     calf_cm = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, verbose_name=_("دور ساق پا"))
     thigh_left_cm = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, verbose_name=_("دور ران (چپ)"))
     calf_left_cm = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, verbose_name=_("دور ساق پا (چپ)"))
+    chest_armpit_men_mm = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, verbose_name=_("کالیپر سینه"))
+    axilla_mm = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, verbose_name=_("کالیپر زیربغل"))
+    subscapular_mm = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, verbose_name=_("کالیپر تحت کتفی"))
+    abdominal_mm = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, verbose_name=_("کالیپر شکم"))
+    suprailiac_mm = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, verbose_name=_("کالیپر سه‌تیغ خاصره"))
+    chest_mm = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, verbose_name=_("کالیپر کمر"))
+    biceps_mm = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, verbose_name=_("کالیپر جلوبازو"))
+    triceps_mm = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, verbose_name=_("کالیپر پشت بازو"))
+    thigh_mm = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, verbose_name=_("کالیپر جلوی ران"))
+    calf_mm = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, verbose_name=_("کالیپر پشت ساق پا"))
     pushed_to_measurements = models.BooleanField(default=False, verbose_name=_("به اندازه‌گیری‌ها افزوده شد"))
+    pushed_to_caliper = models.BooleanField(default=False, verbose_name=_("به کالیپر افزوده شد"))
+    pushed_health_to_records = models.BooleanField(default=False, verbose_name=_("اطلاعات سلامت به سوابق افزوده شد"))
+    pushed_attachments_to_files = models.BooleanField(default=False, verbose_name=_("پیوست‌ها به فایل‌های کاربر افزوده شد"))
     admin_read_at = models.DateTimeField(null=True, blank=True, verbose_name=_("زمان مشاهده توسط ادمین"))
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING, db_index=True, verbose_name=_("وضعیت"))
     created_at = models.DateTimeField(auto_now_add=True)
@@ -542,6 +583,20 @@ class CoachRequest(models.Model):
                 "hips_cm", "thigh_cm", "calf_cm", "thigh_left_cm", "calf_left_cm",
             )
         )
+
+    @property
+    def has_caliper_data(self) -> bool:
+        return any(
+            getattr(self, field) is not None
+            for field in (
+                "chest_armpit_men_mm", "axilla_mm", "subscapular_mm", "abdominal_mm",
+                "suprailiac_mm", "chest_mm", "biceps_mm", "triceps_mm", "thigh_mm", "calf_mm",
+            )
+        )
+
+    @property
+    def workout_type_labels(self):
+        return [self.WORKOUT_TYPE_LABELS.get(value, value) for value in (self.workout_types or [])]
 
 
 class CoachRequestAttachment(models.Model):
@@ -744,6 +799,13 @@ class ExerciseGoal(models.Model):
 class ExerciseSetType(models.Model):
     set_count = models.CharField(max_length=40, verbose_name=_("تعداد ست"))
     goal = models.CharField(max_length=80, blank=True, verbose_name=_("هدف"))
+    method = models.CharField(
+        max_length=20,
+        choices=ExerciseTrainingMethod.choices,
+        default=ExerciseTrainingMethod.NORMAL,
+        db_index=True,
+        verbose_name=_("روش تمرین"),
+    )
 
     class Meta:
         ordering = ["goal", "set_count"]
@@ -757,6 +819,13 @@ class ExerciseSetType(models.Model):
 class ExerciseRepetitionType(models.Model):
     reps = models.CharField(max_length=40, verbose_name=_("تعداد تکرار"))
     goal = models.CharField(max_length=80, blank=True, verbose_name=_("هدف"))
+    method = models.CharField(
+        max_length=20,
+        choices=ExerciseTrainingMethod.choices,
+        default=ExerciseTrainingMethod.NORMAL,
+        db_index=True,
+        verbose_name=_("روش تمرین"),
+    )
 
     class Meta:
         ordering = ["goal", "reps"]
@@ -770,6 +839,13 @@ class ExerciseRepetitionType(models.Model):
 class ExerciseRestType(models.Model):
     rest_time = models.CharField(max_length=40, verbose_name=_("زمان استراحت"))
     goal = models.CharField(max_length=80, blank=True, verbose_name=_("هدف"))
+    method = models.CharField(
+        max_length=20,
+        choices=ExerciseTrainingMethod.choices,
+        default=ExerciseTrainingMethod.NORMAL,
+        db_index=True,
+        verbose_name=_("روش تمرین"),
+    )
 
     class Meta:
         ordering = ["goal", "rest_time"]
@@ -876,7 +952,21 @@ class CorrectiveExercise(models.Model):
 
 
 class WorkoutProgram(models.Model):
+    class ProgramType(models.TextChoices):
+        NORMAL = "normal", "Normal"
+        FULL_BODY = "full_body", "Full Body"
+        PUSH_PULL = "push_pull", "Push/Pull"
+        SPLIT = "split", "Split"
+        PUSH_PULL_LEGS = "push_pull_legs", "Push/Pull/Leg"
+
     title = models.CharField(max_length=150, verbose_name=_("عنوان برنامه"))
+    program_type = models.CharField(
+        max_length=20,
+        choices=ProgramType.choices,
+        default=ProgramType.NORMAL,
+        blank=True,
+        verbose_name=_("نوع برنامه"),
+    )
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -931,6 +1021,13 @@ class WorkoutProgram(models.Model):
     def clean(self):
         if self.end_date and self.start_date and self.end_date < self.start_date:
             raise ValidationError({"end_date": _("تاریخ پایان نمی‌تواند قبل از تاریخ شروع باشد.")})
+
+    @property
+    def duration_weeks(self):
+        if not self.start_date or not self.end_date:
+            return 1
+        duration_days = max(1, (self.end_date - self.start_date).days + 1)
+        return max(1, (duration_days + 6) // 7)
 
     def __str__(self):
         return f"{self.title} - {self.user.fullname}"
@@ -1002,6 +1099,24 @@ class WorkoutProgramDay(models.Model):
 
     def __str__(self):
         return f"{self.program.title} - {self.name}"
+
+
+class WorkoutProgramDayProgress(models.Model):
+    day = models.OneToOneField(
+        WorkoutProgramDay,
+        on_delete=models.CASCADE,
+        related_name="progress",
+        verbose_name=_("جلسه برنامه"),
+    )
+    completed_count = models.PositiveIntegerField(default=0, verbose_name=_("تعداد دفعات انجام‌شده"))
+    updated_at = models.DateTimeField(auto_now=True, verbose_name=_("آخرین به‌روزرسانی"))
+
+    class Meta:
+        verbose_name = "پیشرفت جلسه برنامه"
+        verbose_name_plural = "پیشرفت جلسات برنامه"
+
+    def __str__(self):
+        return f"{self.day} - {self.completed_count}"
 
 
 class WorkoutProgramExercise(models.Model):

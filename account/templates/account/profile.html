@@ -11,13 +11,14 @@
         <h2 class="profile-screen__title">{% trans 'پروفایل' %}</h2>
     </header>
 
-    {% if dashboard_feed %}
-        <article class="dashboard-feed-banner dashboard-feed-banner--{{ dashboard_feed.kind }}">
+    {% if dashboard_feed and dashboard_feed.body %}
+        <article class="dashboard-feed-banner dashboard-feed-banner--{{ dashboard_feed.kind }}" data-dashboard-feed>
             <span class="dashboard-feed-banner__icon" aria-hidden="true">{% if dashboard_feed.kind == 'birthday' %}🎉{% else %}📣{% endif %}</span>
             <div class="dashboard-feed-banner__body">
                 <strong>{{ dashboard_feed.title }}</strong>
-                {% if dashboard_feed.body %}<p>{{ dashboard_feed.body }}</p>{% endif %}
+                <p>{{ dashboard_feed.body }}</p>
             </div>
+            <button type="button" class="dashboard-feed-banner__close" data-dashboard-feed-close aria-label="{% trans 'بستن پیام' %}">×</button>
         </article>
     {% endif %}
 

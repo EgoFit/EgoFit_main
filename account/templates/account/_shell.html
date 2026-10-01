@@ -94,6 +94,14 @@
                     });
                 }
             });
+            document.querySelectorAll("[data-dashboard-feed]").forEach(function (feed) {
+                var closeBtn = feed.querySelector("[data-dashboard-feed-close]");
+                if (closeBtn) {
+                    closeBtn.addEventListener("click", function () {
+                        feed.classList.add("is-dismissed");
+                    });
+                }
+            });
         });
     </script>
 {% endblock %}

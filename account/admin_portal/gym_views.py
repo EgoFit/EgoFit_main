@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import jdatetime
 
 from django.contrib import messages
 from django.core.exceptions import ValidationError
@@ -45,6 +46,7 @@ from account.models import (
     Muscle,
     WorkoutProgram,
     WorkoutProgramFeedback,
+    User,
 )
 from account.services.gym_library_service import GymLibraryService
 from account.services.gym_program_pdf import build_program_pdf
@@ -108,9 +110,9 @@ LOOKUP_REGISTRY = {
     "pressure-type": {"model": ExercisePressureType, "title": _("نوع فشار")},
     "sport-type": {"model": ExerciseSportType, "title": _("نوع ورزش")},
     "goal": {"model": ExerciseGoal, "title": _("اهداف برنامه"), "fields": ("name", "name_en")},
-    "set-type": {"model": ExerciseSetType, "title": _("نوع ست"), "fields": ("set_count", "goal")},
-    "repetition-type": {"model": ExerciseRepetitionType, "title": _("نوع تکرار"), "fields": ("reps", "goal")},
-    "rest-type": {"model": ExerciseRestType, "title": _("نوع استراحت"), "fields": ("rest_time", "goal")},
+    "set-type": {"model": ExerciseSetType, "title": _("نوع ست"), "fields": ("set_count", "goal", "method")},
+    "repetition-type": {"model": ExerciseRepetitionType, "title": _("نوع تکرار"), "fields": ("reps", "goal", "method")},
+    "rest-type": {"model": ExerciseRestType, "title": _("نوع استراحت"), "fields": ("rest_time", "goal", "method")},
 }
 
 
@@ -134,20 +136,56 @@ class AutomaticProgrammingView(AdminPageMixin, View):
         return render(request, self.template_name, self._context(AutomaticProgrammingForm()))
 
     def post(self, request):
-        form = AutomaticProgrammingForm(request.POST)
+        post_data = request.POST.copy()
+        try:
+            athlete_id = int(post_data.get("user", ""))
+        except (TypeError, ValueError):
+            athlete_id = None
+        athlete = User.objects.filter(pk=athlete_id, is_admin=False).first() if athlete_id else None
+        if athlete:
+            post_data["title"] = self._program_title(athlete)
+        form = AutomaticProgrammingForm(post_data)
         action = request.POST.get("action", "generate")
         preview = None
         if form.is_valid():
+            signature = self._settings_signature(form.cleaned_data)
+            if action == "apply" or (
+                action == "generate"
+                and form.cleaned_data.get("applied_settings") != signature
+            ):
+                try:
+                    targets, selected_ids = automatic_program_service.build_session_targets(
+                        program_type=form.cleaned_data.get("program_type") or WorkoutProgram.ProgramType.NORMAL,
+                        sessions=form.cleaned_data["sessions_per_week"],
+                        current_targets=form.cleaned_data.get("session_movement_targets_json") or [],
+                        selected_ids=[
+                            item.pk
+                            for item in form.cleaned_data.get("target_secondary_movement_types", [])
+                        ],
+                    )
+                except ValidationError as exc:
+                    form.add_error(None, exc)
+                else:
+                    post_data.setlist(
+                        "session_movement_targets_json",
+                        [json.dumps(targets, ensure_ascii=False)],
+                    )
+                    post_data.setlist("target_secondary_movement_types", selected_ids)
+                    post_data["applied_settings"] = signature
+                    form = AutomaticProgrammingForm(post_data)
+                    form.is_valid()
+                    messages.info(request, _("چیدمان جلسه‌ها اعمال شد؛ در صورت نیاز آن را ویرایش و سپس برنامه را بسازید."))
+                return render(request, self.template_name, self._context(form, preview))
+
             if action == "save":
+                if form.cleaned_data.get("applied_settings") != signature:
+                    form.add_error(None, _("ابتدا تغییرات را اعمال و برنامه را دوباره تولید کنید."))
+                    preview = self._decode(request.POST.get("days_json"), request.POST.get("correctives_json"))
+                    return render(request, self.template_name, self._context(form, preview))
                 payload_form = WorkoutProgramPayloadForm(request.POST)
-                program_data = request.POST.copy()
+                program_data = post_data.copy()
                 if not program_data.get("start_date"):
                     program_data["start_date"] = timezone.localdate().isoformat()
-                # This action is explicitly labelled "save and send to user".
-                # A checkbox is omitted from POST when it is unchecked, which
-                # would otherwise turn the saved program into a draft that the
-                # user portal correctly hides.
-                program_data["is_published"] = "on"
                 program_form = WorkoutProgramForm(program_data)
                 if payload_form.is_valid() and program_form.is_valid():
                     try:
@@ -161,13 +199,18 @@ class AutomaticProgrammingView(AdminPageMixin, View):
                     except ValidationError as exc:
                         form.add_error(None, exc)
                     else:
-                        messages.success(request, _("برنامه خودکار برای کاربر منتشر شد."))
+                        message = (
+                            _("برنامه خودکار برای کاربر منتشر شد.")
+                            if program.is_published
+                            else _("برنامه به‌صورت پیش‌نویس ذخیره شد و برای کاربر نمایش داده نمی‌شود.")
+                        )
+                        messages.success(request, message)
                         return redirect("register:admin_program_list", user_id=program.user_id)
                 else:
                     for error in list(payload_form.errors.values()) + list(program_form.errors.values()):
                         form.add_error(None, error)
                     preview = self._decode(request.POST.get("days_json"), request.POST.get("correctives_json"))
-            else:
+            elif action == "generate":
                 movement_type_counts = (
                     form.cleaned_data.get("secondary_movement_counts_json") or {}
                 )
@@ -178,18 +221,48 @@ class AutomaticProgrammingView(AdminPageMixin, View):
                     str(item.pk): movement_type_counts.get(str(item.pk), 1)
                     for item in form.cleaned_data["target_secondary_movement_types"]
                 }
-                preview = automatic_program_service.generate(
-                    difficulty=form.cleaned_data["difficulty"],
-                    gender=form.cleaned_data.get("gender"),
-                    abnormalities=form.cleaned_data.get("abnormalities"),
-                    sessions=form.cleaned_data["sessions_per_week"],
-                    movements=form.cleaned_data["movements_per_session"],
-                    goal=form.cleaned_data["goal"],
-                    secondary_movement_counts=selected,
-                    session_movement_targets=session_movement_targets,
-                )
-                messages.info(request, _("پیش‌نمایش ساخته شد؛ قبل از انتشار حرکت‌ها را بررسی و ویرایش کنید."))
+                try:
+                    preview = automatic_program_service.generate(
+                        difficulty=form.cleaned_data["difficulty"],
+                        gender=form.cleaned_data.get("gender"),
+                        abnormalities=form.cleaned_data.get("abnormalities"),
+                        sessions=form.cleaned_data["sessions_per_week"],
+                        movements=form.cleaned_data["movements_per_session"],
+                        goal=form.cleaned_data["goal"],
+                        training_methods=form.cleaned_data.get("training_methods"),
+                        secondary_movement_counts=selected,
+                        session_movement_targets=session_movement_targets,
+                    )
+                except ValidationError as exc:
+                    form.add_error(None, exc)
+                else:
+                    messages.info(request, _("پیش‌نمایش ساخته شد؛ قبل از ذخیره، حرکت‌ها و نسخه‌ها را بررسی کنید."))
         return render(request, self.template_name, self._context(form, preview))
+
+    @staticmethod
+    def _program_title(athlete):
+        name = " ".join(
+            value.strip()
+            for value in (athlete.first_name, athlete.last_name)
+            if value and value.strip()
+        ) or athlete.fullname
+        jalali_today = jdatetime.date.fromgregorian(date=timezone.localdate())
+        return f"{name} - {jalali_today.strftime('%Y/%m/%d')}"
+
+    @staticmethod
+    def _settings_signature(cleaned_data):
+        payload = {
+            "user": cleaned_data["user"].pk,
+            "program_type": cleaned_data.get("program_type") or "normal",
+            "training_methods": sorted(cleaned_data.get("training_methods") or []),
+            "difficulty": cleaned_data["difficulty"].pk,
+            "gender": cleaned_data.get("gender") or "",
+            "abnormalities": sorted(item.pk for item in cleaned_data.get("abnormalities", [])),
+            "sessions": cleaned_data["sessions_per_week"],
+            "movements": cleaned_data["movements_per_session"],
+            "goal": cleaned_data["goal"],
+        }
+        return json.dumps(payload, ensure_ascii=False, sort_keys=True)
 
     @staticmethod
     def _decode(days_json, correctives_json):
@@ -201,6 +274,7 @@ class AutomaticProgrammingView(AdminPageMixin, View):
             return {"days": [], "correctives": []}
 
     def _context(self, form, preview=None):
+        athletes = list(form.fields["user"].queryset)
         return {
             "form": form,
             "preview": preview or {"days": [], "correctives": []},
@@ -236,6 +310,20 @@ class AutomaticProgrammingView(AdminPageMixin, View):
                 {"id": item.pk, "name": item.name}
                 for item in CorrectiveExercise.objects.all()
             ],
+            "athlete_catalog": [
+                {
+                    "id": athlete.pk,
+                    "name": " ".join(
+                        value.strip()
+                        for value in (athlete.first_name, athlete.last_name)
+                        if value and value.strip()
+                    ) or athlete.fullname,
+                }
+                for athlete in athletes
+            ],
+            "jalali_today": jdatetime.date.fromgregorian(
+                date=timezone.localdate()
+            ).strftime("%Y/%m/%d"),
             "active_section": self.active_section,
             "page_title": _("برنامه‌ریزی خودکار"),
             "default_start_date": (
@@ -626,6 +714,11 @@ class LookupListView(LookupKeyMixin, TemplateView):
                 "pk": obj.pk,
                 "primary": getattr(obj, fields[0]),
                 "secondary": getattr(obj, fields[1]) if len(fields) > 1 else "",
+                "tertiary": (
+                    obj.get_method_display()
+                    if len(fields) > 2 and fields[2] == "method"
+                    else getattr(obj, fields[2]) if len(fields) > 2 else ""
+                ),
             }
             for obj in items_page["page_obj"].object_list
         ]

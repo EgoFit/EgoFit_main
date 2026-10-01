@@ -59,6 +59,6 @@ typing_extensions==4.8.0
 tzdata==2024.1  
 ua-parser==0.18.0  
 urllib3==1.26.15  # Downgraded to a version compatible with both botocore and requests
-PyMySQL==1.2.0  # used only by manage.py import_legacy_data (legacy MySQL migration tool)
+PyMySQL==1.2.0  # MySQL driver for Django and the legacy data import command
 # zarinpal==1.0.0  # Remove or update based on compatibility
 zeep==4.2.1

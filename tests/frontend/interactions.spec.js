@@ -187,6 +187,33 @@ test.describe("account and comment interactions", () => {
     await expect(page.locator("[data-otp-resend]")).toBeHidden();
   });
 
+  test("coach workout types support selecting multiple touch-friendly options", async ({ page }) => {
+    await page.setContent(`
+      <form data-coach-form>
+        <div id="id_workout_types">
+          <div>
+            <label>فضای تمرین</label>
+            <div><label for="id_workout_types_0_0"><input id="id_workout_types_0_0" type="checkbox" name="workout_types" value="home">خانه</label></div>
+            <div><label for="id_workout_types_0_1"><input id="id_workout_types_0_1" type="checkbox" name="workout_types" value="gym_weights">باشگاه</label></div>
+          </div>
+        </div>
+      </form>
+    `);
+    await loadScript(page, "assets/js/account-user.js");
+    await fireDomReady(page);
+
+    const options = page.locator('#id_workout_types input[name="workout_types"]');
+    const optionCards = page.locator('#id_workout_types label[for]');
+    await optionCards.nth(0).click();
+    await optionCards.nth(1).click();
+
+    await expect(options).toHaveCount(2);
+    await expect(options.nth(0)).toBeChecked();
+    await expect(options.nth(1)).toBeChecked();
+    await expect(options.nth(0).locator(".." )).toHaveClass(/is-selected/);
+    await expect(options.nth(1).locator(".." )).toHaveClass(/is-selected/);
+  });
+
   test("comment validation blocks short text and AJAX success replaces the comments section", async ({ page }) => {
     await page.setContent(`
       <section id="tabThree" data-comment-endpoint="/course/1/">

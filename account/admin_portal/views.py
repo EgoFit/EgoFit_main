@@ -428,21 +428,29 @@ class AdminUserAnalysisView(AdminUserMixin, TemplateView):
             admin_portal_service.get_analysis_context(
                 self.target_user,
                 metric=self.request.GET.get("metric"),
+                start=self.request.GET.get("start"),
+                end=self.request.GET.get("end"),
                 circ_date=self.request.GET.get("circ_date"),
                 body_fat_formula=self.request.GET.get("body_fat_formula"),
                 use_full_chart_range=True,
             )
         )
         selected_body_fat_formula = context.get("analysis_selected_body_fat_formula")
+        start = self.request.GET.get("start")
+        end = self.request.GET.get("end")
         context.update(
             admin_portal_service.get_analysis_dashboard_data(
                 self.target_user,
                 body_fat_formula=selected_body_fat_formula,
+                start=start,
+                end=end,
             )
         )
         context["analysis_metric_series"] = admin_portal_service.get_analysis_metric_series(
             self.target_user,
             body_fat_formula=selected_body_fat_formula,
+            start=start,
+            end=end,
         )
         context["page_title"] = self.target_user.fullname
         return context
@@ -587,11 +595,15 @@ class CoachRequestMarkHandledView(AdminRequiredMixin, View):
 class CoachRequestPushMeasurementsView(AdminRequiredMixin, View):
     def post(self, request, pk):
         coach_request = get_object_or_404(CoachRequest, pk=pk)
-        instance = admin_portal_service.push_coach_request_to_measurements(coach_request)
-        if instance is not None:
-            messages.success(request, _("اندازه‌های درخواست به اندازه‌گیری‌های کاربر افزوده شد."))
+        result = admin_portal_service.save_coach_request_to_database(
+            coach_request=coach_request,
+            uploaded_by=request.user,
+        )
+        saved_count = sum(bool(result[key]) for key in ("measurements", "caliper")) + result["health"] + result["attachments"]
+        if saved_count:
+            messages.success(request, _("اطلاعات این درخواست در جداول مرتبط ذخیره شد."))
         else:
-            messages.info(request, _("اندازه‌ای برای افزودن وجود ندارد یا قبلاً افزوده شده است."))
+            messages.info(request, _("اطلاعات این درخواست قبلاً ذخیره شده است یا داده‌ای برای ذخیره وجود ندارد."))
         next_url = request.POST.get("next") or reverse("register:admin_search")
         return redirect(next_url)
 

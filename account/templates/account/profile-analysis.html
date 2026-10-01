@@ -63,6 +63,8 @@
             <p class="analysis-sec-title">{% trans 'نتایج محاسبات' %}</p>
             {% if analysis_dates or analysis_body_fat_formulas %}
             <form class="analysis-datepicker analysis-result-controls" method="get" data-analysis-filters-form>
+                <input type="hidden" name="start" value="{{ analysis_selected_start_date|default:'' }}">
+                <input type="hidden" name="end" value="{{ analysis_selected_end_date|default:'' }}">
                 {% if analysis_dates %}
                 <div class="analysis-result-control">
                     <label class="analysis-datepicker__label" for="analysis-date-select">{% trans 'تاریخ آنالیز' %}</label>
@@ -213,6 +215,27 @@
             <div class="analysis-explorer-head">
                 <strong>{% trans 'بررسی شاخص دلخواه' %}</strong>
             </div>
+            <form class="analysis-datepicker analysis-range-controls" method="get">
+                <input type="hidden" name="date" value="{{ analysis_selected_date|default:'' }}">
+                <input type="hidden" name="body_fat_formula" value="{{ analysis_selected_body_fat_formula|default:'auto' }}">
+                <div class="analysis-result-control">
+                    <label class="analysis-datepicker__label" for="analysis-start-date">{% trans 'تاریخ شروع' %}</label>
+                    <select class="analysis-trend-select" id="analysis-start-date" name="start" dir="ltr">
+                        {% for d in analysis_range_dates %}
+                            <option value="{{ d.value }}" {% if d.value == analysis_selected_start_date %}selected{% endif %}>{{ d.label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="analysis-result-control">
+                    <label class="analysis-datepicker__label" for="analysis-end-date">{% trans 'تاریخ اتمام' %}</label>
+                    <select class="analysis-trend-select" id="analysis-end-date" name="end" dir="ltr">
+                        {% for d in analysis_range_dates %}
+                            <option value="{{ d.value }}" {% if d.value == analysis_selected_end_date %}selected{% endif %}>{{ d.label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="analysis-datepicker__go">{% trans 'نمایش' %}</button>
+            </form>
             <select class="analysis-trend-select" data-metric-select aria-label="{% trans 'بررسی شاخص دلخواه' %}">
                 {% for option in analysis_metric_options %}
                     <option value="{{ option.key }}">{{ option.label }}</option>

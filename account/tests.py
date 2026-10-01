@@ -493,6 +493,94 @@ class AdminPortalTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "analysis-chart-card")
 
+    def test_analysis_metric_series_uses_measurement_dates(self):
+        from account.models import CaliperMeasurement
+        from account.services.profile_analysis_service import ProfileAnalysisService
+
+        self.client_user.height_cm = 180
+        self.client_user.weight_kg = 78
+        self.client_user.gender = "male"
+        self.client_user.birth_date_jalali = "1370/02/12"
+        self.client_user.save(update_fields=["height_cm", "weight_kg", "gender", "birth_date_jalali"])
+
+        for measured_at_jalali, abdominal_mm in (("1403/01/10", 22), ("1403/02/05", 20)):
+            CaliperMeasurement.objects.create(
+                user=self.client_user,
+                measured_at_jalali=measured_at_jalali,
+                chest_mm=10,
+                triceps_mm=18,
+                subscapular_mm=14,
+                abdominal_mm=abdominal_mm,
+                suprailiac_mm=16,
+                thigh_mm=22,
+            )
+
+        series = ProfileAnalysisService().get_analysis_metric_series(
+            self.client_user,
+            body_fat_formula="jp4",
+        )
+
+        self.assertEqual(series["body_fat"]["labels"], ["1403/01/10", "1403/02/05"])
+        self.assertEqual(len(series["body_fat"]["values"]), 2)
+        self.assertEqual(series["lean_mass"]["labels"], ["1403/01/10", "1403/02/05"])
+        self.assertEqual(len(series["lean_mass"]["values"]), 2)
+
+    def test_analysis_date_range_filters_metric_and_dashboard_charts(self):
+        from account.models import BodyCircumferenceMeasurement, CaliperMeasurement
+        from account.services.profile_analysis_service import ProfileAnalysisService
+
+        self.client_user.height_cm = 180
+        self.client_user.weight_kg = 78
+        self.client_user.gender = "male"
+        self.client_user.birth_date_jalali = "1370/02/12"
+        self.client_user.save(update_fields=["height_cm", "weight_kg", "gender", "birth_date_jalali"])
+
+        for measured_at_jalali, weight in (("1403/01/10", 78), ("1403/02/05", 76)):
+            BodyCircumferenceMeasurement.objects.create(
+                user=self.client_user,
+                measured_at_jalali=measured_at_jalali,
+                height_cm=180,
+                weight_kg=weight,
+                chest_cm=100,
+            )
+            CaliperMeasurement.objects.create(
+                user=self.client_user,
+                measured_at_jalali=measured_at_jalali,
+                chest_mm=10,
+                triceps_mm=18,
+                subscapular_mm=14,
+                abdominal_mm=20,
+                suprailiac_mm=16,
+                thigh_mm=22,
+            )
+
+        service = ProfileAnalysisService()
+        dashboard = service.get_analysis_dashboard_data(
+            self.client_user,
+            start="1403/02/01",
+            end="1403/02/28",
+        )
+        metric_series = service.get_analysis_metric_series(
+            self.client_user,
+            start="1403/02/01",
+            end="1403/02/28",
+            body_fat_formula="jp4",
+        )
+
+        self.assertEqual(dashboard["analysis_trend_charts"]["weight"]["labels"], ["1403/02/05"])
+        self.assertEqual(dashboard["analysis_measurement_groups"]["chest-shoulder"]["labels"], ["1403/02/05"])
+        self.assertEqual(metric_series["body_fat"]["labels"], ["1403/02/05"])
+
+        self.client.force_login(self.admin)
+        response = self.client.get(
+            reverse("register:admin_user_analysis", args=[self.client_user.pk]),
+            {"start": "1403/02/01", "end": "1403/02/28"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="start"')
+        self.assertContains(response, 'value="1403/02/01" selected')
+        self.assertContains(response, 'value="1403/02/28" selected')
+
     def test_analysis_body_fat_formula_selection_updates_history_table(self):
         from account.models import BodyCircumferenceMeasurement, CaliperMeasurement
 

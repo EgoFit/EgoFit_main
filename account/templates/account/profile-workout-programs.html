@@ -106,14 +106,35 @@
                 <form method="post" action="{% url 'register:profile_workout_program_performance' program.pk %}" class="workout-performance-form">
                     {% csrf_token %}
                     <input type="hidden" name="day_id" value="{{ day.pk }}">
-                    <section class="workout-day">
-                        <div class="workout-day__heading">
-                            <div class="workout-day__title">
-                                <span class="account-eyebrow workout-day__eyebrow">{% trans 'جلسه تمرین' %} {{ forloop.counter }}</span>
-                                <h3>{{ day.name }}</h3>
+                    <details class="workout-day" {% if day.completed_count >= day.completion_weeks %}data-workout-day-complete{% endif %}>
+                        <summary class="workout-day__summary">
+                            <div class="workout-day__heading">
+                                <div class="workout-day__title">
+                                    <span class="account-eyebrow workout-day__eyebrow">{% trans 'جلسه تمرین' %} {{ forloop.counter }}</span>
+                                    <h3>{{ day.name }}</h3>
+                                </div>
+                                {% if day.notes %}<p>{{ day.notes }}</p>{% endif %}
                             </div>
-                            {% if day.notes %}<p>{{ day.notes }}</p>{% endif %}
-                        </div>
+                            <span class="workout-day__chevron" aria-hidden="true">⌄</span>
+                            <div class="workout-day-completions" aria-label="{% trans 'دفعات انجام برنامه' %}">
+                                <div class="workout-day-completions__heading">
+                                    <strong>{% trans 'دفعات انجام برنامه' %}</strong>
+                                    <span>
+                                        {{ day.completed_count }}/{{ day.completion_weeks }}
+                                        {% if day.completed_count >= day.completion_weeks %}{% trans 'تکمیل شد' %}{% endif %}
+                                    </span>
+                                </div>
+                                <div class="workout-day-completions__list">
+                                    {% for completion_number in day.completion_checks %}
+                                        <label for="workout-completion-{{ day.pk }}-{{ completion_number }}">
+                                            <input id="workout-completion-{{ day.pk }}-{{ completion_number }}" type="checkbox" disabled {% if completion_number <= day.completed_count %}checked{% endif %}>
+                                            <span>{% trans 'دفعه' %} {{ completion_number }}</span>
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </summary>
+                        <div class="workout-day__content">
                         <div class="workout-table-wrap">
                             <table class="workout-table">
                                 <thead>
@@ -186,7 +207,8 @@
                             <span aria-hidden="true">✓</span>
                             {% trans 'ذخیره رکوردها و بازخورد' %}
                         </button>
-                    </section>
+                        </div>
+                    </details>
                 </form>
                 {% endfor %}
 

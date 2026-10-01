@@ -92,6 +92,8 @@ class FrontendBackendIntegrationTests(TestCase):
                 "waist_cm": "82",
                 "abdomen_cm": "85",
                 "hips_cm": "98",
+                "training_experience_years": "5",
+                "training_sports": "بدنسازی و شنا",
                 "attachments": attachment,
             },
         )
@@ -101,6 +103,8 @@ class FrontendBackendIntegrationTests(TestCase):
         self.assertEqual(coach_request.sessions_per_week, "3")
         self.assertTrue(coach_request.wants_workout)
         self.assertEqual(coach_request.height_cm, 180)
+        self.assertEqual(coach_request.training_experience_years, 5)
+        self.assertEqual(coach_request.training_sports, "بدنسازی و شنا")
 
         saved_attachment = CoachRequestAttachment.objects.get(request=coach_request)
         self.assertIn("mobility-guide", saved_attachment.file.name)
@@ -124,6 +128,8 @@ class FrontendBackendIntegrationTests(TestCase):
             wants_workout=True,
             height_cm=180,
             pain_notes="زانو درد",
+            training_experience_years=5,
+            training_sports="بدنسازی و شنا",
         )
         self.client.force_login(admin)
 
@@ -132,6 +138,8 @@ class FrontendBackendIntegrationTests(TestCase):
         self.assertEqual(page.status_code, 200)
         self.assertContains(page, "اندازه‌های ارسال‌شده")
         self.assertContains(page, "زانو درد")
+        self.assertContains(page, "سوابق تمرینی")
+        self.assertContains(page, "بدنسازی و شنا")
         self.assertContains(page, "حذف پیام")
         self.assertContains(
             page,

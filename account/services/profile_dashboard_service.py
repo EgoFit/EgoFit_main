@@ -66,11 +66,20 @@ class ProfileDashboardService:
                 "title": _("🎉 تولدت مبارک، %(name)s!") % {"name": display_name},
                 "body": _("تیم ایگوفیت برات یک سال پر از پیشرفت آرزو می‌کند."),
             }
-        latest = list(recent_notifications[:1]) if recent_notifications is not None else list(
-            self.notification_service.get_dashboard_notifications(user, limit=1)
+        notifications = (
+            recent_notifications
+            if recent_notifications is not None
+            else self.notification_service.get_dashboard_notifications(user, limit=5)
         )
-        if latest:
-            notification = latest[0]
+        notification = next(
+            (
+                item
+                for item in notifications
+                if str(getattr(item, "message", "") or "").strip()
+            ),
+            None,
+        )
+        if notification:
             return {
                 "kind": "news",
                 "title": notification.title,
