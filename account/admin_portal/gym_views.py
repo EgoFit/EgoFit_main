@@ -5,6 +5,7 @@ import jdatetime
 
 from django.contrib import messages
 from django.core.exceptions import ValidationError
+from django.db.models.deletion import ProtectedError
 from django.http import HttpResponse
 from django.http import Http404
 from django.core.paginator import Paginator
@@ -16,6 +17,7 @@ from django.views.generic import TemplateView
 
 from account.admin_forms import (
     AutomaticProgrammingForm,
+    CardioExerciseForm,
     CorrectiveExerciseForm,
     ExerciseForm,
     LibrarySearchForm,
@@ -26,6 +28,7 @@ from account.admin_forms import (
 )
 from account.admin_portal.views import AdminPageMixin, AdminUserMixin
 from account.models import (
+    CardioExercise,
     CorrectiveExercise,
     Exercise,
     ExerciseAbnormalityType,
@@ -126,6 +129,66 @@ class GymLibraryView(AdminPageMixin, TemplateView):
         return context
 
 
+class CardioExerciseListView(AdminPageMixin, TemplateView):
+    template_name = "admin_portal/gym/cardio_exercise_list.html"
+    active_section = "library"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        query = (self.request.GET.get("query") or "").strip()
+        page = paginate_gym_queryset(
+            self.request,
+            gym_library_service.search_cardio_exercises(query).order_by("name", "pk"),
+        )
+        context.update(
+            {
+                "form": LibrarySearchForm(initial={"query": query}),
+                "search_query": query,
+                "cardio_exercises": page["page_obj"].object_list,
+            }
+        )
+        context.update(page)
+        return context
+
+
+class CardioExerciseFormView(AdminPageMixin, View):
+    template_name = "admin_portal/gym/cardio_exercise_form.html"
+    active_section = "library"
+
+    def get(self, request, pk=None):
+        instance = get_object_or_404(CardioExercise, pk=pk) if pk else None
+        return render(request, self.template_name, self._context(CardioExerciseForm(instance=instance), instance))
+
+    def post(self, request, pk=None):
+        instance = get_object_or_404(CardioExercise, pk=pk) if pk else None
+        form = CardioExerciseForm(request.POST, request.FILES, instance=instance)
+        if form.is_valid():
+            gym_library_service.save_cardio_exercise(form)
+            messages.success(request, _("حرکت هوازی ذخیره شد."))
+            return redirect("register:admin_cardio_exercise_list")
+        return render(request, self.template_name, self._context(form, instance))
+
+    def _context(self, form, instance):
+        return {
+            "form": form,
+            "cardio_exercise": instance,
+            "active_section": self.active_section,
+            "page_title": _("ویرایش حرکت هوازی") if instance else _("افزودن حرکت هوازی"),
+        }
+
+
+class CardioExerciseDeleteView(AdminPageMixin, View):
+    def post(self, request, pk):
+        exercise = get_object_or_404(CardioExercise, pk=pk)
+        try:
+            gym_library_service.delete_cardio_exercise(exercise)
+        except ProtectedError:
+            messages.error(request, _("این حرکت در یک برنامه استفاده شده و قابل حذف نیست."))
+        else:
+            messages.success(request, _("حرکت هوازی حذف شد."))
+        return redirect("register:admin_cardio_exercise_list")
+
+
 class AutomaticProgrammingView(AdminPageMixin, View):
     """Generate an editable program payload and optionally publish it to a user."""
 
@@ -153,28 +216,36 @@ class AutomaticProgrammingView(AdminPageMixin, View):
                 action == "generate"
                 and form.cleaned_data.get("applied_settings") != signature
             ):
-                try:
-                    targets, selected_ids = automatic_program_service.build_session_targets(
-                        program_type=form.cleaned_data.get("program_type") or WorkoutProgram.ProgramType.NORMAL,
-                        sessions=form.cleaned_data["sessions_per_week"],
-                        current_targets=form.cleaned_data.get("session_movement_targets_json") or [],
-                        selected_ids=[
-                            item.pk
-                            for item in form.cleaned_data.get("target_secondary_movement_types", [])
-                        ],
-                    )
-                except ValidationError as exc:
-                    form.add_error(None, exc)
+                if form.cleaned_data.get("goal") == "cardio":
+                    sessions = form.cleaned_data["sessions_per_week"]
+                    targets = [
+                        {"name": _("روز %(number)s") % {"number": index}}
+                        for index in range(1, sessions + 1)
+                    ]
+                    selected_ids = []
                 else:
-                    post_data.setlist(
-                        "session_movement_targets_json",
-                        [json.dumps(targets, ensure_ascii=False)],
-                    )
-                    post_data.setlist("target_secondary_movement_types", selected_ids)
-                    post_data["applied_settings"] = signature
-                    form = AutomaticProgrammingForm(post_data)
-                    form.is_valid()
-                    messages.info(request, _("چیدمان جلسه‌ها اعمال شد؛ در صورت نیاز آن را ویرایش و سپس برنامه را بسازید."))
+                    try:
+                        targets, selected_ids = automatic_program_service.build_session_targets(
+                            program_type=form.cleaned_data.get("program_type") or WorkoutProgram.ProgramType.NORMAL,
+                            sessions=form.cleaned_data["sessions_per_week"],
+                            current_targets=form.cleaned_data.get("session_movement_targets_json") or [],
+                            selected_ids=[
+                                item.pk
+                                for item in form.cleaned_data.get("target_secondary_movement_types", [])
+                            ],
+                        )
+                    except ValidationError as exc:
+                        form.add_error(None, exc)
+                        return render(request, self.template_name, self._context(form, preview))
+                post_data.setlist(
+                    "session_movement_targets_json",
+                    [json.dumps(targets, ensure_ascii=False)],
+                )
+                post_data.setlist("target_secondary_movement_types", selected_ids)
+                post_data["applied_settings"] = signature
+                form = AutomaticProgrammingForm(post_data)
+                form.is_valid()
+                messages.info(request, _("چیدمان جلسه‌ها اعمال شد؛ در صورت نیاز آن را ویرایش و سپس برنامه را بسازید."))
                 return render(request, self.template_name, self._context(form, preview))
 
             if action == "save":
@@ -301,6 +372,15 @@ class AutomaticProgrammingView(AdminPageMixin, View):
                     "secondary_movement_type",
                     "difficulty_level",
                 ).all()
+            ],
+            "cardio_catalog": [
+                {
+                    "id": item.pk,
+                    "name": item.name,
+                    "performance_type": item.performance_type,
+                    "performance_type_label": item.get_performance_type_display(),
+                }
+                for item in CardioExercise.objects.all()
             ],
             "body_part_catalog": [
                 {"id": item.pk, "name": item.name}
@@ -448,6 +528,15 @@ class AdminProgramFormView(AdminProgramMixin, View):
                 for exercise in Exercise.objects.select_related(
                     "primary_muscle", "body_part"
                 ).all()
+            ],
+            "cardio_catalog": [
+                {
+                    "id": exercise.pk,
+                    "name": exercise.name,
+                    "performance_type": exercise.performance_type,
+                    "performance_type_label": exercise.get_performance_type_display(),
+                }
+                for exercise in CardioExercise.objects.all()
             ],
             "body_part_catalog": [
                 {"id": item.pk, "name": item.name}

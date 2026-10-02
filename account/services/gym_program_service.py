@@ -11,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from account.utils import normalize_digits
 from account.services.notification_service import NotificationService
 from account.models import (
+    CardioExercise,
     CorrectiveExercise,
     Exercise,
     ExerciseGoal,
@@ -60,6 +61,7 @@ class GymProgramService:
                             "items",
                             queryset=WorkoutProgramExercise.objects.select_related(
                                 "exercise",
+                                "cardio_exercise",
                                 "superset_exercise",
                                 "third_exercise",
                             ),
@@ -86,8 +88,14 @@ class GymProgramService:
                     "notes": day.notes,
                     "items": [
                         {
-                            "exercise": item.exercise_id,
-                            "exercise_name": item.exercise.name,
+                            "exercise": (
+                                item.cardio_exercise_id
+                                if item.cardio_exercise_id
+                                else item.exercise_id
+                            ),
+                            "exercise_type": "cardio" if item.cardio_exercise_id else "strength",
+                            "body_part_filter": "cardio" if item.cardio_exercise_id else "",
+                            "exercise_name": item.movement.name,
                             "superset_exercise": item.superset_exercise_id,
                             "superset_exercise_name": (
                                 item.superset_exercise.name if item.superset_exercise_id else ""
@@ -142,10 +150,21 @@ class GymProgramService:
         self._validate_payload_shape(days_payload, correctives_payload)
 
         exercise_ids: set[int] = set()
+        cardio_exercise_ids: set[int] = set()
         corrective_ids: set[int] = set()
         for day in days_payload:
             for item in day.get("items", []):
-                exercise_ids.add(self._parse_id(item.get("exercise"), _("حرکت اصلی")))
+                exercise_type = str(item.get("exercise_type") or "strength").strip().lower()
+                if exercise_type == "cardio":
+                    if item.get("superset_exercise") not in (None, "", 0, "0") or item.get("third_exercise") not in (None, "", 0, "0"):
+                        raise ValidationError(_("حرکت هوازی را نمی‌توان در سوپرست یا حرکت سوم قرار داد."))
+                    cardio_exercise_ids.add(
+                        self._parse_id(item.get("exercise"), _("حرکت هوازی"))
+                    )
+                elif exercise_type == "strength":
+                    exercise_ids.add(self._parse_id(item.get("exercise"), _("حرکت اصلی")))
+                else:
+                    raise ValidationError(_("نوع حرکت برنامه معتبر نیست."))
                 if item.get("superset_exercise") not in (None, "", 0, "0"):
                     exercise_ids.add(self._parse_id(item.get("superset_exercise"), _("حرکت دوم سوپرست")))
                 if item.get("third_exercise") not in (None, "", 0, "0"):
@@ -159,6 +178,10 @@ class GymProgramService:
             exercise.pk: exercise
             for exercise in Exercise.objects.filter(pk__in=exercise_ids)
         }
+        cardio_exercises = {
+            exercise.pk: exercise
+            for exercise in CardioExercise.objects.filter(pk__in=cardio_exercise_ids)
+        }
         correctives = {
             corrective.pk: corrective
             for corrective in CorrectiveExercise.objects.filter(pk__in=corrective_ids)
@@ -167,6 +190,8 @@ class GymProgramService:
         missing_exercises = exercise_ids - exercises.keys()
         if missing_exercises:
             raise ValidationError(_("یکی از حرکت‌های انتخاب‌شده در کتابخانه وجود ندارد."))
+        if cardio_exercise_ids - cardio_exercises.keys():
+            raise ValidationError(_("یکی از حرکت‌های هوازی انتخاب‌شده در کتابخانه وجود ندارد."))
         missing_correctives = corrective_ids - correctives.keys()
         if missing_correctives:
             raise ValidationError(_("یکی از حرکت‌های اصلاحی انتخاب‌شده در کتابخانه وجود ندارد."))
@@ -194,7 +219,13 @@ class GymProgramService:
                 order=day_order,
             )
             for item_order, item_data in enumerate(day_data.get("items", []), start=1):
-                exercise_id = self._parse_id(item_data.get("exercise"), _("حرکت اصلی"))
+                exercise_type = str(item_data.get("exercise_type") or "strength").strip().lower()
+                exercise_id = None
+                cardio_exercise_id = None
+                if exercise_type == "cardio":
+                    cardio_exercise_id = self._parse_id(item_data.get("exercise"), _("حرکت هوازی"))
+                else:
+                    exercise_id = self._parse_id(item_data.get("exercise"), _("حرکت اصلی"))
                 superset_id = item_data.get("superset_exercise")
                 superset_id = (
                     self._parse_id(superset_id, _("حرکت دوم سوپرست"))
@@ -219,7 +250,12 @@ class GymProgramService:
                 self._validate_lookup_value(ExerciseRestType, "rest_time", item_data.get("rest"), goal)
                 WorkoutProgramExercise.objects.create(
                     day=day,
-                    exercise=exercises[exercise_id],
+                    exercise=exercises.get(exercise_id) if exercise_id else None,
+                    cardio_exercise=(
+                        cardio_exercises.get(cardio_exercise_id)
+                        if cardio_exercise_id
+                        else None
+                    ),
                     superset_exercise=exercises.get(superset_id) if superset_id else None,
                     third_exercise=exercises.get(third_id) if third_id else None,
                     goal=goal,
@@ -429,6 +465,8 @@ class GymProgramService:
             "fat_burning": ("fat_burning", "fat burn", "fat-burning", "چربی سوزی", "چربی‌سوزی"),
             "power": ("power", "توان", "توانی", "توان انفجاری", "explosive"),
             "general": ("general", "عمومی", "تناسب عمومی"),
+            "cardio": ("cardio", "aerobic", "هوازی"),
+            "aerobic": ("cardio", "aerobic", "هوازی"),
         }
         return set(aliases.get(key, (goal_obj.name_en, goal_obj.name))) | {
             goal_obj.name_en,

@@ -54,14 +54,12 @@
             </div>
         {% endif %}
 
-        <section class="admin-form-panel automatic-design-panel">
-            <div class="admin-program-section-head">
-                <div>
-                    <p class="automatic-section-eyebrow">{% trans 'مرحله اول' %}</p>
-                    <h2>{% trans 'پارامترهای طراحی برنامه' %}</h2>
-                    <p>{% trans 'ورودی‌ها را انتخاب کنید؛ سطح انتخاب‌شده و سطح‌های ساده‌تر برای پیشنهاد حرکت‌ها استفاده می‌شوند.' %}</p>
-                </div>
-            </div>
+        <details class="admin-form-panel automatic-design-panel" {% if form.errors %}open{% endif %}>
+            <summary class="automatic-design-panel__summary">
+                <span><small>{% trans 'مرحله اول' %}</small><strong>{% trans 'پارامترهای طراحی برنامه' %}</strong></span>
+                <span class="automatic-design-panel__chevron" aria-hidden="true">⌄</span>
+            </summary>
+            <div class="automatic-design-panel__body">
 
             <div class="admin-form-grid admin-form-grid--cols2">
                 {% for field in form %}
@@ -137,65 +135,72 @@
             </div>
             {{ form.applied_settings }}
             <button type="submit" name="action" value="apply" class="admin-secondary-btn automatic-apply-settings" data-busy-text="{% trans 'در حال اعمال…' %}">{% trans 'اعمال تغییرات' %}</button>
-        </section>
-
-        <section id="session-movement-targets" class="admin-form-panel automatic-session-targets">
-            <div class="automatic-session-targets__header">
-                <div class="automatic-session-targets__header-copy">
-                    <p class="automatic-section-eyebrow">{% trans 'مرحله دوم' %}</p>
-                    <h2>{% trans 'تقسیم هدف و تعداد حرکت‌ها در هر جلسه' %}</h2>
-                    <p>{% trans 'برای هر جلسه ردیف‌های مستقل بسازید. حرکت‌های توان اول قرار می‌گیرند، حرکات چندمفصلی هر بخش قبل از حرکات تک‌مفصلی همان بخش چیده می‌شوند، حرکت تکراری در برنامه پیشنهاد نمی‌شود و ست و تکرارها بر اساس هدف از دیتابیس به‌صورت متنوع انتخاب می‌شوند.' %}</p>
-                </div>
-                <button type="button" class="admin-secondary-btn admin-secondary-btn--small" data-session-copy>{% trans 'کپی جلسه اول برای همه' %}</button>
             </div>
+        </details>
 
-            <div class="automatic-target-library">
-                <label for="id_target_secondary_movement_types">{{ form.target_secondary_movement_types.label }}</label>
-                {{ form.target_secondary_movement_types }}
-                <small>{% trans 'این فهرست به‌صورت خودکار از بخش‌های انتخاب‌شده در جلسه‌ها ساخته می‌شود و برای کنترل سریع هدف‌های فعال استفاده می‌شود.' %}</small>
-                {{ form.target_secondary_movement_types.errors }}
-            </div>
+        <details id="session-movement-targets" class="admin-form-panel automatic-session-targets automatic-design-panel">
+            <summary class="automatic-design-panel__summary automatic-session-targets__summary">
+                <div class="automatic-session-targets__header">
+                    <div class="automatic-session-targets__header-copy">
+                        <p class="automatic-section-eyebrow">{% trans 'مرحله دوم' %}</p>
+                        <h2>{% trans 'تقسیم هدف و تعداد حرکت‌ها در هر جلسه' %}</h2>
+                    </div>
+                    <span class="automatic-design-panel__chevron" aria-hidden="true">⌄</span>
+                </div>
+            </summary>
 
-            <div id="session-movement-target-list" class="automatic-session-target-list"></div>
-            {{ form.session_movement_targets_json }}
-        </section>
+            <div class="automatic-design-panel__body automatic-session-targets__body">
+                <p class="automatic-session-targets__intro">{% trans 'برای هر جلسه ردیف‌های مستقل بسازید. حرکت‌های توان اول قرار می‌گیرند، حرکات چندمفصلی هر بخش قبل از حرکات تک‌مفصلی همان بخش چیده می‌شوند، حرکت تکراری در برنامه پیشنهاد نمی‌شود و ست و تکرارها بر اساس هدف از دیتابیس به‌صورت متنوع انتخاب می‌شوند.' %}</p>
+                <button type="button" class="admin-secondary-btn admin-secondary-btn--small automatic-session-targets__copy" data-session-copy>{% trans 'کپی جلسه اول برای همه' %}</button>
 
-        <section class="admin-form-panel automatic-program-meta">
-            <div class="admin-program-section-head">
-                <div>
-                    <p class="automatic-section-eyebrow">{% trans 'اطلاعات انتشار' %}</p>
-                    <h2>{% trans 'عنوان، زمان‌بندی و توضیحات' %}</h2>
-                    <p>{% trans 'این اطلاعات همراه برنامه ذخیره می‌شوند و در ویرایش و نمایش کاربر قابل استفاده هستند.' %}</p>
+                <div class="automatic-target-library">
+                    <label for="id_target_secondary_movement_types">{{ form.target_secondary_movement_types.label }}</label>
+                    {{ form.target_secondary_movement_types }}
+                    <small>{% trans 'این فهرست به‌صورت خودکار از بخش‌های انتخاب‌شده در جلسه‌ها ساخته می‌شود و برای کنترل سریع هدف‌های فعال استفاده می‌شود.' %}</small>
+                    {{ form.target_secondary_movement_types.errors }}
+                </div>
+
+                <p class="automatic-cardio-target-note" data-cardio-target-note hidden>{% trans 'برای هر جلسه یک حرکت از کتابخانه تمرینات هوازی انتخاب می‌شود؛ تنظیم ست، مدت و استراحت از هدف هوازی خوانده خواهد شد.' %}</p>
+                <div id="session-movement-target-list" class="automatic-session-target-list"></div>
+                {{ form.session_movement_targets_json }}
+            </div>
+        </details>
+
+        <details class="admin-form-panel automatic-program-meta automatic-design-panel">
+            <summary class="automatic-design-panel__summary">
+                <span><small>{% trans 'اطلاعات انتشار' %}</small><h2>{% trans 'عنوان، زمان‌بندی و توضیحات' %}</h2></span>
+                <span class="automatic-design-panel__chevron" aria-hidden="true">⌄</span>
+            </summary>
+            <div class="automatic-design-panel__body automatic-program-meta__body">
+                <div class="admin-form-grid admin-form-grid--cols2">
+                    <div class="field-group automatic-date-field">
+                        <label for="id_start_date">{% trans 'تاریخ شروع' %}</label>
+                        <input class="admin-input" type="date" name="start_date" id="id_start_date" value="{{ request.POST.start_date|default:default_start_date }}" required>
+                    </div>
+                    <div class="field-group automatic-date-field">
+                        <label for="id_end_date">{% trans 'تاریخ پایان' %}</label>
+                        <input class="admin-input" type="date" name="end_date" id="id_end_date" value="{{ request.POST.end_date }}">
+                        <small>{% trans 'اختیاری؛ نباید قبل از تاریخ شروع باشد.' %}</small>
+                    </div>
+                    <div class="field-group admin-form-grid__full">
+                        <label for="id_notes">{% trans 'یادداشت برنامه' %}</label>
+                        <textarea class="admin-input" name="notes" id="id_notes" rows="3" placeholder="{% trans 'توضیحات کلی برنامه' %}">{{ request.POST.notes }}</textarea>
+                    </div>
+                    <div class="field-group">
+                        <label for="id_supplements_note">{% trans 'مکمل و نکات تغذیه‌ای' %}</label>
+                        <textarea class="admin-input" name="supplements_note" id="id_supplements_note" rows="3" placeholder="{% trans 'اختیاری' %}">{{ request.POST.supplements_note }}</textarea>
+                    </div>
+                    <div class="field-group">
+                        <label for="id_warmup_notes">{% trans 'توضیحات گرم کردن' %}</label>
+                        <textarea class="admin-input" name="warmup_notes" id="id_warmup_notes" rows="3" placeholder="{% trans 'اختیاری' %}">{{ request.POST.warmup_notes }}</textarea>
+                    </div>
+                    <div class="field-group">
+                        <label for="id_cooldown_notes">{% trans 'توضیحات سرد کردن' %}</label>
+                        <textarea class="admin-input" name="cooldown_notes" id="id_cooldown_notes" rows="3" placeholder="{% trans 'اختیاری' %}">{{ request.POST.cooldown_notes }}</textarea>
+                    </div>
                 </div>
             </div>
-            <div class="admin-form-grid admin-form-grid--cols2">
-                <div class="field-group automatic-date-field">
-                    <label for="id_start_date">{% trans 'تاریخ شروع' %}</label>
-                    <input class="admin-input" type="date" name="start_date" id="id_start_date" value="{{ request.POST.start_date|default:default_start_date }}" required>
-                </div>
-                <div class="field-group automatic-date-field">
-                    <label for="id_end_date">{% trans 'تاریخ پایان' %}</label>
-                    <input class="admin-input" type="date" name="end_date" id="id_end_date" value="{{ request.POST.end_date }}">
-                    <small>{% trans 'اختیاری؛ نباید قبل از تاریخ شروع باشد.' %}</small>
-                </div>
-                <div class="field-group admin-form-grid__full">
-                    <label for="id_notes">{% trans 'یادداشت برنامه' %}</label>
-                    <textarea class="admin-input" name="notes" id="id_notes" rows="3" placeholder="{% trans 'توضیحات کلی برنامه' %}">{{ request.POST.notes }}</textarea>
-                </div>
-                <div class="field-group">
-                    <label for="id_supplements_note">{% trans 'مکمل و نکات تغذیه‌ای' %}</label>
-                    <textarea class="admin-input" name="supplements_note" id="id_supplements_note" rows="3" placeholder="{% trans 'اختیاری' %}">{{ request.POST.supplements_note }}</textarea>
-                </div>
-                <div class="field-group">
-                    <label for="id_warmup_notes">{% trans 'توضیحات گرم کردن' %}</label>
-                    <textarea class="admin-input" name="warmup_notes" id="id_warmup_notes" rows="3" placeholder="{% trans 'اختیاری' %}">{{ request.POST.warmup_notes }}</textarea>
-                </div>
-                <div class="field-group">
-                    <label for="id_cooldown_notes">{% trans 'توضیحات سرد کردن' %}</label>
-                    <textarea class="admin-input" name="cooldown_notes" id="id_cooldown_notes" rows="3" placeholder="{% trans 'اختیاری' %}">{{ request.POST.cooldown_notes }}</textarea>
-                </div>
-            </div>
-        </section>
+        </details>
 
         {% if preview.days %}
             <section class="admin-form-panel automatic-preview-panel">
@@ -266,6 +271,7 @@
 
 {{ preview|json_script:"automatic-preview" }}
 {{ exercise_catalog|json_script:"automatic-exercises" }}
+{{ cardio_catalog|json_script:"automatic-cardio-exercises" }}
 {{ body_part_catalog|json_script:"automatic-body-parts" }}
 {{ corrective_catalog|json_script:"automatic-corrective-catalog" }}
 {{ athlete_catalog|json_script:"automatic-athletes" }}
@@ -279,11 +285,13 @@
 
     const previewNode = document.getElementById("automatic-preview");
     const exerciseNode = document.getElementById("automatic-exercises");
+    const cardioExerciseNode = document.getElementById("automatic-cardio-exercises");
     const bodyPartNode = document.getElementById("automatic-body-parts");
     const correctiveNode = document.getElementById("automatic-corrective-catalog");
     const athleteNode = document.getElementById("automatic-athletes");
     const preview = parseJson(previewNode ? previewNode.textContent : "", {days: [], correctives: []});
     const exercises = parseJson(exerciseNode ? exerciseNode.textContent : "", []);
+    const cardioExercises = parseJson(cardioExerciseNode ? cardioExerciseNode.textContent : "", []);
     const bodyParts = parseJson(bodyPartNode ? bodyPartNode.textContent : "", []);
     const correctiveCatalog = parseJson(correctiveNode ? correctiveNode.textContent : "", []);
     const athleteCatalog = parseJson(athleteNode ? athleteNode.textContent : "", []);
@@ -292,6 +300,9 @@
     const sessionTargetsList = document.getElementById("session-movement-target-list");
     const sessionTargetsInput = document.getElementById("id_session_movement_targets_json");
     const sessionsInput = document.getElementById("id_sessions_per_week");
+    const goalInput = document.getElementById("id_goal");
+    const targetLibrary = document.querySelector(".automatic-target-library");
+    const cardioTargetNote = document.querySelector("[data-cardio-target-note]");
     const athleteSearch = document.getElementById("automatic-athlete-search");
     const athleteSelect = document.getElementById("id_user");
     const titleInput = document.getElementById("id_title");
@@ -345,6 +356,7 @@
         thirdSettings: "{% trans 'تنظیمات حرکت سوم' %}",
         bodyPartFilter: "{% trans 'فیلتر بخش بدن' %}",
         allBodyParts: "{% trans 'همه بخش‌های بدن' %}",
+        cardio: "{% trans 'هوازی' %}",
         collapseItem: "{% trans 'جمع کردن تنظیمات حرکت' %}",
         expandItem: "{% trans 'باز کردن تنظیمات حرکت' %}",
         corrective: "{% trans 'حرکت اصلاحی' %}",
@@ -664,19 +676,24 @@
         collectSessionTargets();
     }
 
-    function exerciseById(value) {
+    function exerciseById(value, bodyPartFilter) {
         const wanted = stringId(value);
-        return exercises.find(function (item) { return stringId(item.id) === wanted; }) || null;
+        const catalog = bodyPartFilter === "cardio" ? cardioExercises : exercises;
+        return catalog.find(function (item) { return stringId(item.id) === wanted; }) || null;
     }
 
     function exerciseLabel(item) {
         if (!item) return "";
+        if (item.performance_type_label) return [item.name, item.performance_type_label].filter(Boolean).join(" — ");
         return [item.name, item.body_part, item.secondary_movement_type, item.difficulty_level].filter(Boolean).join(" — ");
     }
 
-    function bodyPartOptionMarkup(selected) {
+    function bodyPartOptionMarkup(selected, allowCardio) {
         const selectedId = stringId(selected);
-        return '<option value="">' + esc(text.allBodyParts) + '</option>' + bodyParts.map(function (item) {
+        const cardioOption = allowCardio
+            ? '<option value="cardio"' + (selectedId === "cardio" ? ' selected' : '') + '>' + esc(text.cardio) + '</option>'
+            : '';
+        return '<option value="">' + esc(text.allBodyParts) + '</option>' + cardioOption + bodyParts.map(function (item) {
             const itemId = stringId(item.id);
             return '<option value="' + esc(itemId) + '"' + (itemId === selectedId ? ' selected' : '') + '>' + esc(item.name) + '</option>';
         }).join("");
@@ -687,10 +704,13 @@
         let html = allowEmpty
             ? '<option value="">' + esc(emptyLabel || "") + '</option>'
             : '<option value="">' + esc(text.selectExercise) + '</option>';
-        const selectedItem = exerciseById(selectedId);
-        exercises.filter(function (item) {
-            return !bodyPartFilter || stringId(item.body_part_id) === stringId(bodyPartFilter);
-        }).forEach(function (item) {
+        const selectedItem = exerciseById(selectedId, bodyPartFilter);
+        const catalog = bodyPartFilter === "cardio"
+            ? cardioExercises
+            : exercises.filter(function (item) {
+                return !bodyPartFilter || stringId(item.body_part_id) === stringId(bodyPartFilter);
+            });
+        catalog.forEach(function (item) {
             const itemId = stringId(item.id);
             html += '<option value="' + esc(itemId) + '"' + (itemId === selectedId ? ' selected' : '') + '>' + esc(exerciseLabel(item)) + '</option>';
         });
@@ -711,9 +731,12 @@
         let html = allowEmpty
             ? '<option value="">' + esc(emptyLabel) + '</option>'
             : '<option value="">' + esc(text.selectExercise) + '</option>';
-        exercises.filter(function (item) {
-            return !bodyPartFilter || stringId(item.body_part_id) === stringId(bodyPartFilter);
-        }).forEach(function (item) {
+        const catalog = bodyPartFilter === "cardio"
+            ? cardioExercises
+            : exercises.filter(function (item) {
+                return !bodyPartFilter || stringId(item.body_part_id) === stringId(bodyPartFilter);
+            });
+        catalog.forEach(function (item) {
             html += '<option value="' + esc(item.id) + '">' + esc(exerciseLabel(item)) + '</option>';
         });
         select.innerHTML = html;
@@ -724,10 +747,11 @@
     function exerciseSelectMarkup(selected, allowEmpty, emptyLabel, role, bodyPartFilter) {
         const filterKey = role + "_body_part_filter";
         return '<div class="automatic-exercise-picker" data-exercise-picker>' +
-            '<label><span>' + esc(text.bodyPartFilter) + '</span><select class="admin-input" data-exercise-body-part-filter data-key="' + esc(filterKey) + '">' + bodyPartOptionMarkup(bodyPartFilter) + '</select></label>' +
+            '<label><span>' + esc(text.bodyPartFilter) + '</span><select class="admin-input" data-exercise-body-part-filter data-key="' + esc(filterKey) + '">' + bodyPartOptionMarkup(bodyPartFilter, role === "exercise") + '</select></label>' +
             '<select class="admin-input" data-exercise-select data-key="' + esc(role || "exercise") + '" data-loaded="false" data-allow-empty="' + (allowEmpty ? "true" : "false") + '" data-empty-label="' + esc(emptyLabel || "") + '"' + (!allowEmpty ? " required" : "") + '>' +
                 exerciseOptionMarkup(selected, allowEmpty, emptyLabel, bodyPartFilter) +
             '</select>' +
+            (role === "exercise" ? '<input type="hidden" data-key="exercise_type" value="' + (bodyPartFilter === "cardio" ? "cardio" : "strength") + '">' : '') +
         '</div>';
     }
 
@@ -782,7 +806,7 @@
                             const itemBodyId = "automatic-item-body-" + dayIndex + "-" + itemIndex;
                             const secondBodyId = "automatic-item-second-" + dayIndex + "-" + itemIndex;
                             const thirdBodyId = "automatic-item-third-" + dayIndex + "-" + itemIndex;
-                            return '<div class="admin-program-item automatic-program-item" data-item="' + itemIndex + '">' +
+                            return '<div class="admin-program-item automatic-program-item' + (item.exercise_type === "cardio" ? " automatic-program-item--cardio" : "") + '" data-item="' + itemIndex + '">' +
                                 '<div class="admin-program-item__top">' +
                                     '<button type="button" class="automatic-program-item__toggle" data-item-toggle aria-expanded="true" aria-controls="' + itemBodyId + '"><span class="automatic-program-item__identity"><strong>' + esc(text.movement) + ' ' + (itemIndex + 1) + '</strong><small>' + esc(text.collapseItem) + '</small></span><span class="automatic-program-item__toggle-icon" aria-hidden="true">⌄</span></button>' +
                                     '<button type="button" class="admin-secondary-btn admin-secondary-btn--small automatic-program-item__remove" data-item-remove>' + esc(text.remove) + '</button>' +
@@ -880,6 +904,10 @@
     function updateDesignSummary() {
         const summaryNode = document.querySelector("[data-design-summary]");
         if (!summaryNode) return;
+        if (goalInput && goalInput.value === "cardio") {
+            summaryNode.textContent = sessionCount() + " " + text.sessions + " • " + text.cardio;
+            return;
+        }
         const targetData = sessionTargetData();
         const selectedSections = new Set();
         let plannedMovements = 0;
@@ -890,6 +918,15 @@
             });
         });
         summaryNode.textContent = sessionCount() + " " + text.sessions + " • " + selectedSections.size + " " + text.sections + " • " + plannedMovements + " " + text.movements;
+    }
+
+    function syncCardioGoalMode() {
+        const isCardio = Boolean(goalInput && goalInput.value === "cardio");
+        if (targetLibrary) targetLibrary.hidden = isCardio;
+        if (sessionTargetsList) sessionTargetsList.hidden = isCardio;
+        if (sessionCopyButton) sessionCopyButton.hidden = isCardio;
+        if (cardioTargetNote) cardioTargetNote.hidden = !isCardio;
+        updateDesignSummary();
     }
 
     function setDayCollapsed(day, collapsed) {
@@ -952,7 +989,7 @@
             return false;
         }
 
-        if (movementTypeCatalog && !movementTypeCatalog.selectedOptions.length) {
+        if ((!goalInput || goalInput.value !== "cardio") && movementTypeCatalog && !movementTypeCatalog.selectedOptions.length) {
             setFormStatus(text.invalidTargets);
             movementTypeCatalog.classList.add("is-invalid");
             movementTypeCatalog.setAttribute("aria-invalid", "true");
@@ -1183,18 +1220,30 @@
             if (event.target.matches("[data-exercise-body-part-filter]")) {
                 const picker = event.target.closest("[data-exercise-picker]");
                 const select = picker && picker.querySelector("[data-exercise-select]");
-                const selected = select && exerciseById(select.value);
-                if (selected && event.target.value && stringId(selected.body_part_id) !== stringId(event.target.value)) {
-                    select.value = "";
-                }
                 if (select) {
+                    select.value = "";
                     select.dataset.loaded = "false";
                     hydrateExerciseSelect(select);
+                }
+                const itemElement = event.target.closest(".automatic-program-item");
+                if (itemElement && event.target.dataset.key === "exercise_body_part_filter") {
+                    const isCardio = event.target.value === "cardio";
+                    const typeInput = itemElement.querySelector('[data-key="exercise_type"]');
+                    if (typeInput) typeInput.value = isCardio ? "cardio" : "strength";
+                    itemElement.classList.toggle("automatic-program-item--cardio", isCardio);
+                    if (isCardio) {
+                        itemElement.querySelectorAll('[data-key^="superset"], [data-key^="third"]').forEach(function (element) {
+                            element.value = "";
+                        });
+                    }
                 }
                 collectPreview();
                 return;
             }
-            if (event.target.matches("[data-exercise-select]")) hydrateExerciseSelect(event.target);
+            if (event.target.matches("[data-exercise-select]")) {
+                hydrateExerciseSelect(event.target);
+                collectPreview();
+            }
             if (event.target.matches("[data-day-name]")) collectPreview();
             updatePreviewSummary();
         });
@@ -1332,7 +1381,9 @@
         });
     }
 
+    if (goalInput) goalInput.addEventListener("change", syncCardioGoalMode);
     renderSessionTargets();
+    syncCardioGoalMode();
     renderPreview();
     renderCorrectives();
 })();

@@ -5,7 +5,7 @@ import os
 from django.contrib import messages
 from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.views import PasswordChangeView
-from django.http import FileResponse
+from django.http import FileResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -106,7 +106,10 @@ class Register(View):
                 return render(request, self.template_name, {"form": form})
 
             messages.success(request, _("کد تایید برای شما ارسال شد."))
-            return redirect(f"{reverse('register:verification')}?token={token}")
+            verification_url = f"{reverse('register:verification')}?token={token}"
+            if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                return JsonResponse({"verification_url": verification_url})
+            return redirect(verification_url)
 
         return render(request, self.template_name, {"form": form})
 

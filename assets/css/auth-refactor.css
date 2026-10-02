@@ -104,6 +104,71 @@
     outline-offset: 2px;
 }
 
+.auth-password-control {
+    position: relative;
+}
+
+.auth-mobile-screen .auth-password-control input {
+    width: 100%;
+    padding-inline-end: 6.25rem;
+}
+
+.auth-password-toggle {
+    position: absolute;
+    inset-inline-end: 8px;
+    top: 50%;
+    z-index: 1;
+    display: inline-flex;
+    min-width: 82px;
+    min-height: 40px;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 0 9px;
+    transform: translateY(-50%);
+    border: 0;
+    border-radius: 12px;
+    background: rgba(52, 84, 209, 0.07);
+    color: #3454d1;
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.auth-password-toggle:hover {
+    background: rgba(52, 84, 209, 0.13);
+}
+
+.auth-password-toggle:focus-visible {
+    outline: 3px solid rgba(52, 84, 209, 0.28);
+    outline-offset: 1px;
+}
+
+.auth-password-toggle__icon {
+    width: 19px;
+    height: 19px;
+    flex: 0 0 auto;
+}
+
+.auth-password-toggle__icon--hide,
+.auth-password-toggle[aria-pressed="true"] .auth-password-toggle__icon--show {
+    display: none;
+}
+
+.auth-password-toggle[aria-pressed="true"] .auth-password-toggle__icon--hide {
+    display: block;
+}
+
+.dark .auth-password-toggle {
+    color: #a5b4fc;
+}
+
+.dark .auth-password-toggle:hover {
+    background: rgba(165, 180, 252, 0.12);
+}
+
 .auth-mobile-primary {
     transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
 }

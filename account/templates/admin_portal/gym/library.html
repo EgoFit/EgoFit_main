@@ -19,6 +19,10 @@
             <strong>{{ exercise_count }}</strong>
         </article>
         <article>
+            <span>{% trans 'تمرینات هوازی' %}</span>
+            <strong>{{ cardio_exercise_count }}</strong>
+        </article>
+        <article>
             <span>{% trans 'حرکات اصلاحی' %}</span>
             <strong>{{ corrective_count }}</strong>
         </article>
@@ -35,6 +39,10 @@
         </a>
         <a href="{% url 'register:admin_exercise_list' %}" class="admin-menu-item">
             <span>{% trans 'کتابخانه حرکات تمرینی' %}</span>
+            <span aria-hidden="true">‹</span>
+        </a>
+        <a href="{% url 'register:admin_cardio_exercise_list' %}" class="admin-menu-item">
+            <span>{% trans 'تمرینات هوازی' %}</span>
             <span aria-hidden="true">‹</span>
         </a>
         <a href="{% url 'register:admin_corrective_list' %}" class="admin-menu-item">

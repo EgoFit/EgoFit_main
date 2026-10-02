@@ -30,6 +30,8 @@
         </div>
     </article>
 
+    {% include 'admin_portal/_cardio_training.html' %}
+
     <section class="admin-menu-list">
         <a href="{% url 'register:admin_personal_info' target_user.id %}" class="admin-menu-item">
             <span>{% trans 'ثبت اطلاعات شخصی' %}</span>

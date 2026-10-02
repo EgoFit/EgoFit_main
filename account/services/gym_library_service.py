@@ -3,7 +3,7 @@ from __future__ import annotations
 from django.db.models import ProtectedError, Q
 from django.utils.translation import gettext_lazy as _
 
-from account.models import CorrectiveExercise, Exercise, Muscle
+from account.models import CardioExercise, CorrectiveExercise, Exercise, Muscle
 
 EXERCISE_LOOKUP_SELECT_RELATED = (
     "primary_muscle",
@@ -22,6 +22,7 @@ class GymLibraryService:
         return {
             "muscle_count": Muscle.objects.count(),
             "exercise_count": Exercise.objects.count(),
+            "cardio_exercise_count": CardioExercise.objects.count(),
             "corrective_count": CorrectiveExercise.objects.count(),
         }
 
@@ -43,6 +44,12 @@ class GymLibraryService:
             queryset = queryset.filter(name__icontains=query)
         return queryset
 
+    def search_cardio_exercises(self, query: str):
+        queryset = CardioExercise.objects.all()
+        if query:
+            queryset = queryset.filter(Q(name__icontains=query) | Q(name_en__icontains=query))
+        return queryset
+
     def save_muscle(self, form) -> Muscle:
         return form.save()
 
@@ -50,6 +57,9 @@ class GymLibraryService:
         return form.save()
 
     def save_corrective(self, form) -> CorrectiveExercise:
+        return form.save()
+
+    def save_cardio_exercise(self, form) -> CardioExercise:
         return form.save()
 
     def delete_muscle(self, muscle: Muscle) -> None:
@@ -60,6 +70,9 @@ class GymLibraryService:
 
     def delete_corrective(self, corrective: CorrectiveExercise) -> None:
         corrective.delete()
+
+    def delete_cardio_exercise(self, exercise: CardioExercise) -> None:
+        exercise.delete()
 
     def list_lookup(self, model):
         return model.objects.all()

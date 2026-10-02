@@ -152,25 +152,33 @@
                                         <tr>
                                             <td>
                                                 {% if row.label %}<span class="workout-superset-label">{{ row.label }}</span>{% endif %}
-                                                <a href="{% url 'register:profile_workout_movement' 'exercise' row.exercise.pk %}?program={{ program.pk }}" class="workout-movement-link">{{ row.exercise.name }}</a>
+                                                {% if row.is_cardio %}
+                                                    <span class="workout-movement-link">{{ row.exercise.name }}</span>
+                                                {% else %}
+                                                    <a href="{% url 'register:profile_workout_movement' 'exercise' row.exercise.pk %}?program={{ program.pk }}" class="workout-movement-link">{{ row.exercise.name }}</a>
+                                                {% endif %}
                                             </td>
                                             <td>{{ row.sets }}</td>
                                             <td>{{ row.reps }}</td>
                                             <td>{{ row.rest|default:"—" }}</td>
                                             <td>{{ row.item.note|default:"—" }}</td>
                                             <td>
-                                                <label class="workout-record-input">
-                                                    <span class="sr-only">{% trans 'بهترین رکورد' %} {{ row.exercise.name }}</span>
-                                                    <input
-                                                        type="number"
-                                                        name="{{ row.input_name }}"
-                                                        value="{{ row.record.value|default_if_none:'' }}"
-                                                        min="0"
-                                                        step="0.01"
-                                                        inputmode="decimal"
-                                                        placeholder="{% trans 'ثبت نشده' %}"
-                                                    >
-                                                </label>
+                                                {% if row.is_cardio %}
+                                                    <span aria-label="{% trans 'برای حرکت هوازی ثبت رکورد وزنه ندارد' %}">—</span>
+                                                {% else %}
+                                                    <label class="workout-record-input">
+                                                        <span class="sr-only">{% trans 'بهترین رکورد' %} {{ row.exercise.name }}</span>
+                                                        <input
+                                                            type="number"
+                                                            name="{{ row.input_name }}"
+                                                            value="{{ row.record.value|default_if_none:'' }}"
+                                                            min="0"
+                                                            step="0.01"
+                                                            inputmode="decimal"
+                                                            placeholder="{% trans 'ثبت نشده' %}"
+                                                        >
+                                                    </label>
+                                                {% endif %}
                                             </td>
                                         </tr>
                                     {% endfor %}

@@ -57,7 +57,7 @@
 
         <form method="post" class="stack-form auth-mobile-form__stack" novalidate>
             {% csrf_token %}
-            <div class="field-group">
+            <div class="field-group" data-otp-autofill>
                 {% trans 'کد تایید' as default_code_label %}
                 <label for="id_code">{{ form.code.label|default:default_code_label }}</label>
                 {{ form.code }}

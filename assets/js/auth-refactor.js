@@ -1,12 +1,208 @@
-document.addEventListener("DOMContentLoaded", function () {
+function initAuthPage() {
     if (!document.body.classList.contains("auth-page")) {
         return;
     }
 
     initAuthFormLoadingStates();
     initOtpTimers();
+    initPasswordVisibilityToggles();
+    initRegisterOtpFlow();
+    initOtpAutofill();
     resetAllAuthLoadingStates();
-});
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initAuthPage, { once: true });
+} else {
+    initAuthPage();
+}
+
+function initPasswordVisibilityToggles() {
+    document.querySelectorAll("[data-password-toggle]").forEach(function (toggle) {
+        if (toggle.dataset.passwordToggleInitialized === "true") {
+            return;
+        }
+
+        const inputId = toggle.dataset.target || toggle.getAttribute("aria-controls");
+        const input = (inputId && document.getElementById(inputId)) ||
+            (toggle.closest(".auth-password-control") && toggle.closest(".auth-password-control").querySelector("input"));
+        const label = toggle.querySelector("[data-password-toggle-label]");
+
+        if (!input) {
+            toggle.hidden = true;
+            return;
+        }
+
+        toggle.dataset.passwordToggleInitialized = "true";
+        toggle.addEventListener("click", function () {
+            const shouldShow = input.type === "password";
+            input.type = shouldShow ? "text" : "password";
+            toggle.setAttribute("aria-pressed", String(shouldShow));
+            toggle.setAttribute("aria-label", shouldShow ? toggle.dataset.hideLabel : toggle.dataset.showLabel);
+            input.focus({ preventScroll: true });
+
+            if (label) {
+                label.textContent = shouldShow ? toggle.dataset.hideText : toggle.dataset.showText;
+            }
+        });
+    });
+}
+
+function initOtpAutofill() {
+    const container = document.querySelector("[data-otp-autofill]");
+    const input = container && container.querySelector("#id_code[autocomplete='one-time-code']");
+    const form = input && input.closest("form");
+
+    if (!input || !form || !("OTPCredential" in window) || !navigator.credentials || !navigator.credentials.get) {
+        return;
+    }
+
+    const controller = new AbortController();
+    const stopListening = function () {
+        controller.abort();
+    };
+
+    input.addEventListener("input", stopListening, { once: true });
+    form.addEventListener("submit", stopListening, { once: true });
+
+    navigator.credentials.get({
+        otp: { transport: ["sms"] },
+        signal: controller.signal
+    }).then(function (credential) {
+        if (!credential || !credential.code || input.value) {
+            return;
+        }
+
+        input.value = credential.code;
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+    }).catch(function () {
+        // Unsupported SMS formats, denied permission, and canceled requests use manual entry.
+    });
+}
+
+function supportsWebOtp() {
+    return "OTPCredential" in window && navigator.credentials && navigator.credentials.get && window.AbortController;
+}
+
+function initRegisterOtpFlow() {
+    const form = document.querySelector("[data-otp-request-form]");
+
+    if (!form || !supportsWebOtp()) {
+        return;
+    }
+
+    form.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const controller = new AbortController();
+        let receivedCode = "";
+        navigator.credentials.get({
+            otp: { transport: ["sms"] },
+            signal: controller.signal
+        }).then(function (credential) {
+            if (!credential || !credential.code) {
+                return;
+            }
+
+            receivedCode = credential.code;
+            fillVerificationCode(receivedCode);
+        }).catch(function () {
+            // Unsupported SMS formats, denied permission, and canceled requests use manual entry.
+        });
+
+        const submitButton = form.querySelector('[type="submit"]');
+        fetch(form.action || window.location.href, {
+            method: "POST",
+            body: new FormData(form),
+            headers: { "X-Requested-With": "XMLHttpRequest" },
+            credentials: "same-origin"
+        }).then(async function (response) {
+            const contentType = response.headers.get("content-type") || "";
+
+            if (contentType.includes("application/json")) {
+                const result = await response.json();
+                const verificationResponse = await fetch(result.verification_url, {
+                    credentials: "same-origin"
+                });
+                const verificationHtml = await verificationResponse.text();
+                resetAuthSubmitButton(submitButton);
+
+                if (!verificationResponse.ok || !replaceAuthScreen(verificationHtml, result.verification_url)) {
+                    window.location.assign(result.verification_url);
+                    return;
+                }
+
+                connectVerificationInputToAbort(controller);
+                if (receivedCode) {
+                    fillVerificationCode(receivedCode);
+                }
+                initAuthFormLoadingStates();
+                initOtpTimers();
+                return;
+            }
+
+            const errorHtml = await response.text();
+            controller.abort();
+            resetAuthSubmitButton(submitButton);
+            if (replaceAuthScreen(errorHtml)) {
+                initAuthFormLoadingStates();
+                initOtpTimers();
+                initPasswordVisibilityToggles();
+                initRegisterOtpFlow();
+            }
+        }).catch(function () {
+            controller.abort();
+            resetAuthSubmitButton(submitButton);
+            window.location.reload();
+        });
+
+    });
+}
+
+function replaceAuthScreen(html, nextUrl) {
+    const nextDocument = new DOMParser().parseFromString(html, "text/html");
+    const nextScreen = nextDocument.querySelector(".auth-mobile-screen");
+    const frame = document.querySelector(".auth-mobile-frame");
+
+    if (!nextScreen || !frame) {
+        return false;
+    }
+
+    frame.replaceChildren(nextScreen);
+    if (nextDocument.title) {
+        document.title = nextDocument.title;
+    }
+    if (nextUrl) {
+        window.history.replaceState(null, "", nextUrl);
+    }
+    return true;
+}
+
+function fillVerificationCode(code) {
+    const input = document.querySelector("[data-otp-autofill] #id_code[autocomplete='one-time-code']");
+    if (!input || input.value) {
+        return;
+    }
+
+    input.value = code;
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
+function connectVerificationInputToAbort(controller) {
+    const input = document.querySelector("[data-otp-autofill] #id_code");
+    const form = input && input.closest("form");
+
+    if (!input || !form) {
+        return;
+    }
+
+    input.addEventListener("input", function () {
+        controller.abort();
+    }, { once: true });
+    form.addEventListener("submit", function () {
+        controller.abort();
+    }, { once: true });
+}
 
 function resetAuthSubmitButton(submitButton) {
     if (!submitButton) {
@@ -27,6 +223,11 @@ function resetAllAuthLoadingStates() {
 
 function initAuthFormLoadingStates() {
     document.querySelectorAll(".auth-mobile-form form, .auth-mobile-screen form").forEach(function (form) {
+        if (form.dataset.authLoadingInitialized === "true") {
+            return;
+        }
+        form.dataset.authLoadingInitialized = "true";
+
         const submitButton = form.querySelector('[type="submit"]');
 
         form.addEventListener("submit", function () {
@@ -53,9 +254,10 @@ function initAuthFormLoadingStates() {
         }, true);
     });
 
-    window.addEventListener("pageshow", function () {
-        resetAllAuthLoadingStates();
-    });
+    if (!window.authFormLoadingPageshowBound) {
+        window.authFormLoadingPageshowBound = true;
+        window.addEventListener("pageshow", resetAllAuthLoadingStates);
+    }
 }
 
 function formatCountdown(totalSeconds) {

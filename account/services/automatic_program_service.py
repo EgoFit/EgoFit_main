@@ -13,6 +13,7 @@ from account.domain.workout_prescriptions import (
     parse_set_prescription,
 )
 from account.models import (
+    CardioExercise,
     CorrectiveExercise,
     Exercise,
     ExerciseDifficultyLevel,
@@ -68,6 +69,8 @@ class AutomaticProgramService:
         "fat_burning": ("fat_burning", "fat burn", "fat-burning", "چربی سوزی", "چربی‌سوزی"),
         "power": ("power", "توان"),
         "general": ("general", "عمومی", "تناسب عمومی"),
+        "cardio": ("cardio", "aerobic", "هوازی"),
+        "aerobic": ("cardio", "aerobic", "هوازی"),
     }
     POWER_TYPE_ALIASES = ("power", "توان", "توانی", "explosive")
     COMPOUND_JOINT_ALIASES = (
@@ -328,6 +331,9 @@ class AutomaticProgramService:
         ``session_movement_targets`` retain both legacy and row-based input
         shapes for compatibility with saved editor payloads.
         """
+        if self._is_cardio_goal(goal):
+            return self._generate_cardio(sessions=sessions, goal="cardio")
+
         selected_ids = self._selected_movement_type_ids(
             secondary_movement_counts,
             session_movement_targets,
@@ -612,6 +618,62 @@ class AutomaticProgramService:
                 % {"goal": goal, "method": method_label}
             )
         return catalogs
+
+    @classmethod
+    def _is_cardio_goal(cls, goal: str) -> bool:
+        normalized = " ".join(str(goal or "").casefold().replace("_", " ").split())
+        return normalized in {alias.casefold() for alias in cls.GOAL_ALIASES["cardio"]}
+
+    @classmethod
+    def _generate_cardio(cls, *, sessions: int, goal: str) -> dict[str, list[dict[str, Any]]]:
+        cardio_exercises = list(CardioExercise.objects.all())
+        if not cardio_exercises:
+            raise ValidationError(_("برای ساخت برنامه، ابتدا تمرین هوازی به کتابخانه اضافه کنید."))
+
+        prescriptions = cls._prescription_catalogs(goal, ExerciseTrainingMethod.NORMAL)
+        try:
+            session_count = max(1, min(7, int(sessions)))
+        except (TypeError, ValueError):
+            session_count = 1
+
+        days = []
+        unused = list(cardio_exercises)
+        random.shuffle(unused)
+        for day_number in range(1, session_count + 1):
+            if not unused:
+                unused = list(cardio_exercises)
+                random.shuffle(unused)
+            cardio_exercise = unused.pop()
+            prescription = cls._prescription_for_index(prescriptions, day_number - 1)
+            days.append(
+                {
+                    "name": f"روز {day_number}",
+                    "notes": "تمرین هوازی؛ نوع اجرا: " + str(cardio_exercise.get_performance_type_display()),
+                    "items": [
+                        {
+                            "exercise": cardio_exercise.pk,
+                            "exercise_type": "cardio",
+                            "exercise_name": cardio_exercise.name,
+                            "body_part_filter": "cardio",
+                            "goal": goal,
+                            "superset_exercise": "",
+                            "third_exercise": "",
+                            "sets": prescription["sets"],
+                            "reps": prescription["reps"],
+                            "rest": prescription["rest"],
+                            "superset_sets": "",
+                            "superset_reps": "",
+                            "superset_rest": "",
+                            "third_sets": "",
+                            "third_reps": "",
+                            "third_rest": "",
+                            "note": str(cardio_exercise.get_performance_type_display()),
+                            "training_method": ExerciseTrainingMethod.NORMAL,
+                        }
+                    ],
+                }
+            )
+        return {"days": days, "correctives": [], "warnings": []}
 
     @classmethod
     def _valid_repetition_sequence(cls, value: str, method: str) -> bool:

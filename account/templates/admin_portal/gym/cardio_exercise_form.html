@@ -1,0 +1,35 @@
+{% extends 'admin_portal/_shell.html' %}
+{% load i18n %}
+
+{% block title %}{% blocktrans %}{{ page_title }} | ایگوفیت{% endblocktrans %}{% endblock %}
+
+{% block admin_content %}
+<section class="admin-screen">
+    <header class="admin-screen__header admin-screen__header--split">
+        <a href="{% url 'register:admin_cardio_exercise_list' %}" class="admin-back-link" aria-label="{% trans 'بازگشت' %}">→</a>
+        <h1 class="admin-screen__title">{{ page_title }}</h1>
+    </header>
+
+    <form method="post" enctype="multipart/form-data" class="admin-form-panel">
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="admin-form-errors">{% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}</div>{% endif %}
+        <div class="admin-form-grid admin-form-grid--cols2">
+            {% for field in form %}
+                <div class="field-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+                    {{ field.errors }}
+                    {% if field.name == 'image' and cardio_exercise.image %}
+                        <img src="{{ cardio_exercise.image.url }}" alt="{{ cardio_exercise.name }}" class="admin-cardio-exercise-image">
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+        <div class="admin-form-actions">
+            <button type="submit" class="admin-primary-btn">{% trans 'ذخیره تمرین هوازی' %}</button>
+            <a href="{% url 'register:admin_cardio_exercise_list' %}" class="admin-secondary-btn">{% trans 'انصراف' %}</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

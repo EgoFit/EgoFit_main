@@ -285,7 +285,7 @@ class ProfileWorkoutProgramsView(AccountPageMixin, UserPortalRequiredMixin, Temp
             rows = []
             for item in day.items.all():
                 movement_slots = (
-                    ("main", item.exercise, item.sets, item.reps, item.rest, ""),
+                    ("main", item.movement, item.sets, item.reps, item.rest, ""),
                     (
                         "superset",
                         item.superset_exercise,
@@ -311,12 +311,13 @@ class ProfileWorkoutProgramsView(AccountPageMixin, UserPortalRequiredMixin, Temp
                             "item": item,
                             "slot": slot,
                             "exercise": exercise,
+                            "is_cardio": slot == "main" and bool(item.cardio_exercise_id),
                             "sets": sets,
                             "reps": reps,
                             "rest": rest,
                             "label": label,
-                            "record": records.get(exercise.pk),
-                            "input_name": f"best_record_{exercise.pk}",
+                            "record": records.get(exercise.pk) if not (slot == "main" and item.cardio_exercise_id) else None,
+                            "input_name": f"best_record_{exercise.pk}" if not (slot == "main" and item.cardio_exercise_id) else "",
                         }
                     )
             day.workout_rows = rows

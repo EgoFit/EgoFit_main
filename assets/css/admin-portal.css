@@ -468,8 +468,26 @@
     gap: 11px;
 }
 
+.admin-cardio-exercise-image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    background: #eef1f6;
+}
+
+.admin-result-card--media .admin-cardio-exercise-image.admin-empty {
+    display: grid;
+    place-items: center;
+    color: #94a3b8;
+}
+
 .admin-result-card--media .admin-result-card__meta {
     grid-template-columns: minmax(0, 1fr);
+}
+
+.admin-program-item--cardio .admin-program-movement {
+    display: none;
 }
 
 .admin-result-card__tags {
@@ -1423,6 +1441,336 @@
     color: #6b7280;
     direction: ltr;
     text-align: right;
+}
+
+.admin-cardio-targets {
+    display: grid;
+    gap: 18px;
+    padding: clamp(16px, 2.5vw, 24px);
+    border: 1px solid rgba(52, 84, 209, .16);
+    border-radius: 22px;
+    background: linear-gradient(145deg, #fff 0%, #f7f9ff 100%);
+    box-shadow: 0 16px 36px rgba(25, 43, 94, .08);
+}
+
+.admin-cardio-targets > summary {
+    cursor: pointer;
+    list-style: none;
+}
+
+.admin-cardio-targets > summary::-webkit-details-marker {
+    display: none;
+}
+
+.admin-cardio-targets > summary:focus-visible {
+    outline: 3px solid rgba(52, 84, 209, .35);
+    outline-offset: 4px;
+}
+
+.admin-cardio-targets__chevron {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+    border-radius: 10px;
+    background: rgba(52, 84, 209, .08);
+    color: #3454d1;
+    font-size: 1rem;
+    transition: transform .2s ease;
+}
+
+.admin-cardio-targets[open] .admin-cardio-targets__chevron {
+    transform: rotate(180deg);
+}
+
+.admin-cardio-targets__header,
+.admin-cardio-targets__title-wrap {
+    display: flex;
+    align-items: center;
+}
+
+.admin-cardio-targets__header {
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.admin-cardio-targets__title-wrap { gap: 13px; min-width: 0; }
+
+.admin-cardio-targets__icon {
+    flex: 0 0 46px;
+    width: 46px;
+    height: 46px;
+    display: grid;
+    place-items: center;
+    border-radius: 15px;
+    color: var(--primary, #3454d1);
+    background: rgba(52, 84, 209, .1);
+}
+
+.admin-cardio-targets__icon svg {
+    width: 25px;
+    height: 25px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.admin-cardio-targets__eyebrow {
+    display: block;
+    margin-bottom: 3px;
+    color: var(--primary, #3454d1);
+    font-size: .7rem;
+    font-weight: 900;
+}
+
+.admin-cardio-targets h2 {
+    margin: 0;
+    color: #172033;
+    font-size: 1.08rem;
+    font-weight: 900;
+}
+
+.admin-cardio-targets__header p {
+    margin: 4px 0 0;
+    color: #64748b;
+    font-size: .78rem;
+}
+
+.admin-cardio-targets__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+    padding: 9px 12px;
+    border: 1px solid rgba(52, 84, 209, .18);
+    border-radius: 12px;
+    color: var(--primary, #3454d1);
+    background: #fff;
+    font-size: .76rem;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.admin-cardio-targets__link:hover,
+.admin-cardio-targets__link:focus-visible {
+    border-color: var(--primary, #3454d1);
+    background: rgba(52, 84, 209, .06);
+}
+
+.admin-cardio-targets__metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(125px, 1fr));
+    gap: 9px;
+}
+
+.admin-cardio-targets__metric {
+    min-width: 0;
+    display: grid;
+    align-content: center;
+    gap: 5px;
+    min-height: 68px;
+    padding: 10px 12px;
+    border: 1px solid #e7ebf3;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .82);
+}
+
+.admin-cardio-targets__metric > span {
+    color: #64748b;
+    font-size: .7rem;
+    font-weight: 700;
+}
+
+.admin-cardio-targets__metric strong {
+    color: #172033;
+    font-size: .9rem;
+    font-weight: 900;
+}
+
+.admin-cardio-targets__metric strong bdi { color: inherit; font-weight: inherit; }
+.admin-cardio-targets__metric small { color: #94a3b8; font-size: .68rem; }
+
+.admin-cardio-targets__metric--accent {
+    border-color: rgba(52, 84, 209, .18);
+    background: rgba(52, 84, 209, .055);
+}
+
+.admin-cardio-targets__metric--accent strong { color: var(--primary, #3454d1); }
+
+.admin-cardio-targets__table-wrap {
+    overflow-x: auto;
+    border: 1px solid #e7ebf3;
+    border-radius: 16px;
+    background: #fff;
+    scrollbar-width: thin;
+}
+
+.admin-cardio-targets__table {
+    width: 100%;
+    min-width: 760px;
+    border-collapse: collapse;
+    text-align: right;
+}
+
+.admin-cardio-targets__table th,
+.admin-cardio-targets__table td {
+    padding: 13px 14px;
+    border-bottom: 1px solid #edf0f5;
+    vertical-align: middle;
+    font-size: .77rem;
+}
+
+.admin-cardio-targets__table thead th {
+    color: #64748b;
+    background: #f8faff;
+    font-size: .7rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.admin-cardio-targets__table tbody tr:last-child th,
+.admin-cardio-targets__table tbody tr:last-child td { border-bottom: 0; }
+
+.admin-cardio-targets__table tbody th {
+    color: #172033;
+    font-weight: 900;
+}
+
+.admin-cardio-targets__zone-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.admin-cardio-targets__zone-dot {
+    flex: 0 0 9px;
+    width: 9px;
+    height: 9px;
+    display: inline-block;
+    border-radius: 50%;
+    background: #22a879;
+    box-shadow: 0 0 0 4px rgba(34, 168, 121, .12);
+}
+
+.admin-cardio-targets__row--cardiorespiratory_endurance .admin-cardio-targets__zone-dot {
+    background: #e4a22b;
+    box-shadow: 0 0 0 4px rgba(228, 162, 43, .14);
+}
+
+.admin-cardio-targets__row--anaerobic_power .admin-cardio-targets__zone-dot {
+    background: #df5a69;
+    box-shadow: 0 0 0 4px rgba(223, 90, 105, .13);
+}
+
+.admin-cardio-targets__bpm {
+    color: #172033;
+    font-size: .82rem;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.admin-cardio-targets__table td:last-child { min-width: 245px; }
+.admin-cardio-targets__table td:last-child span,
+.admin-cardio-targets__table td:last-child small { display: block; line-height: 1.7; }
+.admin-cardio-targets__table td:last-child span { color: #334155; font-weight: 700; }
+.admin-cardio-targets__table td:last-child small { margin-top: 3px; color: #718096; font-size: .69rem; }
+
+.admin-cardio-targets__method {
+    overflow: hidden;
+    border: 1px solid #e7ebf3;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .74);
+}
+
+.admin-cardio-targets__method summary {
+    padding: 11px 14px;
+    color: #334155;
+    cursor: pointer;
+    font-size: .76rem;
+    font-weight: 800;
+}
+
+.admin-cardio-targets__method-content {
+    display: grid;
+    gap: 6px;
+    padding: 0 14px 13px;
+}
+
+.admin-cardio-targets__method-content p {
+    margin: 0;
+    color: #475569;
+    font-size: .74rem;
+    line-height: 1.8;
+}
+
+.admin-cardio-targets__method-content bdi { color: #172033; font-weight: 800; }
+.admin-cardio-targets__method-content .admin-cardio-targets__source-note { color: #64748b; }
+
+.admin-cardio-targets__disclaimer {
+    margin: -5px 0 0;
+    color: #718096;
+    font-size: .7rem;
+    line-height: 1.8;
+}
+
+.admin-cardio-targets__empty {
+    display: grid;
+    gap: 7px;
+    padding: 16px;
+    border: 1px dashed rgba(52, 84, 209, .3);
+    border-radius: 15px;
+    background: rgba(52, 84, 209, .035);
+}
+
+.admin-cardio-targets__empty strong { color: #172033; font-size: .82rem; }
+.admin-cardio-targets__empty p { margin: 0; color: #64748b; font-size: .75rem; line-height: 1.8; }
+.admin-cardio-targets__empty .admin-cardio-targets__link { justify-self: start; margin-top: 3px; }
+
+.dark .admin-dashboard .admin-cardio-targets {
+    border-color: rgba(99, 124, 235, .26);
+    background: linear-gradient(145deg, rgba(15, 23, 42, .94), rgba(20, 31, 57, .94));
+    box-shadow: 0 16px 36px rgba(0, 0, 0, .18);
+}
+
+.dark .admin-dashboard .admin-cardio-targets h2,
+.dark .admin-dashboard .admin-cardio-targets__metric strong,
+.dark .admin-dashboard .admin-cardio-targets__table tbody th,
+.dark .admin-dashboard .admin-cardio-targets__bpm,
+.dark .admin-dashboard .admin-cardio-targets__method-content bdi,
+.dark .admin-dashboard .admin-cardio-targets__empty strong { color: #e2e8f0; }
+
+.dark .admin-dashboard .admin-cardio-targets__header p,
+.dark .admin-dashboard .admin-cardio-targets__metric > span,
+.dark .admin-dashboard .admin-cardio-targets__metric small,
+.dark .admin-dashboard .admin-cardio-targets__table td:last-child span,
+.dark .admin-dashboard .admin-cardio-targets__table td:last-child small,
+.dark .admin-dashboard .admin-cardio-targets__method-content p,
+.dark .admin-dashboard .admin-cardio-targets__disclaimer,
+.dark .admin-dashboard .admin-cardio-targets__empty p { color: #a8b4c7; }
+
+.dark .admin-dashboard .admin-cardio-targets__link,
+.dark .admin-dashboard .admin-cardio-targets__metric,
+.dark .admin-dashboard .admin-cardio-targets__table-wrap,
+.dark .admin-dashboard .admin-cardio-targets__method {
+    border-color: rgba(148, 163, 184, .2);
+    background: rgba(30, 41, 59, .78);
+}
+
+.dark .admin-dashboard .admin-cardio-targets__table th,
+.dark .admin-dashboard .admin-cardio-targets__table td { border-color: rgba(148, 163, 184, .13); }
+.dark .admin-dashboard .admin-cardio-targets__table thead th { color: #b6c2d4; background: rgba(15, 23, 42, .68); }
+.dark .admin-dashboard .admin-cardio-targets__method summary { color: #d5deeb; }
+
+@media (max-width: 640px) {
+    .admin-cardio-targets { gap: 14px; border-radius: 18px; }
+    .admin-cardio-targets__header { align-items: flex-start; flex-direction: row; }
+    .admin-cardio-targets__title-wrap { align-items: flex-start; }
+    .admin-cardio-targets__link { align-self: flex-start; }
+    .admin-cardio-targets__metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 .admin-body-map {

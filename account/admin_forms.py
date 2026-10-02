@@ -13,6 +13,7 @@ from account.models import (
     CaliperMeasurement,
     ClientDocument,
     ClientMedia,
+    CardioExercise,
     CorrectiveExercise,
     Exercise,
     ExerciseMovementType,
@@ -403,10 +404,13 @@ class LookupCatalogModelForm(forms.ModelForm):
                 )
         elif model is ExerciseRepetitionType and "reps" in cleaned:
             method = cleaned.get("method") or ExerciseTrainingMethod.NORMAL
-            if not is_valid_repetition_prescription(cleaned["reps"], method):
+            if not is_valid_repetition_prescription(cleaned["reps"], method, cleaned.get("goal", "")):
                 self.add_error(
                     "reps",
-                    _("تکرارها با روش انتخاب‌شده سازگار نیستند؛ بازه را مانند ۶-۱۲ و توالی روش‌ها را با / یا + ثبت کنید."),
+                    _(
+                        "تکرارها با روش انتخاب‌شده سازگار نیستند؛ بازه را مانند ۶-۱۲ و توالی روش‌ها را با / یا + ثبت کنید. "
+                        "برای هدف هوازی و روش معمولی، مدت را مانند ۱۵ دقیقه یا ۴۵ ثانیه وارد کنید."
+                    ),
                 )
         return cleaned
 
@@ -458,7 +462,7 @@ def build_lookup_form(model, *, fields=("name", "name_en"), data=None, instance=
             "بازه‌های معمول را مانند ۶-۱۲ وارد کنید. Pyramid و High To Low نزولی، "
             "Reverse Pyramid و Low To High صعودی و 21 Reps دقیقاً ۷+۷+۷ است. "
             "بازهٔ تکرار به‌تنهایی نسخه را تعیین نمی‌کند؛ بار، کیفیت اجرا و حجم هفتگی را هم بررسی کنید. "
-            "روش‌های پیشرفته اختیاری‌اند."
+            "روش‌های پیشرفته اختیاری‌اند. برای هدف هوازی و روش معمولی، مدت را مانند ۱۵ دقیقه یا ۴۵ ثانیه وارد کنید."
         )
     if model is ExerciseRestType:
         form.fields["rest_time"].help_text = _(
@@ -551,6 +555,23 @@ class ExerciseForm(forms.ModelForm):
     def clean_video_3(self):
         uploaded_file = self.cleaned_data.get("video_3")
         return validate_video_upload(uploaded_file) if isinstance(uploaded_file, UploadedFile) else uploaded_file
+
+
+class CardioExerciseForm(forms.ModelForm):
+    class Meta:
+        model = CardioExercise
+        fields = ("name", "name_en", "performance_type", "image")
+        widgets = {
+            "name": forms.TextInput(attrs={"class": INPUT_CLASS, "placeholder": _("نام حرکت")} ),
+            "name_en": forms.TextInput(attrs={"class": INPUT_CLASS, "placeholder": _("نام انگلیسی حرکت"), "dir": "ltr"}),
+            "performance_type": forms.Select(attrs={"class": INPUT_CLASS}),
+            "image": forms.ClearableFileInput(attrs={"class": INPUT_CLASS, "accept": "image/*"}),
+        }
+        labels = {"image": _("تصویر حرکت")}
+
+    def clean_image(self):
+        uploaded_file = self.cleaned_data.get("image")
+        return validate_image_upload(uploaded_file) if isinstance(uploaded_file, UploadedFile) else uploaded_file
 
 
 class CorrectiveExerciseForm(forms.ModelForm):

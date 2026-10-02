@@ -16,6 +16,8 @@ _DIGIT_MAP = str.maketrans("۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩", "01234567
 _OPTIONAL_SET_UNIT = r"(?:\s*(?:sets?|ست))?"
 _OPTIONAL_REP_UNIT = r"(?:\s*(?:reps?|تکرار))?"
 _RANGE_SEPARATOR = r"(?:-|–|—|تا|to)"
+_CARDIO_DURATION_UNIT = r"(?:seconds?|secs?|s|minutes?|mins?|min|m|ثانیه|دقیقه)"
+_CARDIO_GOALS = {"cardio", "aerobic", "هوازی"}
 
 
 def parse_set_prescription(value: object) -> tuple[int, int] | None:
@@ -63,8 +65,26 @@ def _is_simple_rep_range(value: object) -> bool:
     return minimum > 0 and maximum >= minimum
 
 
-def is_valid_repetition_prescription(value: object, method: str) -> bool:
-    """Validate a rep range or the direction-specific sequence a method requires."""
+def _is_cardio_duration(value: object) -> bool:
+    text = str(value or "").translate(_DIGIT_MAP).strip().casefold()
+    match = re.fullmatch(
+        rf"(\d+)(?:\s*{_RANGE_SEPARATOR}\s*(\d+))?\s*{_CARDIO_DURATION_UNIT}",
+        text,
+    )
+    if not match:
+        return False
+    minimum = int(match.group(1))
+    maximum = int(match.group(2) or minimum)
+    return minimum > 0 and maximum >= minimum
+
+
+def is_valid_repetition_prescription(value: object, method: str, goal: str = "") -> bool:
+    """Validate a rep range, cardio duration, or method-specific rep sequence."""
+    normalized_goal = " ".join(str(goal or "").casefold().replace("_", " ").split())
+    if method == "normal":
+        if normalized_goal in _CARDIO_GOALS and _is_cardio_duration(value):
+            return True
+        return _is_simple_rep_range(value)
     if method == _TWENTY_ONE_REPS:
         return _rep_sequence(value) == [7, 7, 7]
     if method in {

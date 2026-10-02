@@ -26,6 +26,11 @@ class ExerciseTrainingMethod(models.TextChoices):
     HIGH_TO_LOW = "high_to_low", "High To Low"
 
 
+class CardioExerciseType(models.TextChoices):
+    INTERVAL = "interval", _("اینتروال")
+    CONTINUOUS = "continuous", _("تداومی")
+
+
 def _is_video_file_name(name):
     suffix = str(name or "").rsplit(".", 1)
     return len(suffix) == 2 and suffix[1].lower() in VIDEO_FILE_EXTENSIONS
@@ -951,6 +956,30 @@ class CorrectiveExercise(models.Model):
         return None
 
 
+class CardioExercise(models.Model):
+    name = models.CharField(max_length=120, verbose_name=_("نام حرکت"))
+    name_en = models.CharField(max_length=160, blank=True, verbose_name=_("نام انگلیسی حرکت"))
+    performance_type = models.CharField(
+        max_length=20,
+        choices=CardioExerciseType.choices,
+        verbose_name=_("نوع انجام"),
+    )
+    image = models.ImageField(
+        upload_to="cardio_exercises/",
+        null=True,
+        blank=True,
+        verbose_name=_("تصویر حرکت"),
+    )
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = "حرکت هوازی"
+        verbose_name_plural = "کتابخانه تمرینات هوازی"
+
+    def __str__(self):
+        return self.name
+
+
 class WorkoutProgram(models.Model):
     class ProgramType(models.TextChoices):
         NORMAL = "normal", "Normal"
@@ -1129,8 +1158,18 @@ class WorkoutProgramExercise(models.Model):
     exercise = models.ForeignKey(
         Exercise,
         on_delete=models.PROTECT,
+        null=True,
+        blank=True,
         related_name="program_items",
         verbose_name=_("حرکت اصلی"),
+    )
+    cardio_exercise = models.ForeignKey(
+        CardioExercise,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="program_items",
+        verbose_name=_("حرکت هوازی"),
     )
     superset_exercise = models.ForeignKey(
         Exercise,
@@ -1205,8 +1244,19 @@ class WorkoutProgramExercise(models.Model):
             models.Index(fields=["exercise"]),
             models.Index(fields=["superset_exercise"]),
         ]
+        constraints = [
+            models.CheckConstraint(
+                check=(
+                    models.Q(exercise__isnull=False, cardio_exercise__isnull=True)
+                    | models.Q(exercise__isnull=True, cardio_exercise__isnull=False)
+                ),
+                name="workout_program_exercise_one_movement",
+            ),
+        ]
 
     def clean(self):
+        if bool(self.exercise_id) == bool(self.cardio_exercise_id):
+            raise ValidationError(_("برای حرکت اصلی دقیقاً یک حرکت بدنسازی یا هوازی انتخاب کنید."))
         if self.superset_exercise_id and self.exercise_id == self.superset_exercise_id:
             raise ValidationError({"superset_exercise": _("حرکت دوم سوپرست باید با حرکت اصلی متفاوت باشد.")})
         if self.third_exercise_id and self.exercise_id == self.third_exercise_id:
@@ -1222,8 +1272,12 @@ class WorkoutProgramExercise(models.Model):
     def is_superset(self):
         return bool(self.superset_exercise_id)
 
+    @property
+    def movement(self):
+        return self.cardio_exercise or self.exercise
+
     def __str__(self):
-        movements = [self.exercise.name]
+        movements = [self.movement.name]
         if self.superset_exercise_id:
             movements.append(self.superset_exercise.name)
         if self.third_exercise_id:

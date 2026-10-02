@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 from django.core.cache import cache
@@ -13,6 +14,7 @@ from django.utils.translation import gettext_lazy as _
 from account.constants import GLOBAL_NOTIFICATION_CACHE_KEY
 from account.admin_forms import CorrectiveExerciseForm
 from account.models import (
+    CardioExercise,
     BodyCircumferenceMeasurement,
     CaliperMeasurement,
     ClientDocument,
@@ -77,13 +79,9 @@ class UserCreationForm(forms.ModelForm):
 
 
 class UserChangeForm(forms.ModelForm):
-    password1 = forms.CharField(
-        label=_("رمز عبور جدید"),
-        widget=forms.PasswordInput,
-        required=False,
-        help_text=_("برای کاربرانی که فقط با OTP وارد می‌شوند، اینجا رمز تعیین کنید."),
+    password = ReadOnlyPasswordHashField(
+        label=_("رمز عبور"),
     )
-    password2 = forms.CharField(label=_("تایید رمز عبور جدید"), widget=forms.PasswordInput, required=False)
     password_status = forms.CharField(
         label=_("وضعیت رمز عبور"),
         required=False,
@@ -94,6 +92,7 @@ class UserChangeForm(forms.ModelForm):
     class Meta:
         model = User
         fields = [
+            "password",
             "fullname",
             "phone",
             "email",
@@ -125,25 +124,6 @@ class UserChangeForm(forms.ModelForm):
             else:
                 self.fields["password_status"].initial = _("تنظیم نشده (فقط ورود با OTP)")
 
-    def clean_password2(self):
-        password1 = self.cleaned_data.get("password1")
-        password2 = self.cleaned_data.get("password2")
-        if password1 or password2:
-            if password1 != password2:
-                raise ValidationError(_("رمز عبور و تکرار آن یکسان نیست."))
-            validate_strong_password(password1)
-        return password2
-
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        password = self.cleaned_data.get("password1")
-        if password:
-            user.set_password(password)
-        if commit:
-            user.save()
-        return user
-
-
 @admin.action(description=_("فعال‌سازی کاربران انتخاب‌شده"))
 def activate_users(modeladmin, request, queryset):
     updated = queryset.update(is_active=True)
@@ -174,6 +154,7 @@ def demote_from_admin(modeladmin, request, queryset):
 class UserAdmin(BaseUserAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
+    change_form_template = "admin/account/user/change_form.html"
     change_list_template = "admin/account/user/change_list.html"
     list_display = ["fullname", "phone", "email", "password_status_display", "is_admin", "is_active", "coach"]
     list_select_related = ("coach",)
@@ -189,9 +170,8 @@ class UserAdmin(BaseUserAdmin):
             _("ورود و امنیت"),
             {
                 "fields": [
+                    "password",
                     "password_status",
-                    "password1",
-                    "password2",
                     "last_login",
                 ]
             },
@@ -531,16 +511,24 @@ class WorkoutProgramDayAdmin(admin.ModelAdmin):
 
 @admin.register(WorkoutProgramExercise)
 class WorkoutProgramExerciseAdmin(admin.ModelAdmin):
-    list_display = ("exercise", "superset_exercise", "third_exercise", "day", "sets", "reps", "rest", "order")
-    list_select_related = ("day", "day__program", "exercise", "superset_exercise", "third_exercise")
+    list_display = ("movement", "superset_exercise", "third_exercise", "day", "sets", "reps", "rest", "order")
+    list_select_related = ("day", "day__program", "exercise", "cardio_exercise", "superset_exercise", "third_exercise")
     search_fields = (
         "exercise__name",
+        "cardio_exercise__name",
         "superset_exercise__name",
         "third_exercise__name",
         "day__program__title",
         "day__program__user__fullname",
     )
     ordering = ("day", "order")
+
+
+@admin.register(CardioExercise)
+class CardioExerciseAdmin(admin.ModelAdmin):
+    list_display = ("name", "name_en", "performance_type")
+    list_filter = ("performance_type",)
+    search_fields = ("name", "name_en")
 
 
 @admin.register(WorkoutProgramCorrective)

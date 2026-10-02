@@ -23,6 +23,7 @@ from account.models import (
 from account.services.coach_request_service import CoachRequestService
 from account.services.notification_service import NotificationService
 from account.services.profile_service import ProfileService
+from account.services.cardio_training_service import CardioTrainingService
 from account.services.sms_service import SmsService
 from account.services.mood_service import MoodService
 from account.utils import is_birthday_today
@@ -276,6 +277,7 @@ class AdminPortalService:
             "workout_record_query": workout_record_query,
             "coach_requests": list(user.coach_requests.prefetch_related("attachments").all()[:10]),
             "unread_coach_requests_count": self.coach_request_service.get_unread_pending_count(user=user),
+            "cardio_training": CardioTrainingService().get_dashboard_context(user),
         }
 
     def delete_coach_request(self, *, coach_request: CoachRequest) -> None:

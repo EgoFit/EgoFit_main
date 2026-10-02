@@ -1,0 +1,69 @@
+{% load i18n %}
+<details class="admin-cardio-targets" aria-labelledby="admin-cardio-targets-title">
+    <summary class="admin-cardio-targets__header">
+        <div class="admin-cardio-targets__title-wrap">
+            <span class="admin-cardio-targets__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M20.8 8.8c0 5.2-8.8 11-8.8 11S3.2 14 3.2 8.8a4.5 4.5 0 0 1 8.8-1.3 4.5 4.5 0 0 1 8.8 1.3Z"/><path d="M4.5 12h4l1.8-3.2 3.1 6 1.8-3h4.3"/></svg>
+            </span>
+            <div>
+                <span class="admin-cardio-targets__eyebrow">{% trans 'راهنمای تمرین' %}</span>
+                <h2 id="admin-cardio-targets-title">{% trans 'محدودهٔ ضربان قلب هدف' %}</h2>
+                <p>{% trans 'برآورد اختصاصی بر اساس سن، جنسیت ثبت‌شده و آخرین ضربان قلب استراحت' %}</p>
+            </div>
+        </div>
+        <span class="admin-cardio-targets__chevron" aria-hidden="true">⌄</span>
+    </summary>
+    <a href="{% url 'register:admin_health' target_user.id %}" class="admin-cardio-targets__link">{% trans 'سوابق سلامت' %}<span aria-hidden="true">←</span></a>
+
+    <div class="admin-cardio-targets__metrics">
+        <div class="admin-cardio-targets__metric"><span>{% trans 'سن' %}</span><strong>{% if cardio_training.has_age %}{{ cardio_training.age }} {% trans 'سال' %}{% else %}{% trans 'ثبت نشده' %}{% endif %}</strong></div>
+        <div class="admin-cardio-targets__metric"><span>{% trans 'جنسیت' %}</span><strong>{{ cardio_training.gender_label }}</strong></div>
+        <div class="admin-cardio-targets__metric"><span>{% trans 'ضربان استراحت' %}</span><strong>{% if cardio_training.has_resting_bpm %}<bdi dir="ltr">{{ cardio_training.resting_bpm }} BPM</bdi>{% else %}{% trans 'ثبت نشده' %}{% endif %}</strong>
+            {% if cardio_training.resting_entry %}<small dir="ltr">{{ cardio_training.resting_entry.entry_date|date:'Y/m/d' }}</small>{% endif %}
+        </div>
+        {% if cardio_training.can_calculate %}
+            <div class="admin-cardio-targets__metric admin-cardio-targets__metric--accent"><span>{% trans 'حداکثر ضربان برآوردی' %}</span><strong><bdi dir="ltr">{{ cardio_training.max_heart_rate_bpm }} BPM</bdi></strong></div>
+            <div class="admin-cardio-targets__metric admin-cardio-targets__metric--accent"><span>{% trans 'ذخیرهٔ ضربان قلب (HRR)' %}</span><strong><bdi dir="ltr">{{ cardio_training.heart_rate_reserve_bpm }} BPM</bdi></strong></div>
+        {% endif %}
+    </div>
+
+    {% if cardio_training.can_calculate %}
+        <div class="admin-cardio-targets__table-wrap">
+            <table class="admin-cardio-targets__table">
+                <thead><tr><th>{% trans 'هدف تمرین' %}</th><th>{% trans 'شدت از HRR' %}</th><th>{% trans 'ضربان هدف' %}</th><th>{% trans 'راهنمای مربی' %}</th></tr></thead>
+                <tbody>
+                    {% for zone in cardio_training.zones %}
+                        <tr class="admin-cardio-targets__row admin-cardio-targets__row--{{ zone.key }}">
+                            <th scope="row"><span class="admin-cardio-targets__zone-label"><span class="admin-cardio-targets__zone-dot" aria-hidden="true"></span>{{ zone.label }}</span></th>
+                            <td><bdi dir="ltr">{{ zone.lower_percent }}–{{ zone.upper_percent }}%</bdi></td>
+                            <td><strong class="admin-cardio-targets__bpm"><bdi dir="ltr">{{ zone.lower_bpm }}–{{ zone.upper_bpm }} BPM</bdi></strong></td>
+                            <td><span>{{ zone.goal }}</span><small>{{ zone.note }}</small></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <details class="admin-cardio-targets__method">
+            <summary>{% trans 'فرمول و روش محاسبه' %}</summary>
+            <div class="admin-cardio-targets__method-content">
+                <p><span>{% trans 'حداکثر ضربان تخمینی:' %}</span> <bdi dir="ltr">HRmax ≈ {{ cardio_training.max_heart_rate_formula }}</bdi></p>
+                <p><span>{% trans 'ذخیرهٔ ضربان قلب:' %}</span> <bdi dir="ltr">HRR = HRmax − HRrest</bdi></p>
+                <p><span>{% trans 'ضربان هدف (روش کارونن):' %}</span> <bdi dir="ltr">HRrest + (% intensity × HRR)</bdi></p>
+                <p class="admin-cardio-targets__source-note">{% trans 'معادلهٔ HRmax: Tanaka و همکاران (۲۰۰۱)؛ برای زنان از برآورد اختصاصی Gulati و همکاران (۲۰۱۰) استفاده شده است. بازه‌های شدت بر مبنای HRR راهنمای تمرینی‌اند و جای آزمون ورزشی یا آستانه‌های اندازه‌گیری‌شده را نمی‌گیرند.' %}</p>
+            </div>
+        </details>
+        <p class="admin-cardio-targets__disclaimer">{% trans 'این اعداد برآورد جمعیتی‌اند و می‌توانند با داروها (مانند بتابلاکر)، بیماری قلبی و تفاوت‌های فردی تغییر کنند. برای برنامه‌ریزی افراد دارای بیماری یا علامت، ارزیابی متخصص لازم است.' %}</p>
+    {% else %}
+        <div class="admin-cardio-targets__empty" role="status">
+            <strong>{% trans 'برای محاسبه، اطلاعات لازم کامل نیست.' %}</strong>
+            <p>{% if not cardio_training.has_age %}{% trans 'سن در اطلاعات شخصی کاربر ثبت نشده است.' %}{% elif not cardio_training.age_supported %}{% trans 'این معادله برای بزرگسالان ۱۸ تا ۸۰ سال در نظر گرفته شده است.' %}{% endif %}
+                {% if not cardio_training.has_gender %}{% trans 'جنسیت در اطلاعات شخصی ثبت نشده است.' %}{% endif %}
+                {% if not cardio_training.has_resting_bpm %}{% trans 'هنوز ضربان قلب استراحتی ثبت نشده است.' %}{% endif %}
+                {% if cardio_training.has_age and cardio_training.has_gender and cardio_training.has_resting_bpm and not cardio_training.resting_bpm_valid %}{% trans 'ضربان استراحت ثبت‌شده برای این برآورد از حداکثر ضربان تخمینی بالاتر است؛ لطفاً داده را بررسی کنید.' %}{% endif %}
+            </p>
+            {% if not cardio_training.has_age or not cardio_training.has_gender %}<a href="{% url 'register:admin_personal_info' target_user.id %}" class="admin-cardio-targets__link">{% trans 'تکمیل اطلاعات شخصی' %}<span aria-hidden="true">←</span></a>{% endif %}
+            {% if not cardio_training.has_resting_bpm or not cardio_training.resting_bpm_valid %}<a href="{% url 'register:admin_health' target_user.id %}" class="admin-cardio-targets__link">{% trans 'بررسی ضربان استراحت' %}<span aria-hidden="true">←</span></a>{% endif %}
+        </div>
+    {% endif %}
+</details>

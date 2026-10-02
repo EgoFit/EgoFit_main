@@ -37,7 +37,7 @@ def _pdf_link_base_url(request=None) -> str:
 def _pdf_movement_media_url(movement, link_base_url="") -> str:
     media = next(iter(_movement_video_files(movement)), None)
     if media is None:
-        media = getattr(movement, "media", None)
+        media = getattr(movement, "media", None) or getattr(movement, "image", None)
     media_name = getattr(media, "name", "") if media else ""
     if not media_name:
         return ""
@@ -240,7 +240,7 @@ def _build_sarbarg_day_table(
     movement_rows = []
     if day is not None:
         for item in day.items.all():
-            movement_rows.append((item.exercise, item.sets, item.reps, item.rest, item.note))
+            movement_rows.append((item.movement, item.sets, item.reps, item.rest, item.note))
             if item.superset_exercise_id:
                 movement_rows.append(
                     (
@@ -280,7 +280,6 @@ def _build_sarbarg_day_table(
     table = Table(
         rows,
         colWidths=table_widths,
-        rowHeights=[19, 23] + [17] * (len(rows) - 2),
     )
     table.setStyle(
         TableStyle(
@@ -387,7 +386,6 @@ def _draw_sarbarg_summary_page(
             ],
         ],
         colWidths=[content_width / 2, content_width / 2],
-        rowHeights=[0.35 * inch, 1.15 * inch, 2.45 * inch],
     )
     summary.setStyle(
         TableStyle(
@@ -603,7 +601,7 @@ def _fallback_movement_rows(day):
     if day is None:
         return rows
     for item in day.items.all():
-        rows.append((item.exercise.name, item.sets, item.reps, item.rest, item.note, item.exercise))
+        rows.append((item.movement.name, item.sets, item.reps, item.rest, item.note, item.movement))
         if item.superset_exercise_id:
             rows.append(
                 (

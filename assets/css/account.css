@@ -336,6 +336,13 @@
     text-decoration: none;
     transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
+.cta-primary--strong{
+    border-radius: 16px;
+    color: hsl(var(--muted));
+    font-size: var(--bottom-nav-label-size);
+    font-weight: 700;
+    line-height: 1.2;
+}
 
 .account-bottom-nav__item.is-active {
     background: rgba(37, 99, 235, 0.1);
@@ -3012,9 +3019,9 @@
 
 .workout-table th:last-child,
 .workout-table td:last-child {
-    width: 65px;
-    min-width: 65px;
-    max-width: 65px;
+    width: 110px;
+    min-width: 100px;
+    max-width: 130px;
     padding-inline: 4px;
 }
 
@@ -3765,4 +3772,66 @@
     border-color: rgba(125, 211, 252, 0.42);
     background-color: rgba(14, 165, 233, 0.14);
     box-shadow: 0 14px 30px rgba(0, 0, 0, 0.24);
+}
+
+/* Profile settings form actions */
+.account-app .profile-settings-submit {
+    appearance: none;
+    -webkit-appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 190px;
+    min-height: 50px;
+    padding-inline: 24px;
+    border: 1px solid rgba(37, 99, 235, 0.22);
+    border-radius: var(--account-radius-control, 15px);
+    background: linear-gradient(135deg, #2563eb 0%, #3454d1 58%, #0f766e 140%);
+    color: #fff;
+    box-shadow: 0 12px 26px rgba(37, 99, 235, 0.2), 0 5px 12px rgba(15, 23, 42, 0.08);
+    font: inherit;
+    font-size: 0.92rem;
+    font-weight: 800;
+    line-height: 1.4;
+    cursor: pointer;
+    transition: transform 180ms var(--account-interaction-ease), box-shadow 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.account-app .profile-settings-submit:not(:disabled):hover {
+    transform: translateY(-2px);
+    border-color: rgba(37, 99, 235, 0.46);
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 62%, #047857 140%);
+    box-shadow: 0 17px 32px rgba(37, 99, 235, 0.26), 0 8px 18px rgba(15, 23, 42, 0.12);
+}
+
+.account-app .profile-settings-submit:not(:disabled):active {
+    transform: translateY(0) scale(0.985);
+    box-shadow: 0 7px 16px rgba(37, 99, 235, 0.2);
+}
+
+.dark .account-app .profile-settings-submit {
+    border-color: rgba(125, 211, 252, 0.24);
+    background: linear-gradient(135deg, #1e40af 0%, #2563eb 58%, #0f766e 140%);
+    color: #f8fafc;
+    box-shadow: 0 14px 28px rgba(2, 6, 23, 0.36), 0 5px 14px rgba(37, 99, 235, 0.2);
+}
+
+.dark .account-app .profile-settings-submit:not(:disabled):hover {
+    border-color: rgba(125, 211, 252, 0.52);
+    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 58%, #0e7490 140%);
+    box-shadow: 0 18px 34px rgba(2, 6, 23, 0.48), 0 8px 20px rgba(14, 165, 233, 0.2);
+}
+
+.account-app .profile-settings-submit:disabled {
+    cursor: not-allowed;
+    opacity: 0.58;
+    transform: none;
+    box-shadow: none;
+}
+
+@media (max-width: 520px) {
+    .account-app .profile-settings-submit {
+        width: 100%;
+        min-width: 0;
+    }
 }

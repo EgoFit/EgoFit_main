@@ -1010,8 +1010,8 @@
         }
 
         .automatic-session-targets__header {
-            grid-template-columns: 1fr;
-            align-items: stretch;
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: start;
         }
 
         .automatic-preview-summary {
@@ -1070,6 +1070,113 @@
             width: 100%;
             min-width: 0;
         }
+    }
+
+    .automatic-design-panel {
+        padding: 0;
+        overflow: hidden;
+    }
+
+    .automatic-session-targets.automatic-design-panel,
+    .automatic-program-meta.automatic-design-panel {
+        gap: 0;
+    }
+
+    .automatic-session-targets__body,
+    .automatic-program-meta__body {
+        display: grid;
+        gap: 12px;
+    }
+
+    .automatic-session-targets__copy {
+        justify-self: start;
+    }
+
+    .automatic-session-targets__intro {
+        max-width: 780px;
+        margin: 0;
+        color: var(--admin-muted, #64748b);
+        font-size: .78rem;
+        line-height: 1.8;
+    }
+
+    .automatic-design-panel__summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        min-height: 4rem;
+        padding: .8rem 1.1rem;
+        color: var(--admin-text, #172033);
+        cursor: pointer;
+        list-style: none;
+    }
+
+    .automatic-design-panel__summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .automatic-design-panel__summary > span:first-child {
+        display: grid;
+        gap: .15rem;
+    }
+
+    .automatic-design-panel__summary small {
+        color: var(--admin-muted, #64748b);
+        font-size: .74rem;
+        font-weight: 800;
+    }
+
+    .automatic-design-panel__summary strong {
+        font-size: 1rem;
+        font-weight: 900;
+    }
+
+    .automatic-design-panel__summary h2 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 900;
+    }
+
+    .automatic-design-panel__summary:focus-visible {
+        outline: 3px solid rgba(20, 184, 166, .38);
+        outline-offset: -3px;
+    }
+
+    .automatic-design-panel__chevron {
+        font-size: 1.35rem;
+        transition: transform .18s ease;
+    }
+
+    .automatic-design-panel[open] .automatic-design-panel__chevron {
+        transform: rotate(180deg);
+    }
+
+    .automatic-design-panel__body {
+        padding: 0 1.1rem 1.1rem;
+    }
+
+    .automatic-program-item--cardio .automatic-program-movement {
+        display: none;
+    }
+
+    .automatic-cardio-target-note {
+        margin: 0 0 1rem;
+        padding: .9rem 1rem;
+        border: 1px solid rgba(20, 184, 166, .22);
+        border-radius: 1rem;
+        color: #0f766e;
+        background: rgba(20, 184, 166, .07);
+        line-height: 1.8;
+    }
+
+    .automatic-cardio-target-note[hidden] {
+        display: none;
+    }
+
+    .automatic-design-panel [hidden],
+    .automatic-session-targets [hidden] {
+        display: none !important;
     }
 
     @media (prefers-reduced-motion: reduce) {

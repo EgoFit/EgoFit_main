@@ -25,7 +25,7 @@
             </div>
         {% endif %}
 
-        <form method="post" class="stack-form auth-mobile-form__stack" novalidate>
+        <form method="post" class="stack-form auth-mobile-form__stack" data-otp-request-form novalidate>
             {% csrf_token %}
             <div class="field-group">
                 {% trans 'شماره موبایل' as default_phone_label %}
