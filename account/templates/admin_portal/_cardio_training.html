@@ -13,6 +13,7 @@
         </div>
         <span class="admin-cardio-targets__chevron" aria-hidden="true">⌄</span>
     </summary>
+    <div class="admin-cardio-targets__content">
     <a href="{% url 'register:admin_health' target_user.id %}" class="admin-cardio-targets__link">{% trans 'سوابق سلامت' %}<span aria-hidden="true">←</span></a>
 
     <div class="admin-cardio-targets__metrics">
@@ -66,4 +67,5 @@
             {% if not cardio_training.has_resting_bpm or not cardio_training.resting_bpm_valid %}<a href="{% url 'register:admin_health' target_user.id %}" class="admin-cardio-targets__link">{% trans 'بررسی ضربان استراحت' %}<span aria-hidden="true">←</span></a>{% endif %}
         </div>
     {% endif %}
+    </div>
 </details>

@@ -30,7 +30,9 @@
         </div>
     </article>
 
-    {% include 'admin_portal/_cardio_training.html' %}
+    <div class="admin-cardio-targets-section__wrapper">
+        {% include 'admin_portal/_cardio_training.html' %}
+    </div>
 
     <section class="admin-menu-list">
         <a href="{% url 'register:admin_personal_info' target_user.id %}" class="admin-menu-item">
@@ -68,6 +70,7 @@
     </section>
 
     <section class="admin-workout-records-section">
+        <div class="admin-workout-records-section__wrapper">
         <details class="admin-workout-records admin-collapsible" {% if workout_record_query %}open{% endif %}>
             <summary class="admin-collapsible__summary">
             <div>
@@ -112,6 +115,7 @@
             </div>
             </div>
         </details>
+        </div>
     </section>
 
     <section class="admin-data-preview">

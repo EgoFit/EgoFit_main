@@ -285,12 +285,25 @@
 .admin-workout-records {
     display: grid;
     gap: 16px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
     margin-top: 18px;
     padding: 18px;
     border: 1px solid rgba(209, 213, 219, 0.9);
     border-radius: 18px;
     background: #fff;
     box-shadow: 0 12px 26px rgba(15, 23, 42, 0.06);
+}
+
+.admin-workout-records-section__wrapper {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .admin-collapsible {
@@ -340,6 +353,14 @@
     margin-top: 16px;
 }
 
+.admin-workout-records .admin-collapsible__content,
+.admin-workout-records__table-wrap {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
 .admin-workout-records__header,
 .admin-workout-records__filter > div {
     display: flex;
@@ -375,6 +396,11 @@
 .admin-workout-records__filter input {
     flex: 1;
     min-width: 0;
+}
+
+.admin-workout-records__filter > div {
+    min-width: 0;
+    flex-wrap: wrap;
 }
 
 .admin-workout-records__table-wrap {
@@ -638,12 +664,14 @@
 
 .admin-bottom-nav__submenu {
     position: absolute;
-    inset-inline-end: 0;
+    inset-inline-start: 0;
+    inset-inline-end: auto;
     bottom: calc(100% + 10px);
     z-index: 70;
     display: grid;
     gap: 5px;
-    width: min(220px, calc(100vw - 32px));
+    width: min(220px, calc(100vw - 24px));
+    box-sizing: border-box;
     padding: 8px;
     border: 1px solid rgba(148, 163, 184, 0.2);
     border-radius: 18px;
@@ -653,6 +681,10 @@
     -webkit-backdrop-filter: blur(18px) saturate(140%);
     list-style: none;
     margin: 0;
+}
+
+.admin-bottom-nav__group:not([open]) > .admin-bottom-nav__submenu {
+    display: none;
 }
 
 .admin-bottom-nav__submenu > li {
@@ -1446,11 +1478,37 @@
 .admin-cardio-targets {
     display: grid;
     gap: 18px;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
     padding: clamp(16px, 2.5vw, 24px);
     border: 1px solid rgba(52, 84, 209, .16);
     border-radius: 22px;
     background: linear-gradient(145deg, #fff 0%, #f7f9ff 100%);
     box-shadow: 0 16px 36px rgba(25, 43, 94, .08);
+}
+
+.admin-cardio-targets-section__wrapper {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.admin-cardio-targets__content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.admin-cardio-targets > * {
+    min-width: 0;
+    max-width: 100%;
 }
 
 .admin-cardio-targets > summary {
@@ -1494,9 +1552,18 @@
 .admin-cardio-targets__header {
     justify-content: space-between;
     gap: 16px;
+    min-width: 0;
 }
 
-.admin-cardio-targets__title-wrap { gap: 13px; min-width: 0; }
+.admin-cardio-targets__title-wrap {
+    flex: 1 1 auto;
+    gap: 13px;
+    min-width: 0;
+}
+
+.admin-cardio-targets__title-wrap > div {
+    min-width: 0;
+}
 
 .admin-cardio-targets__icon {
     flex: 0 0 46px;
@@ -1538,6 +1605,8 @@
     margin: 4px 0 0;
     color: #64748b;
     font-size: .78rem;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
 }
 
 .admin-cardio-targets__link {
@@ -1602,7 +1671,11 @@
 .admin-cardio-targets__metric--accent strong { color: var(--primary, #3454d1); }
 
 .admin-cardio-targets__table-wrap {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
     overflow-x: auto;
+    overscroll-behavior-inline: contain;
     border: 1px solid #e7ebf3;
     border-radius: 16px;
     background: #fff;
@@ -1728,7 +1801,12 @@
 
 .admin-cardio-targets__empty strong { color: #172033; font-size: .82rem; }
 .admin-cardio-targets__empty p { margin: 0; color: #64748b; font-size: .75rem; line-height: 1.8; }
-.admin-cardio-targets__empty .admin-cardio-targets__link { justify-self: start; margin-top: 3px; }
+.admin-cardio-targets__empty .admin-cardio-targets__link {
+    justify-self: start;
+    max-width: 100%;
+    margin-top: 3px;
+    white-space: normal;
+}
 
 .dark .admin-dashboard .admin-cardio-targets {
     border-color: rgba(99, 124, 235, .26);
